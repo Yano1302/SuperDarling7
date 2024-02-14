@@ -11,18 +11,18 @@ using Debug = UnityEngine.Debug;
 /// オーディオを一括管理するシングルトンクラスです。インスタンスはAudioManager.Instanceで取得できます<br />
 /// SE/BGM用のResourcesフォルダを作成し、そこに音源を格納してください<br />
 /// 再生等は音源ファイル名で行うので、命名規則などを設けてください<br />
-/// 作成者はPG2年の矢野洋平です　疑問点や改善点、バグ報告等あれば気軽にご連絡ください<br />
+/// 作成者はPG2年の矢野洋平です　疑問点や改善点、実装してほしい機能、バグ報告等あれば気軽にご連絡ください<br />
 /// </summary>
 
 public class AudioManager : SingletonMonoBehaviour<AudioManager>
 {
 // Config変数  //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
-    private const int    c_MaxSoundOverlap = 10;                                                              //オーディオの最大個数(BGM込み)
-    private const string c_FolderPath_BGM = "C:\\Users\\yano3\\Desktop\\Content_3\\スパダリセブン(UnityData)\\Assets\\Audio\\BGM\\Resources"; //BGMが格納されているフォルダのパス
-    private const string c_FolderPath_SE = "C:\\Users\\yano3\\Desktop\\Content_3\\スパダリセブン(UnityData)\\Assets\\Audio\\SE\\Resources";   //SEが格納されているフォルダのパス
+    private const int    c_MaxSoundOverlap = 10;                     //オーディオの最大個数(BGM込み)
+    private const string c_FolderPath_BGM = "Audio\\BGM\\Resources"; //BGMが格納されているフォルダのパス
+    private const string c_FolderPath_SE = "Audio\\SE\\Resources";   //SEが格納されているフォルダのパス
 
-    private const float c_SoundVolume = 0.5f;                                                                  //SoundVolumeの初期値
-    private const float c_FadeTimer = 1.0f;                                                                    //FadeTimeのデフォルト値
+    private const float c_SoundVolume = 0.5f;                        //SoundVolumeの初期値
+    private const float c_FadeTimer = 1.0f;                          //FadeTimeのデフォルト値
 //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
 
 
@@ -35,6 +35,7 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
 
     /// <summary>フェードにかける時間のデフォルト値を取得・変更します</summary>
     public float DefaultFadeTime { get { return m_defaltTime; } set { m_defaltTime = value; } }
+
 
 
     //  音量設定    //
@@ -54,7 +55,7 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
         }
     }
 
-    /// <summary>〇BGMの音量を徐々に変化させます   <br/>※フェード実行中フェード処理以外からBGMの音量が変化した場合フェード処理は停止されます。<br/>※渡された関数も呼ばれません </summary>
+    /// <summary>BGMの音量を徐々に変化させます   <br/>※フェード実行中フェード処理以外からBGMの音量が変化した場合フェード処理は停止されます。<br/>※渡された関数も呼ばれません </summary>
     /// <param name="volume">設定する音量</param>
     /// <param name="fadeTime">設定した音量になるまでの時間(秒)　※指定しない場合はFadeTimeが使用されます</param>
     /// <param name="action">フェード後に行う実行関数(必要な場合のみ)</param>
@@ -71,54 +72,50 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
         }
     }
 
-    /// <summary>〇現在PlaySoundから再生されているサウンドの音量を変更します</summary>
-    /// <param name="volume"></param>
-    /// <param name="clipName">サウンドの音源指定(指定がない場合は全ての音量が変更されます)</param>
-    /// <returns>音量を変更したオーディオソースを格納したリストを返します</returns>
-    public List<AudioSource> SetVolume(float volume,string clipName = null) {
-        if (GetUsingSource(out var sources)) {
-            bool check = false;
-            //指定なしの場合
-            UnityAction<AudioSource> action =
-                clipName == null ? (AudioSource s) => {
-                    check = true;
-                    s.volume = volume;
-                    Log(s.name + "の音量が変更されます。\n変更後の音量 : " + volume, false); 
-                }
-            //指定ありの場合
-            : (AudioSource s) => {
-                if (s.clip.name == clipName) {
-                    check = true;
-                    s.volume = volume;
-                    Log(s.name + "の音量が変更されます。\n変更後の音量 : " + volume, false);
-                }
-                else {
-                    sources.Remove(s);
-                }
-            };
+    public bool SetAllVolume();
 
-            foreach(var source in sources) {
-                if (source.isPlaying) {
-                  action(source);
+    /// <summary>現在PlaySoundから再生されているサウンドの音量を変更します</summary>
+    /// <param name="volume"></param>
+    /// <param name="clipName">サウンドの指定(同じサウンドがあった場合はすべて変更されます)</param>
+    /// <returns>音源が見つかった場合はtrueを返します</returns>
+    public bool  SetVolume(string clipName,float volume) {
+        bool check = GetUsingSource(out var sds);
+            foreach(var sd in sds) {
+                if (sd.Source.isPlaying) {
+                  sd.Source.volume = volume;
+                Log(sd.Source.clip + "の音量が" + volume + "に変更されます。", false);
                 }
             }
             if (!check) {
                 Log("指定された音源は再生されていませんでした。 : " + clipName, true);
-                return null;
             }
-            return sources;
-        }
-        else {
-            Log("再生されている音源は見つかりませんでした。",true);
-            return null;
-        }
+        return check;
     }
-    
 
-
-    public void SetVolume_Fade(float volume,string clipName,float fadeTime = float.NaN,UnityAction action = null) {
-
+    /// <summary>BGMを除く再生されている音源の音量を徐々に変更します。</summary>
+    /// <param name="clipName">音源指定(指定された音源が複数ある場合は全て変更されます)</param>
+    /// <param name="volume">変更後の音量</param>
+    /// <param name="fadeTime">フェード時間</param>
+    /// <param name="action">フェード後に行う実行関数(必要な場合のみ) 
+    /// <br/>※フェード実行中フェード処理以外からBGMの音量が変化した場合フェード処理は停止されます。※渡された関数も呼ばれません
+    /// <br/>またフェードが完了する前に再生が終了した場合も呼ばれません。再生終了を取得したい場合はフェード時間を短くするか、PlaySoundに関数を渡しつつ実行し、SetVolumeFadeからフェードを実装してください。
+    /// </param>
+    /// <returns>再生されている音源が見つかった場合はtrueを返します</returns>
+    public bool SetVolume_Fade(string clipName,float volume,float fadeTime = float.NaN,UnityAction action = null) {
+        if (GetUsingSource(out var sds)) {
+            bool check = false;
+            foreach (var sd in sds) {
+                if (clipName == sd.Source.clip.name) {
+                    StartCoroutine(FadeSound(sd.Source, fadeTime, volume, action, false));
+                    check = true;
+                }
+            }
+            return check;
+        }
+        return false;
     }   
+
+
 
     //  再生関数    //
 
@@ -177,15 +174,15 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     /// <param name="action">再生された音源が停止された場合に関数を実行します。(必要な場合のみ)
     /// <br/>※音源が最後まで再生されず停止された場合にも関数が実行されます。注意してください。
     /// <br/>※また、ループが有効な場合はループ再生が停止されるまで関数は呼ばれません。</param>
-    /// <returns>再生に使用しているオーディオソースを返します。再生が出来ない場合はnullを返します。</returns>
-    public AudioSource PlaySound(string clipName, float volume = float.NaN, bool IsLoop = false, UnityAction action = null) {
+    /// <returns>再生時に割り振られたIDを取得します。再生が出来なかった場合はint.MinValueを返します</returns>
+    public int PlaySound(string clipName, float volume = float.NaN, bool IsLoop = false, UnityAction action = null) {
         //現在音を鳴らせる状態か先に調べる
         if (!CanPlay) {
             Log("現在再生フラグがオフになっているため、再生できません。", true);
-            return null;
+            return int.MinValue;
         }
-        if (!GetNotUsedSource(out AudioSource ads)) {
-            return null;
+        if (!GetNotUsedSource(out SoundData sd)) {
+            return int.MinValue;
         }
         //音源を取得する
         bool check = ClipList_SE.TryGetValue(clipName, out AudioClip clip);
@@ -195,22 +192,24 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
             //BGM音源からも取得できなかった場合はnullを返す
             if (!check) {
                 GameSystem.LogError("音源ファイル名が間違っているかファイルが存在しません\nファイル名 : " + clipName);
-                return null;
+                return int.MinValue;
             }
             Log("PlaySound関数からBGM音源が再生されます。", true);
         }
         //音量などの設定
         //デフォルト値であれば正しい値を与える
-        ads.volume = float.IsNaN(volume) ? m_defaltVolume : volume;
-        ads.loop = IsLoop;
-        ads.clip = clip;
-        ads.Play();
+        sd.Source.volume = float.IsNaN(volume) ? m_defaltVolume : volume;
+        sd.Source.loop = IsLoop;
+        sd.Source.clip = clip;
+        sd.Source.Play();
         Log(clip, true);
         if (action != null) {
-            StartCoroutine(CheckPlaying(ads, action));
+            StartCoroutine(CheckPlaying(sd.Source, action));
         }
-        return ads;
+        return sd.ID;
     }
+
+   
 
 
     //  停止関数    //
@@ -245,51 +244,80 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
 
     }
 
+    /// <summary>指定されたサウンドを停止させます</summary>
+    /// <param name="clipName">サウンド指定</param>
+    /// <returns>指定されたサウンドが再生中であればtrueを返します</returns>
+    public bool StopSound(string clipName) {
+        bool check = GetUsingSource(out var sds);
+        if (check) {
+            foreach (var sd in sds) {
+                if (sd.Source.clip.name == clipName) {
+                    sd.Source.Stop();
+                }
+            }
+        }
+        return check;
+    }
+
     /// <summary>再生されているサウンドを全て停止させます。</summary>
-    public void StopAllSound(bool IsIncludingBGM) {
+    /// <returns>呼び出し時点で再生されているサウンドがあった場合はtrueを返します。
+    /// <br/>IsIncludingBGMがtrueの場合はBGMのみが再生されていた場合でもtrueを返します</returns>
+    public bool StopAllSound(bool IsIncludingBGM) {
         bool check = false;
         if (IsIncludingBGM) {
             check = m_BGMSource.isPlaying;
             BGM_Stop();
         }
-        if (GetUsingSource(out List<AudioSource> adsList)) {
-            foreach (var ads in adsList) {
-                ads.Stop();
+        string str = check ? "BGM以外に再生されている音源はありませんでした。":null;     
+        if (GetUsingSource(out var sds, str)) {
+            foreach (var ad in sds) {
+                ad.Source.Stop();
+                check = true;
             }
         }
-        else {
-            GameSystem.Action(() =>
-            {
-                if (check) {
-                    Log("BGM以外に再生されている音源はありませんでした。", true);
-                }
-                else {
-                    Log("再生されている音源はありませんでした", true);
-                }
-            });
-        }
+        return check;
     }
 
     /// <summary>PlaySoudから再生されたループ中のサウンドの再生をすべて停止します</summary>
-    public void StopLoopSound() {
-        if (GetUsingSource(out List<AudioSource> adsList)) {
-            bool check = false;
-            foreach (var ads in adsList) {
-                if (ads.isPlaying && ads.loop) {
+    /// <returns>PlaySoundからループ再生中のサウンドがあった場合はtrueを返します</returns>
+    public bool StopLoopSound() {
+        bool check = false;
+        if (GetUsingSource(out var sds)) {
+            foreach (var ad in sds ) {
+                if (ad.Source.isPlaying && ad.Source.loop) {
                     check = true;
-                    Log(ads.clip,false);
-                    ads.Stop();
+                    Log(ad.Source.clip,false);
+                    ad.Source.Stop();
                 }
             }
             if (!check) {
                 Log("ループ再生されている音源はありませんでした。", true);
             }
         }
-        else {
-            Log("再生されている音源は見つかりませんでした。",true);
-        }
-
+        return check;
     }
+
+    /// <summary>ループ中ではないサウンドを全て停止させます。 </summary>
+    /// <returns>ループではない再生中のサウンドがあった場合はtrueを返します</returns>
+    public bool StopNotLoopSound()
+    {
+        bool check = false;
+        if (GetUsingSource(out var sds)) {
+            foreach (var sd in sds) {
+                if (sd.Source.isPlaying && !sd.Source.loop) {
+                    check = true;
+                    Log(sd.Source.clip, false);
+                    sd.Source.Stop();
+                }
+            }
+            if (!check) {
+                Log("ループ再生されていない音源はありませんでした。", true);
+            }
+        }
+        return check;
+    }
+    
+   
 
 
     //  一時停止・再開   //
@@ -323,221 +351,130 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
 
     }
 
-    /// <summary>〇再生されているサウンドを全てポーズします</summary>
+    /// <summary>再生されているサウンドを全てポーズします</summary>
     /// <param name="IsIncludingBGM">BGMも含めるかどうか</param>
-    public void PauseAllSound(bool IsIncludingBGM) {
+    /// <returns>再生されているサウンドがあった場合trueを返します
+    /// </br>IsIncludingBGMがtrueの場合はBGMのみが再生されていた場合もtrueを返します。</returns>
+    public bool PauseAllSound(bool IsIncludingBGM) {
         bool check = false;
         if (IsIncludingBGM) {
             check = m_BGMSource.isPlaying;
             BGM_Pause();
         }
-
-        if (GetUsingSource(out List<AudioSource> adsList)) {
+        string str = check ? "BGM以外に再生されている音源はありませんでした。" : m_BGMSource.isPlaying ? "BGM以外に再生されている音源はありませんでした。(BGMはポーズされません)" : null;
+        if (GetUsingSource(out var sds,str)) {
             check = true;
-            foreach (var ads in adsList) {
-                ads.Stop();
+            foreach (var sd in sds) {
+                sd.Source.Stop();
             }
         }
-        else {
-            GameSystem.Action(() =>
-            {
-                if (check) {
-                    Log("BGM以外に再生されている音源はありませんでした。", true);
-                }
-                else if (m_BGMSource.isPlaying) {
-                    Log("BGM以外に再生されている音源はありませんでした。(BGMはポーズされません)", true);
-                }
-                else {
-                    Log("再生されている音源はありませんでした", true);
-                }
-            });
-        }
+        return check;
     }
 
     /// <summary>全てのポーズされている音源を再開させます</summary>
     /// <param name="IsIncludingBGM">BGMも含めるかどうか</param>
-    public void RestertAllSound(bool IsIncludingBGM) {
+    /// <returns>ポーズ中の音源があった場合はtrueを返します
+    /// <br/>IsIncludingがtrueの場合はBGMのみがポーズ中だった場合でもtrueを返します
+    /// <br/>ただしCanPlay(再生可能フラグ)がfalseだった場合はポーズ中の音源があった場合でもfalseを返します。</returns>
+    public bool RestertAllSound(bool IsIncludingBGM) {
+        bool check = false;
         if (!CanPlay) {
             Log("現在再生フラグがオフになっているため、再生できません。", true);
-            return;
+            return　check;
         }
 
-
-        if (IsIncludingBGM) {
-            if(!m_BGMSource.isPlaying && m_BGMSource.time != 0) {
+        if (!m_BGMSource.isPlaying && m_BGMSource.time != 0) {
+            check = true;
+            if (IsIncludingBGM) {
                 m_BGMSource.Play();
             }
-            else {
-                Log("BGMは中断されていません",true);
-            }
         }
-        bool check = false;
-        if (GetUsingSource(out List<AudioSource> adsList)) {
-            foreach (var ads in adsList) {
-                if (!ads.isPlaying && ads.time != 0) {
-                    Log(ads.clip,true);
-                    ads.Play();
+        bool c2 = GetNotUsedSource(out List<SoundData> sds);
+        if (c2) {
+            foreach (var sd in sds) {
+                if (!sd.Source.isPlaying && sd.Source.time != 0) {
+                    Log(sd.Source.clip,true);
+                    sd.Source.Play();
                     check = true;
                 }
             }
-
-            if (!check) {
-                Log("中断されているサウンドはありません。",true);
+            if (IsIncludingBGM && !check) {
+                Log("BGMはポーズ中ではありませんでした。",true);
             }
-        }     
+            return c2;
+        }
+        else if (check) {
+            string str = IsIncludingBGM ? "BGMのみがポーズから再開されます":"BGM以外のポーズ中の音源はありません。(ポーズは解除されません)";
+            Log(str, true);
+        }
+        else{
+            Log("ポーズ中の音源はありませんでした。",true);
+        }
+        return check;
     }
 
 
-  
-    
-    //   〇ループ中ではないサウンドを全て停止させます。
-    /// <summary>
-    /// 〇ループ中ではないサウンドを全て停止させます。
-    /// </summary>
-    /// <param name="FadeTime">フェードアウトまでの時間(すぐ消したい場合は０)</param>
-    //endregion
-    //  public void Stop_NotInLoop_Sound(float FadeTime,UnityAction action = null)
-    //  .
-    //  {
-    //      int check = -1;
-    //      for (int i = 0; i < source.Length; ++i)
-    //      {
-    //          if (source[i].isPlaying && !source[i].loop)
-    //          {
-    //              if (0 <= check)
-    //              { Task task = AsyncFadeOutSound(source[check], FadeTime, null); }
-    //              check = i;
-    //          }    
-    //      }
-    //      if (0 <= check)
-    //      { Task task = AsyncFadeOutSound(source[check], FadeTime, action); }
-    //      else
-    //          Debug.LogWarning("再生されている音源はありませんでした");
-    //  }
-    //  
-    //
 
-    //
-    //   〇指定した音源のサウンドが再生されていた場合それを停止します
-    /// <summary>
-    /// 指定した音源のサウンドが再生されていた場合それを停止します(BGMは除く)
-    /// </summary>
-    /// <param name="clip">停止させる音源</param>
-    /// <param name="FadeTime">フェードアウトアウトまでの時間(すぐ消したい場合は０)</param>
-    /// <param name="action">フェードが終わった際に関数を呼び出したい場合は使用してください。必要なければnullを渡してください</param>
-    /// <returns>再生を停止させた場合trueを返し、指定した音源が再生されていなかった場合はfalseを返します</returns>
-    //
-    //  public void Stop_Select_Sound(AudioClip clip, float FadeTime,UnityAction action = null)
-    //  .
-    //  {
-    //      int check = -1;
-    //      //フェードアウト処理
-    //      for (int i = 0; i < source.Length; ++i)
-    //      {
-    //          if (source[i].isPlaying && source[i].clip == clip)
-    //          {      
-    //              if (0 <= check)
-    //              { Task task = AsyncFadeOutSound(source[check], FadeTime, null); }
-    //              check = i;
-    //          }
-    //      }
-    //
-    //      if (0 <= check)
-    //      {
-    //          Task task = AsyncFadeOutSound(source[check], FadeTime,action);
-    //      }
-    //      else
-    //      {
-    //          Debug.LogWarning(clip.name + "は再生されていませんでした。");
-    //      }
-    //  }
-    //  
-    //
-    //   〇指定した音源のサウンドが再生されていた場合、そのサウンドの音量を変更します。同じ音源のサウンドが複数見つかった場合は全て変更されます。
-    /// <summary>
-    /// 〇指定した音源のサウンドが再生されていた場合、そのサウンドの音量を変更します。同じ音源のサウンドが複数見つかった場合は全て変更されます。
-    /// </summary>
-    /// <param name="clip">変更したいサウンドの音源</param>
-    /// <param name="SetVolume">変更後の音量</param>
-    /// <param name="FadeTime">この時間をかけて徐々に変更します(すぐ変更したい場合は０)</param>
-    /// <param name="action">フェードが終わった際に関数を呼び出したい場合は使用してください。必要なければnullを渡してください</param>
-    //
-    //  public void Set_Volume_Select_Sound(AudioClip clip, float SetVolume, float FadeTime,UnityAction action = null)
-    //  .
-    //  {
-    //      int check = -1;
-    //      for (int i = 0; i < source.Length; ++i)
-    //      {
-    //          if (source[i].isPlaying && source[i].clip == clip)
-    //          {
-    //              if (0 <= check)
-    //              { Task task = AsyncChangeVolume(source[check], SetVolume, FadeTime, null); }
-    //              check = i;
-    //          }
-    //      }
-    //
-    //      if(0 <= check)
-    //      {
-    //          Task task = AsyncChangeVolume(source[check], SetVolume, FadeTime,action);
-    //      }
-    //      else
-    //          Debug.LogWarning(clip.name + "は再生されていませんでした。");
-    //  }
-    //  
-    //
-    //   〇現在再生されているサウンドがあるか調べます
-    /// <summary>
-    /// 〇現在再生されているサウンドがあるか調べます
-    /// </summary>
-    /// <returns>再生されている音源がある場合trueを返します</returns>
-    //
-    //  public bool Check_IsPlaying_Sound()
-    //  .
-    //  {
-    //      for (int i = 0; i < source.Length; ++i)
-    //      {
-    //          if (source[i].isPlaying)
-    //              return true;
-    //      }
-    //      return false;
-    //  }
-    //  
-    //
-    //   〇今再生されている音源をすべてコンソール上に表示します(デバッグ用)
-    /// <summary>
-    /// 〇今再生されている音源をすべてコンソール上に表示します(デバッグ用)
-    /// </summary>
-    //    
-    //  [Conditional("UNITY_EDITOR")]
-    //  public void Display_IsPlaying_ClipName()
-    //  .
-    //  {
-    //      bool find = false;
-    //      for (int i = 0; i < source.Length; ++i)
-    //      {
-    //          if (source[i].isPlaying)
-    //          {
-    //              find = true;
-    //              Debug.Log(source[i].clip.name);
-    //          }
-    //      }
-    //      if (!find)
-    //          Debug.Log("再生されている音源はありませんでした。");
-    //  }
-    //  
-    //
+    //  その他   //
+
+    /// <summary>指定された音源を取得します</summary>
+    /// <returns>音源情報を返します。見つからなかった場合はnullを返します。</returns>
+    public AudioClip GetAudioClip(string clipName) {
+        bool check = ClipList_BGM.TryGetValue(clipName, out AudioClip audioClip);
+        if (check) {
+            return audioClip;
+        }
+        
+        check = ClipList_SE.TryGetValue(clipName,out audioClip);
+        if (check) {
+            return audioClip;
+        }
+        else {
+            GameSystem.LogError("音源ファイル名が間違っているかファイルが存在しません\nファイル名 : " + clipName);
+            return null;
+        }
+    }
+
+
+    //現在再生されている音源数を取得します。
+
+
+    /// <summary>(デバッグ用)今再生されている音源をすべてコンソール上に表示します</summary>    
+    [Conditional("UNITY_EDITOR")]
+    public void IsPlayingSoundLog(){
+        if (m_BGMSource.isPlaying){
+            Debug.Log("再生されているBGM : " + m_BGMSource.clip.name);
+        }
+
+         if (GetUsingSource(out var sds)) {
+            foreach (var sd in sds) {
+                Debug.Log("再生されているサウンド : " + sd.Source.clip.name);
+            }
+         }       
+      }
+      
+    
+
+
+
 
     //  プライベート変数  //------------------------------------------------------------------------------------------------------------------------------
 
+    //オーディオソースを管理する構造体
+    private struct SoundData {
+        public AudioSource Source;
+        public int ID;
+    }
     //使用するオーディオソース
-    private AudioSource[] m_SoundSource;                       
-    private AudioSource m_BGMSource;
+    private SoundData[] m_SDatas;                       
+    private AudioSource m_BGMSource = null;
     //音源リスト
     private Dictionary<string, AudioClip> ClipList_BGM;     //BGMのリスト
     private Dictionary<string, AudioClip> ClipList_SE;      //SEのリスト
     //その他
     private float m_defaltVolume = c_SoundVolume;           //デフォルトのvolume
     private float m_defaltTime = c_FadeTimer;               //デフォルトのフェード時間
+    private int m_IDN = int.MinValue + 1;                   //ID配布用の番号
     [SerializeField, TooltipAttribute("再生される音源などをログに表示するかどうか(エラーメッセージは除く)")] private bool PlaySoundLog = true;
     //  プライベート関数  //------------------------------------------------------------------------------------------------------------------------------
 
@@ -546,11 +483,12 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     {
         base.Awake();
         //オーディオソースの作成----------------------------------------------------
-        if (m_SoundSource == null) {
+        if (m_BGMSource == null) {
             m_BGMSource = gameObject.AddComponent<AudioSource>();
-            m_SoundSource = new AudioSource[c_MaxSoundOverlap - 1];
-            for (int i = 0; i < m_SoundSource.Length; ++i) {
-                m_SoundSource[i] = gameObject.AddComponent<AudioSource>();
+            m_SDatas = new SoundData[c_MaxSoundOverlap - 1];
+            for (int i = 0; i < m_SDatas.Length; ++i) {
+                m_SDatas[i].Source = gameObject.AddComponent<AudioSource>();
+                m_SDatas[i].ID = int.MinValue;
             }
             //ファイルの読み込み----------------------------------------------------
             ClipList_BGM = new Dictionary<string, AudioClip>();
@@ -564,35 +502,58 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     //  実行関数    //-----------------------------------------------------------------------------
 
     /// <summary>使われていないオーディオソースの取得</summary>
-    private bool GetNotUsedSource(out AudioSource s)
+    private bool GetNotUsedSource(out SoundData s)
     {
-        s = null;
-      for (int i = 0; i < m_SoundSource.Length; ++i) {
-          if (!m_SoundSource[i].isPlaying && m_SoundSource[i].time == 0) {;
-                s = m_SoundSource[i];
+      for (int i = 0; i < m_SDatas.Length; ++i) {
+          if (!m_SDatas[i].Source.isPlaying && m_SDatas[i].Source.time == 0) {
+                m_SDatas[i].ID = GetID();
+                s = m_SDatas[i];
                 return true;
           }
       }
-        GameSystem.LogError("一度に鳴らせる音の最大数を超えています");
+        Log("一度に鳴らせる音の最大数を超えています",true);
+        s.ID = int.MinValue;
+        s.Source = null;
         return false;
     }
-
-    /// <summary>使われているオーディオソースの取得</summary>
-    private bool GetUsingSource(out List<AudioSource> s) {
-        s = new List<AudioSource> ();
+    /// <summary>使われていないオーディオソースの取得(全て)</summary>
+    private bool GetNotUsedSource(out List<SoundData> s) {
         bool check = false;
-        for (int i = 0; i < m_SoundSource.Length; ++i) {
-            if (m_SoundSource[i].isPlaying) {
-                s.Add (m_SoundSource[i]);
+        s = new List<SoundData> ();
+        for (int i = 0; i < m_SDatas.Length; ++i) {
+            if (!m_SDatas[i].Source.isPlaying && m_SDatas[i].Source.time == 0) {
+                m_SDatas[i].ID = GetID();
+                s.Add(m_SDatas[i]);
                 check = true;
             }
         }
         return check;
     }
 
+    /// <summary>使われているオーディオソースの取得</summary>
+    private bool GetUsingSource(out List<SoundData> s,string noneLog = null) {
+        s = new List<SoundData> ();
+        bool check = false;
+        for (int i = 0; i < m_SDatas.Length; ++i) {
+            if (m_SDatas[i].Source.isPlaying) {
+                s.Add (m_SDatas[i]);
+                check = true;
+            }
+        }
+        GameSystem.Action(() => {
+            if (!check) {
+               noneLog = noneLog ?? "再生されている音源はありませんでした。";
+                Log(noneLog,true);
+            } 
+        });
+
+        return check;
+    }
+
     /// <summary> フォルダのパスからフォルダ内の全ての音源をロードし、リストに追加する</summary>
     private void SetAudioClip(Dictionary<string,AudioClip> dic, string path) {
 
+        path = Application.dataPath + "/" + path;
         string[] fileNames = Directory.GetFiles(path, "*", SearchOption.AllDirectories)
             .Where(s => !s.EndsWith(".meta", System.StringComparison.OrdinalIgnoreCase)).ToArray();
         Debug.Assert(fileNames != null, "フォルダが見つかりませんでした");
@@ -662,6 +623,13 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
             }
             yield return null;
         }
+    }
+
+    /// <summary>サウンドを識別するIDを取得します(簡易的)</summary>
+    private int GetID(){
+        int id = m_IDN == int.MinValue ? int.MinValue + 1 : m_IDN;
+        m_IDN++;
+        return id;
     }
 
     //  デバッグ用   //----------------------------------------------------------------------------
