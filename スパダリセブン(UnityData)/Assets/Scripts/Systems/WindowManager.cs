@@ -226,7 +226,7 @@ public class WindowManager : SingletonMonoBehaviour<WindowManager>
             if (m_EnableDelay)
             {
                 m_IsAvailable = false;
-                GameSystem.Instance.WaitCallBack(c_OCDeley, () => m_IsAvailable = true);
+                UsefulSystem.Instance.WaitCallBack(c_OCDeley, () => m_IsAvailable = true);
             }
             return true;
         }

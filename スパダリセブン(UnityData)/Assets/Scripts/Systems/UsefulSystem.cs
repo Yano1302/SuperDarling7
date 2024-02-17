@@ -29,7 +29,7 @@ using Debug = UnityEngine.Debug;
 ///  また、記載の際にsummaryコメント等を出来る限り残してください。
 ///  
 /// </summary>
-public class GameSystem : SingletonMonoBehaviour<GameSystem>
+public class UsefulSystem : SingletonMonoBehaviour<UsefulSystem>
 {
     //  関数一覧    //
 

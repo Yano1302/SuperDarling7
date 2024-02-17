@@ -75,12 +75,12 @@ public class Display : SingletonMonoBehaviour<Display> {
             if (m_CurrentFadeType == FadeType.Entire) {
                
                 if (v < m_minAlpha) {
-                    GameSystem.Log("MaxAlphaが変更されます : " + MaxAlpha);
+                    UsefulSystem.Log("MaxAlphaが変更されます : " + MaxAlpha);
                     m_FadeObject.material.SetFloat(m_pID[index].m_ID_minAlpha, v);
                     m_FadeObject.material.SetFloat(m_pID[index].m_ID_Fade, 0);
                 }
                 else if (v > m_maxAlpha) {
-                    GameSystem.Log("MinAlphaが変更されます : " + MinAlpha);
+                    UsefulSystem.Log("MinAlphaが変更されます : " + MinAlpha);
                     m_FadeObject.material.SetFloat(m_pID[index].m_ID_maxAlpha, v);
                     m_FadeObject.material.SetFloat(m_pID[index].m_ID_Fade, 1);
                 }
@@ -164,7 +164,7 @@ public class Display : SingletonMonoBehaviour<Display> {
         base.Awake();
         if (m_pID == null) {          
             Debug.Assert(m_FadeObject != null, "フェードオブジェクトがアタッチされていません");
-            Debug.Assert(m_FadeShaders.Length > 0 && m_FadeShaders.Length == GameSystem.GetEnumLength<FadeType>(), "シェーダーがアタッチされていません");
+            Debug.Assert(m_FadeShaders.Length > 0 && m_FadeShaders.Length == UsefulSystem.GetEnumLength<FadeType>(), "シェーダーがアタッチされていません");
             m_pID = new PropertiesID[m_FadeShaders.Length];
             //各IDを取得
             for (int i = 0; i < m_FadeShaders.Length; i++) {             
@@ -200,7 +200,7 @@ public class Display : SingletonMonoBehaviour<Display> {
                 case FadeType.LeftToRight: type = FadeType.RightToLeft; break;
                 case FadeType.CW: type = FadeType.CCW; break;
                 case FadeType.CCW: type = FadeType.CW; break;
-                    default: GameSystem.Log("フェードタイプ : " + type); break;
+                    default: UsefulSystem.Log("フェードタイプ : " + type); break;
             }
             index = (int)type;
         }
@@ -210,7 +210,7 @@ public class Display : SingletonMonoBehaviour<Display> {
 
     /// <summary>フェードの準備を行います。フェード可能であればtrueを返します</summary>
     private bool PrepareForFade(FadeType type,bool fadeOut) {
-        if (m_IsFading) { GameSystem.LogError("フェードの呼び出しが重複しています。重複しているフェードの処理は行われません"); return false; }
+        if (m_IsFading) { UsefulSystem.LogError("フェードの呼び出しが重複しています。重複しているフェードの処理は行われません"); return false; }
         //フェード中に変更
         IsFading = true;
         //タイムスケールを保存する

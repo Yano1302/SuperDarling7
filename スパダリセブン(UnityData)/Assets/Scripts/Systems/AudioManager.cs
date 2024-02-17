@@ -840,7 +840,7 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
                 check = true;
             }
         }
-        GameSystem.Action(() => {
+        UsefulSystem.Action(() => {
             if (!check) {
                noneLog = noneLog ?? "再生されているSEはありませんでした。";
                 Log(noneLog,true);
@@ -960,7 +960,7 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
             check = !IsPrioritizeBGM ? ClipList_BGM.TryGetValue(clipName, out clip) : ClipList_SE.TryGetValue(clipName, out clip);
             //BGM音源からも取得できなかった場合はnullを返す
             if (!check) {
-                GameSystem.LogError("音源ファイル名が間違っているかファイルが存在しません\nファイル名 : " + clipName);
+                UsefulSystem.LogError("音源ファイル名が間違っているかファイルが存在しません\nファイル名 : " + clipName);
             }
 #if UNITY_EDITOR
             string str = IsPrioritizeBGM ? "SE音源がBGMとして使用されます。" : "BGM音源がSEとして使用されます。";

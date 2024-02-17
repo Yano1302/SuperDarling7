@@ -18,19 +18,19 @@ public class AudioDebag :SingletonMonoBehaviour<AudioDebag>
         DA(KeyCode.Return, () => ins.CanPlayFlag = true);
 
         DA(KeyCode.Z, () => ins.BGM_Play("BGM")) ;
-        DA(KeyCode.X, () => ins.BGM_PlayFade("BGM",action:()=>GameSystem.LogError("関数を実行します"))) ;
+        DA(KeyCode.X, () => ins.BGM_PlayFade("BGM",action:()=>UsefulSystem.LogError("関数を実行します"))) ;
 
         DA(KeyCode.C, () => ins.BGM_Pause()) ;
         DA(KeyCode.V, () => ins.BGM_Restert()) ;
 
         DA(KeyCode.B, () => ins.BGM_Stop());
-        DA(KeyCode.N, () => ins.BGM_StopFade(action: () => GameSystem.LogError("関数を実行します")));
+        DA(KeyCode.N, () => ins.BGM_StopFade(action: () => UsefulSystem.LogError("関数を実行します")));
 
 
         DA(KeyCode.M, () => ins.BGM_Volume = 0.1f);
         DA(KeyCode.A, () => ins.BGM_Volume = 1.0f);
-        DA(KeyCode.S, () => ins.BGM_FadeVolume(0.1f, action: () => GameSystem.LogError("関数を実行します")));
-        DA(KeyCode.D, () => ins.BGM_FadeVolume(1.0f, action: () => GameSystem.LogError("関数を実行します")));
+        DA(KeyCode.S, () => ins.BGM_FadeVolume(0.1f, action: () => UsefulSystem.LogError("関数を実行します")));
+        DA(KeyCode.D, () => ins.BGM_FadeVolume(1.0f, action: () => UsefulSystem.LogError("関数を実行します")));
 
 
         DA(KeyCode.F, () => ID = ins.SE_Play("BGM"));
@@ -42,11 +42,11 @@ public class AudioDebag :SingletonMonoBehaviour<AudioDebag>
         DA(KeyCode.Q, () => ins.SE_StopNotLoop());
         DA(KeyCode.W, () => ins.SE_Volume("BGM",1.0f));
         DA(KeyCode.E, () => ins.SE_Volume(ID,1.0f));
-        DA(KeyCode.R, () => ins.SE_SetVolumeFade("BGM",1.0f, action: () => GameSystem.LogError("関数を実行します")));
-        DA(KeyCode.T, () => ins.SE_SetVolumeFade(ID,1.0f, action: () => GameSystem.LogError("関数を実行します")));
+        DA(KeyCode.R, () => ins.SE_SetVolumeFade("BGM",1.0f, action: () => UsefulSystem.LogError("関数を実行します")));
+        DA(KeyCode.T, () => ins.SE_SetVolumeFade(ID,1.0f, action: () => UsefulSystem.LogError("関数を実行します")));
 
-        DA(KeyCode.Y, () => ins.SE_StopFade("BGM", action: () => GameSystem.LogError("関数を実行します")));
-        DA(KeyCode.U, () => ins.SE_StopFade(ID, action: () => GameSystem.LogError("関数を実行します")));
+        DA(KeyCode.Y, () => ins.SE_StopFade("BGM", action: () => UsefulSystem.LogError("関数を実行します")));
+        DA(KeyCode.U, () => ins.SE_StopFade(ID, action: () => UsefulSystem.LogError("関数を実行します")));
 
         DA(KeyCode.I, () => ins.ALL_SetVolume(1.0f, true));
         DA(KeyCode.O, () => ins.ALL_FadeVolume(0.1f,true));
@@ -58,7 +58,7 @@ public class AudioDebag :SingletonMonoBehaviour<AudioDebag>
         DA(KeyCode.Alpha3, () => ins.SE_Pause(ID));
         DA(KeyCode.Alpha4, () => ins.SE_Restert("BGM"));
         DA(KeyCode.Alpha5, () => ins.SE_Restert(ID));
-        DA(KeyCode.Alpha6, () => ins.ALL_StopFade(true,action: () => GameSystem.LogError("関数を実行します")));
+        DA(KeyCode.Alpha6, () => ins.ALL_StopFade(true,action: () => UsefulSystem.LogError("関数を実行します")));
     }
 
 

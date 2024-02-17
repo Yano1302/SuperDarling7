@@ -42,14 +42,14 @@ public class DisplayDebag : SingletonMonoBehaviour<DisplayDebag>
 
     void ChangeType(bool Up) {
         if (Up) {
-            type = type == FadeType.Entire ? (FadeType)(GameSystem.GetEnumLength<FadeType>() - 1) : type - 1;
-            GameSystem.Log("<color=white>フェードタイプ</color>を" + "<color=cyan>" + type + "</color>" + "に変更しました");
+            type = type == FadeType.Entire ? (FadeType)(UsefulSystem.GetEnumLength<FadeType>() - 1) : type - 1;
+            UsefulSystem.Log("<color=white>フェードタイプ</color>を" + "<color=cyan>" + type + "</color>" + "に変更しました");
         }
         else {
             int index = (int)type;
-            type = index == GameSystem.GetEnumLength<FadeType>() - 1 ? FadeType.Entire : type + 1;
+            type = index == UsefulSystem.GetEnumLength<FadeType>() - 1 ? FadeType.Entire : type + 1;
 
-            GameSystem.Log("<color=white>フェードタイプ</color>を" + "<color=cyan>" + type + "</color>" + "に変更しました");
+            UsefulSystem.Log("<color=white>フェードタイプ</color>を" + "<color=cyan>" + type + "</color>" + "に変更しました");
         }
     }
 
