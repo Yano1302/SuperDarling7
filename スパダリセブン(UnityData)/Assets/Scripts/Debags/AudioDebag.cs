@@ -59,6 +59,9 @@ public class AudioDebag :SingletonMonoBehaviour<AudioDebag>
         DA(KeyCode.Alpha4, () => ins.SE_Restert("BGM"));
         DA(KeyCode.Alpha5, () => ins.SE_Restert(ID));
         DA(KeyCode.Alpha6, () => ins.ALL_StopFade(true,action: () => UsefulSystem.LogError("ŠÖ”‚ðŽÀs‚µ‚Ü‚·")));
+
+        DA(KeyCode.UpArrow, () => ins.DivisionScale += 1);
+        DA(KeyCode.DownArrow, () => ins.DivisionScale -= 1);
     }
 
 
