@@ -16,8 +16,8 @@ using Debug = UnityEngine.Debug;
 
 public class AudioManager : SingletonMonoBehaviour<AudioManager>
 {
-    // Config変数  //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
-
+ // Config変数  //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
+    #region Config変数
     [SerializeField, Header("BGMが格納されているResourcesフォルダのパス(Asset/～)")]
     private string c_FolderPath_BGM = "Audio\\BGM\\Resources"; //BGMが格納されているフォルダのパス
     [SerializeField, Header("SEが格納されているResourcesフォルダのパス(Asset/～)")]
@@ -33,16 +33,23 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     private float m_standardVolume = 1.0f;                           //基準の音量
     [SerializeField, Header("デフォルト値で使用されるフェード時間")]
     private float m_standardFadeTime = 1.0f;                        //デフォルトのフェード時間
+
     [Space(10), Header("----初期値------------------------------------------------------------------------------------------------------------------------")]
     [SerializeField, Header("サウンドの段階の初期設定(0～divisionScaleNum)")]
     private int m_divisionScale = 5;                                //サウンドのスケール
     [SerializeField,Header("再生可能フラグ")]
-    private bool m_canPlayFlag = true;                             //再生可能フラグ
+    private bool m_canPlayFlag = true;                              //再生可能フラグ
+    [SerializeField, Header("ミュートかどうかのフラグ")]
+    private bool m_mute;                                           //ミュートかどうか
+  
+    [Space(10), Header("----デバッグ用----------------------------------------------------------------------------------------------------------------------")]
+    [SerializeField, Header("再生される音源などをログに表示するかどうか(エラーメッセージは除く)")]
+    private bool PlaySoundLog = true;
+    #endregion
+//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
 
-    //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
 
-
-    //  変数・関数一覧    //--------------------------------------------------------------------------------------------------------------------------------------------------------------------//
+//  変数・関数一覧    //--------------------------------------------------------------------------------------------------------------------------------------------------------------------//
 
     //  設定など    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -65,8 +72,8 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
         }
     }　
 
-   /// <summary>全ての音源のミュート設定を取得・変更します。</summary>
-   public bool Mute {
+    /// <summary>全ての音源のミュート設定を取得・変更します。</summary>
+    public bool Mute {
        get { return m_mute; }
        set {
             if (m_mute != value) {
@@ -85,7 +92,7 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
    }
 
 
-    //  音量設定    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//  音量設定    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
     
 //BGM
     /// <summary>現在のBGMの音量を設定・取得します。</summary>
@@ -126,7 +133,7 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     /// <param name="volume">変更後の音量</param>
     /// <param name="clipName">サウンドの指定(同じサウンドがあった場合はすべて変更されます)</param>
     /// <returns>音源が見つかった場合はtrueを返します</returns>
-    public bool SE_Volume(string clipName,float volume) {
+    public bool SE_SetVolume(string clipName,float volume) {
         bool check = false;
         if (GetUsingSource(out var sds)) {
             foreach (var sd in sds) {               
@@ -147,7 +154,7 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     /// <param name="id">変更したいSEのID</param>
     /// <param name="volume">変更後の音量</param>
     /// <returns>指定されたIDのSEがあった場合はtrueを返します。</returns>
-     public bool SE_Volume(int id, float volume) {
+     public bool SE_SetVolume(int id, float volume) {
         if (GetUsingSource(out var sds)) {
             foreach (var sd in sds) {
                 if (sd.Source.isPlaying) {
@@ -273,8 +280,14 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     }
 
 
+//  再生速度設定    //----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    //  再生関数    //----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//BGM
+    
+
+
+
+//  再生関数    //----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     //BGM
     /// <summary>BGMを再生します。既にBGMが再生されていた場合はそのBGMは停止されます。</summary>
@@ -756,7 +769,7 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     }
 
 
-    //  その他   //---------------------------------------------------------------------------------------------------------------
+//  その他   //---------------------------------------------------------------------------------------------------------------
 
     /// <summary>指定された音源を取得します</summary>
     /// <returns>音源情報を返します。見つからなかった場合はnullを返します。</returns>
@@ -806,12 +819,9 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     private static Dictionary<string, AudioClip> ClipList_BGM;     //BGMのリスト
     private static Dictionary<string, AudioClip> ClipList_SE;      //SEのリスト
     //その他   
-    private bool m_mute;                                           //ミュートかどうか
     private int m_IDN = 1;                                         //ID配布用の番号
 
-    [Space(10), Header("----デバッグ用----------------------------------------------------------------------------------------------------------------------")]
-    [SerializeField, Header("再生される音源などをログに表示するかどうか(エラーメッセージは除く)")]
-    private bool PlaySoundLog = true;
+  
    
     //  プライベート関数  //------------------------------------------------------------------------------------------------------------------------------
 
@@ -825,6 +835,7 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
             m_BGMData.Source = gameObject.AddComponent<AudioSource>();
             m_BGMData.ID = 0;
             m_BGMData.fadeState = FadeState.None;
+            m_BGMData.Source.loop = true;
             SetVolume(m_BGMData, m_standardVolume);
             m_SEDatas = new SoundData[m_maxSoundOverlap - 1];
             for (int i = 0; i < m_SEDatas.Length; ++i) {

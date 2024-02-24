@@ -550,11 +550,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 827c4c6475e850941b146c7630584fbf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MaxSoundOverlap: 10
-  DivisionScaleNum: 10
-  StandardVolume: 0.8
+  c_FolderPath_BGM: Audio\BGM\Resources
+  c_FolderPath_SE: Audio\SE\Resources
+  m_maxSoundOverlap: 10
+  m_divisionScaleNum: 10
+  m_standardVolume: 1
+  m_standardFadeTime: 1
   m_divisionScale: 5
-  m_defaultFadeTime: 1
+  m_canPlayFlag: 1
   PlaySoundLog: 1
 --- !u!1 &1920802190
 GameObject:
