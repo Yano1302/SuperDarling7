@@ -31,7 +31,7 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     [Space(10),Header("----デフォルト値-------------------------------------------------------------------------------------------------------------------")]
     [SerializeField, Header("デフォルト値で使用される音量(0～1)")]
     private float m_standardVolume = 1.0f;                           //基準の音量
-    [SerializeField, Header("デフォルト値で使用されるフェード時間")]
+    [SerializeField, Header("デフォルト値で使用されるフェード時間(秒)")]
     private float m_standardFadeTime = 1.0f;                        //デフォルトのフェード時間
 
     [Space(10), Header("----初期値------------------------------------------------------------------------------------------------------------------------")]
@@ -40,8 +40,10 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     [SerializeField,Header("再生可能フラグ")]
     private bool m_canPlayFlag = true;                              //再生可能フラグ
     [SerializeField, Header("ミュートかどうかのフラグ")]
-    private bool m_mute;                                           //ミュートかどうか
-  
+    private bool m_mute = false;                                    //ミュートかどうか
+    [SerializeField, Header("SE上限の場合上書きするかどうか(ループ再生中のSEは除く)")]
+    private bool m_overwriteSE = true;                              //SEを上書きするか
+
     [Space(10), Header("----デバッグ用----------------------------------------------------------------------------------------------------------------------")]
     [SerializeField, Header("再生される音源などをログに表示するかどうか(エラーメッセージは除く)")]
     private bool PlaySoundLog = true;
@@ -70,26 +72,29 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
             }        
             Log("サウンドの出力割合が " + m_divisionScale + " に変更されます。", false);
         }
-    }　
+    }
 
     /// <summary>全ての音源のミュート設定を取得・変更します。</summary>
     public bool Mute {
-       get { return m_mute; }
-       set {
+        get { return m_mute; }
+        set {
             if (m_mute != value) {
                 m_BGMData.Source.mute = value;
                 foreach (var sd in m_SEDatas) {
                     sd.Source.mute = value;
                 }
                 m_mute = value;
-                Log("ミュート設定が " + value + " に変更されます。",false);
+                Log("ミュート設定が " + value + " に変更されます。", false);
             }
             else {
                 Log("ミュート設定は既に " + value + " です", true);
             }
-          　　
+
         }
-   }
+    }
+
+    /// <summary>SEが上限に達した際に上書きするかどうか(ループ再生のSEは上書きされません)</summary>
+    public bool OverWriteSE { get { return OverWriteSE; } set { OverWriteSE = value; } }
 
 
 //  音量設定    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -102,8 +107,9 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
             return m_BGMData.Source.volume;
         }
         set {
-            if (!m_BGMData.Source.isPlaying) { Log("BGMは再生されていません。再生時に音量設定が上書きされる恐れがあります。", true); } else { Log("BGMの音量が" + value + "に変更されます。", false); }
-            m_BGMData.Source.volume = value; 
+            Log("BGMは再生されていません。再生時に音量設定が上書きされる恐れがあります。", true, m_BGMData.Source.isPlaying);
+            Log("BGMの音量が" + value + "に変更されます。", false);
+            SetVolume(m_BGMData,value);
         }
     }
 
@@ -134,20 +140,15 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     /// <param name="clipName">サウンドの指定(同じサウンドがあった場合はすべて変更されます)</param>
     /// <returns>音源が見つかった場合はtrueを返します</returns>
     public bool SE_SetVolume(string clipName,float volume) {
-        bool check = false;
-        if (GetUsingSource(out var sds)) {
-            foreach (var sd in sds) {               
-                if (sd.Source.isPlaying && clipName == sd.Source.clip.name) {
-                    SetVolume(sd,volume);
-                    Log(sd.Source.clip + "の音量が" + volume + "に変更されます。", false);
-                    check = true;
-                }
-                
+        UnityAction<SoundData> action = (SoundData sd) =>
+        {
+            if (sd.Source.isPlaying && clipName == sd.Source.clip.name) {
+                SetVolume(sd, volume);
+                Log(sd.Source.clip + "の音量が" + volume + "に変更されます。", false);            
             }
-            if (!check) {
-                Log("指定された音源名のSEは再生されていませんでした。\n指定された音源名 : "+clipName,true);
-            }
-        }
+        };
+        bool check = GetUsingSource(action);
+        Log("指定された音源名のSEは再生されていませんでした。\n指定された音源名 : " + clipName, true,check);
         return check;
     }
     /// <summary>再生されているSEの音量を変更します。(ID指定)</summary>
@@ -155,16 +156,15 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     /// <param name="volume">変更後の音量</param>
     /// <returns>指定されたIDのSEがあった場合はtrueを返します。</returns>
      public bool SE_SetVolume(int id, float volume) {
-        if (GetUsingSource(out var sds)) {
-            foreach (var sd in sds) {
-                if (sd.Source.isPlaying) {
-                    SetVolume(sd,volume);
-                    Log(sd.Source.clip + "の音量が" + volume + "に変更されます。", false);
-                    return true;
-                }
-            }
-        }
-        Log("指定されたIDのSEは再生されていませんでした。\nID : " + id, true);
+        UnityAction<SoundData> action = (SoundData sd) =>
+         {
+             if (sd.Source.isPlaying) {
+                 SetVolume(sd, volume);
+                 Log(sd.Source.clip + "の音量が" + volume + "に変更されます。", false);
+             }
+         };
+        bool check = GetUsingSource(action);
+        Log("指定されたIDのSEは再生されていませんでした。\nID : " + id, true,check);
         return false;
     }
 
@@ -174,22 +174,21 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     /// <param name="clipName">音源指定(指定された音源が複数ある場合は全て変更されます)</param>
     /// <param name="volume">変更後の音量</param>
     /// <param name="fadeTime">フェード時間</param>
-    /// <param name="action">フェード後に行う実行関数(必要な場合のみ) <br/>※フェードが上書きされた場合には呼ばれません。</param>
+    /// <param name="action">フェード後に行う実行関数(必要な場合のみ) 
+    /// <br/>※フェードが上書きされた場合には呼ばれません。
+    ///  <br/>また、複数見つかった場合は見つかった回数分呼ばれます。
+    /// </param>
     /// <param name="StopAction">フェード完了前に再生が停止した場合にactionを実行するかどうか</param>
     /// <returns>再生されている音源が見つかった場合はtrueを返します</returns>
     public bool SE_SetVolumeFade(string clipName,float volume,float fadeTime = float.NaN,UnityAction action = null,bool StopAction = false) {
-        bool check = false;
-        if (GetUsingSource(out var sds)) {
-            foreach (var sd in sds) {
-                if (clipName == sd.Source.clip.name) {
-                    StartCoroutine(FadeSound(sd, fadeTime, volume, action,false,StopAction));
-                    check = true;
-                }
+        UnityAction<SoundData> action1 = (SoundData sd) =>
+        {
+            if (clipName == sd.Source.clip.name) {
+                StartCoroutine(FadeSound(sd, fadeTime, volume, action, false, StopAction));
             }
-            if (!check) {
-                Log("指定されたSEがみつかりませんでした。" + "\n音源名 : " + clipName + "\n", true);
-            }
-        }
+        };    
+        bool check = GetUsingSource(action1);
+        Log("指定されたSEがみつかりませんでした。" + "\n音源名 : " + clipName + "\n", true,check);      
         return check;
     }
     /// <summary>再生されているSEの音量を徐々に変更します。(ID指定)
@@ -202,16 +201,15 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     /// <param name="StopAction">フェード完了前に再生が停止した場合にactionを実行するかどうか</param>
     /// <returns>再生されている音源が見つかった場合はtrueを返します</returns>
     public bool SE_SetVolumeFade(int id,float volume, float fadeTime = float.NaN, UnityAction action = null, bool StopAction = false) {
-        if (GetUsingSource(out var sds)) {
-            foreach (var sd in sds) {
-                if (id == sd.ID) {
-                    StartCoroutine(FadeSound(sd, fadeTime, volume, action, false, StopAction));
-                    return true;
-                }
+        UnityAction<SoundData> action1 = (SoundData sd) =>
+        {
+            if (id == sd.ID) {
+                StartCoroutine(FadeSound(sd, fadeTime, volume, action, false, StopAction));
             }
-        }
-        Log("指定されたSEがみつかりませんでした。" + "\nID : " + id + "\n", true);
-        return false;
+        };
+        bool check = GetUsingSource(action1);
+        Log("指定されたSEがみつかりませんでした。" + "\nID : " + id + "\n", true,check);
+        return check;
     }
 
 //ALL
@@ -222,18 +220,15 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
         if (IncludingBGM) {
             BGM_Volume = volume;
         }
-
-        if (GetUsingSource(out List<SoundData> sds)) {
-            foreach (var sd in sds) {
-                if (sd.Source.isPlaying) {
-                    SetVolume(sd,volume);
-                    Log(sd.Source.volume + "(SE)の音量が変更されます。 \n 変更後の音量 : " + volume, false);
-                }
+        UnityAction<SoundData> action = (SoundData sd) =>
+        {
+            if (sd.Source.isPlaying) {
+                SetVolume(sd, volume);
+                Log(sd.Source.volume + "(SE)の音量が変更されます。 \n 変更後の音量 : " + volume, false);
             }
-        }
-        else {
-            Log("SEは再生されていませんでした。", true);
-        }
+        };
+        bool check = GetUsingSource(action);
+        Log("SEは再生されていませんでした。", true, check);
     }
 
     /// <summary>再生中の全てのサウンドの音量をフェード変更します。サウンドが再生されていなかった場合には処理は行われません。</summary>
@@ -247,21 +242,17 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
         bool check = false;
         if (IncludingBGM && m_BGMData.Source.isPlaying) {
             BGM_FadeVolume(volume, fadeTime, action);
-            check = true;
         }
-
-        if (GetUsingSource(out List<SoundData> sds)) {
-            check = true;
-            if (IncludingBGM && m_BGMData.Source.isPlaying) {
-                foreach (var sd in sds) {
-                    StartCoroutine(FadeSound(sd, fadeTime, volume, null, false, false));       
-                }
-            }
-            else {
-                SoundData restSd = null;
-                float resttime = 0;
-                //残り秒数が一番長いSEを探す
-                foreach (var sd in sds) {
+        if (check) {
+            GetUsingSource((SoundData sd) => { StartCoroutine(FadeSound(sd, fadeTime, volume, null, false, false)); });
+        }
+        else {
+            SoundData restSd = null;
+            float resttime = 0;
+            //残り秒数が一番長いSEを探す
+            foreach (var sd in m_SEDatas) {
+                if (sd.Source.isPlaying) {
+                    check = true;
                     float rt = sd.Source.clip.length - sd.Source.time;
                     if (rt > resttime) {
                         if (restSd != null) { StartCoroutine(FadeSound(restSd, fadeTime, volume, null, false, false)); }
@@ -271,10 +262,10 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
                     else {
                         StartCoroutine(FadeSound(sd, fadeTime, volume, null, false, false));
                     }
-                }
-                //残り秒数が一番長いSEにactionを渡す
-                StartCoroutine(FadeSound(restSd, fadeTime, volume, action, false, StopAction));
-            }  
+                }             
+            }
+            //残り秒数が一番長いSEにactionを渡す
+            StartCoroutine(FadeSound(restSd, fadeTime, volume, action, false, StopAction));
         }
         return check;
     }
@@ -306,6 +297,7 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
         if (GetClip(out AudioClip clip, clipName, true)) {
             //デフォルト値であれば正しい値を与える
             SetVolume(m_BGMData, volume);
+            m_BGMData.fadeState = FadeState.None;
             m_BGMData.Source.clip = clip;
             m_BGMData.Source.loop = true;
             m_BGMData.Source.Play();
@@ -332,7 +324,7 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
             Log("現在再生フラグがオフになっているため、再生できません。", true);
             return;
         }
-        m_BGMData.Source.volume = startVolume;
+        SetVolume(m_BGMData, startVolume);
         BGM_Play(clipName, startVolume);
         StartCoroutine(FadeSound(m_BGMData, fadeTime, endVolume, action, false,false));
     }
@@ -347,29 +339,28 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     /// <returns>再生時に割り振られた識別用のIDのようなものを取得します。再生が出来なかった場合はint.MinValueを返します。</returns>
     public int SE_Play(string clipName, float volume = float.NaN, bool IsLoop = false, UnityAction action = null) {
         //現在音を鳴らせる状態か先に調べる
+        int id = int.MinValue;
         if (!CanPlayFlag) {
             Log("現在再生フラグがオフになっているため、再生できません。", true);
-            return int.MinValue;
+            return id;
         }
-        if (!GetNotUsedSource(out SoundData sd)) {
-            return int.MinValue;
-        }
-        if (GetClip(out var clip, clipName, false)) {
-            //音量などの設定
-            //デフォルト値であれば正しい値を与える
-            SetVolume(m_BGMData, volume);
-            sd.Source.loop = IsLoop;
-            sd.Source.clip = clip;
-            sd.Source.Play();
-            Log(sd,true);
-            if (action != null) {
-                StartCoroutine(CheckPlaying(sd.Source, action));
+        UnityAction<SoundData> action1 = (SoundData sd) =>
+        {
+            if (GetClip(out var clip, clipName, false)) {
+                //音量などの設定
+                //デフォルト値であれば正しい値を与える
+                SetVolume(m_BGMData, volume);
+                sd.Source.loop = IsLoop;
+                sd.Source.clip = clip;
+                sd.fadeState = FadeState.None;
+                sd.Source.Play();
+                id = sd.ID;
+                Log(sd, true);
+                if (action != null) { StartCoroutine(CheckPlaying(sd.Source, action)); }
             }
-            return sd.ID;
-        }
-        else {
-            return int.MinValue;
-        }     
+        };
+        GetNotUsedSource(action1);
+        return id;
     }
 
     /// <summary>BGMをフェードイン再生させます。既にBGMが再生されている場合、そのBGMは停止されます。
@@ -381,27 +372,27 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     /// <param name="action">フェード後に行う実行関数 <br/>※フェード途中で音源が停止された場合やフェードが上書きされた場合には呼ばれません</param>
     /// <returns>再生時に割り振られた識別用のIDのようなものを取得します。再生が出来なかった場合はint.MinValueを返します</returns>
     public int SE_PlayFade(string clipName, float fadeTime = float.NaN, float startVolume = 0.1f, float endVolume = float.NaN, bool IsLoop = false,UnityAction action = null) {
+        int id = int.MaxValue;
         //現在音を鳴らせる状態か先に調べる
         if (!CanPlayFlag) {
             Log("現在再生フラグがオフになっているため、再生できません。", true);
-            return int.MinValue;
+            return id;
         }
-        if (!GetNotUsedSource(out SoundData sd)) {
-            return int.MinValue;
-        }
-        if (GetClip(out var clip, clipName, false)) {
-            //音量などの設定
-            sd.Source.volume = startVolume;
-            sd.Source.loop = IsLoop;
-            sd.Source.clip = clip;
-            sd.Source.Play();
-            Log(sd,true);
-            StartCoroutine(FadeSound(sd, fadeTime, endVolume, action, false, false));
-            return sd.ID;
-        }
-        else {
-            return int.MinValue;
-        }
+        UnityAction<SoundData> action1 = (SoundData sd) =>
+        {
+            if (GetClip(out var clip, clipName, false)) {
+                //音量などの設定
+                SetVolume(sd,startVolume);
+                sd.Source.loop = IsLoop;
+                sd.Source.clip = clip;
+                sd.Source.Play();
+                id = sd.ID;
+                Log(sd, true);
+                StartCoroutine(FadeSound(sd, fadeTime, endVolume, action, false, false));
+            }
+        };
+        GetNotUsedSource(action1);
+        return id;
     }
 
     //  停止関数    //---------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -446,35 +437,31 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     /// <param name="clipName">サウンド名称指定</param>
     /// <returns>呼び出し時に指定されたSEが再生中であればtrueを返します</returns>
     public bool SE_Stop(string clipName) {
-        bool check = GetUsingSource(out var sds);
-        if (check) {
-            foreach (var sd in sds) {
-                if (sd.Source.clip.name == clipName) {
-                    Log(sd,false);
-                    sd.Source.Stop();
-                }
+        UnityAction<SoundData> action = (SoundData sd) =>
+        {
+            if (sd.Source.clip.name == clipName) {
+                Log(sd, false);
+                sd.Source.Stop();
             }
-        }
-        if (!check) {
-            Log("指定された音源は再生されていませんでした。　音源名 : " + clipName, true);
-        }
+        };
+        bool check = GetUsingSource(action);
+        Log("指定された音源は再生されていませんでした。　音源名 : " + clipName, true, check);
         return check;
     }
     /// <summary>指定されたサウンドを停止させます</summary>
     /// <param name="id">サウンドID指定</param>
     /// <returns>呼び出し時に指定されたIDのSEが再生中であればtrueを返します</returns>
     public bool SE_Stop(int id) {
-        if (GetUsingSource(out var sds)) {
-            foreach (var sd in sds) {
-                if (sd.ID == id) {
-                    Log(sd,false);
-                    sd.Source.Stop();
-                    return true;
-                }
+        UnityAction<SoundData> action = (SoundData sd) =>
+        {
+            if (sd.ID == id) {
+                Log(sd, false);
+                sd.Source.Stop();
             }
-        }
-        Log("指定された音源は再生されていませんでした。　ID : " + id, true);
-        return false;
+        };
+        bool check = GetUsingSource(action);
+        Log("指定された音源は再生されていませんでした。　ID : " + id, true,check);
+        return check;
     }
 
     /// <summary>SEをフェードアウトさせ停止します。指定されたSEがなかった場合には処理は実行されません。
@@ -484,22 +471,21 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     /// <param name="fadeTime">フェードアウトまでの時間(秒) ※指定しない場合はFadeTimeが使用されます</param>
     /// <param name="action">フェードアウト後に行う実行関数(行う必要がない場合はnullを渡してください)</param>
     /// <param name="endVolume">停止する直前の音量(０～１)</param>
-    /// <param name="action">フェード後に行う実行関数<br/>※フェードが上書きされた場合には呼び出されません。</param>
+    /// <param name="action">フェード後に行う実行関数
+    /// <br/>※フェードが上書きされた場合には呼び出されません。
+    /// <br/>また、指定されたSEが複数見つかった場合は見つかった回数分呼ばれます。
+    /// </param>
     /// <param name="StopAction">フェード完了前に再生が停止した場合にactionを実行するかどうか</param>
     public bool SE_StopFade(string clipName,float fadeTime = float.NaN, float endVolume = 0.05f, UnityAction action = null,bool StopAction = false) {
-        bool check = false;
-        if (GetUsingSource(out var sds)) {
-            foreach (var sd in sds) {
-                if (sd.Source.clip.name == clipName) {
-                    Log(sd,false);
-                    StartCoroutine(FadeSound(sd, fadeTime, endVolume, action, true, StopAction));
-                    check = true;
-                }
+        UnityAction<SoundData> action1 = (SoundData sd) =>
+        {
+            if (sd.Source.clip.name == clipName) {
+                Log(sd, false);
+                StartCoroutine(FadeSound(sd, fadeTime, endVolume, action, true, StopAction));
             }
-        }
-        if (!check) {
-            Log("指定された音源は再生されていませんでした。　音源名 : "+clipName, true);
-        }
+        };
+        bool check = GetUsingSource(action1);
+        Log("指定された音源は再生されていませんでした。　音源名 : " + clipName, true,check);
         return check;
     }
     /// <summary>SEをフェードアウトさせ停止します。指定されたSEがなかった場合には処理は実行されません。
@@ -511,55 +497,46 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     /// <param name="action">フェード後に行う実行関数<br/>※フェードが上書きされた場合には呼び出されません。</param>
     /// <param name="StopAction">フェード完了前に再生が停止した場合にactionを実行するかどうか</param>
     public bool SE_StopFade(int id, float fadeTime = float.NaN, float endVolume = 0.05f, UnityAction action = null, bool StopAction = false) {
-        if (GetUsingSource(out var sds)) {
-            foreach (var sd in sds) {
-                if (sd.ID == id) {
-                    Log(sd,false);
-                    StartCoroutine(FadeSound(sd, fadeTime, endVolume, action, true, StopAction));
-                    return true;
-                }
+        UnityAction<SoundData> action1 = (SoundData sd) =>
+        {
+            if (sd.ID == id) {
+                Log(sd, false);
+                StartCoroutine(FadeSound(sd, fadeTime, endVolume, action, true, StopAction));
             }
-        }
-        Log("指定された音源は再生されていませんでした。　ID : " + id, true);
-        return false;
+        };
+        bool check = GetUsingSource(action1);
+        Log("指定された音源は再生されていませんでした。　ID : " + id, true,check);
+        return check;
     }
 
     /// <summary>ループ再生中のSEをすべて停止します</summary>
     /// <returns>ループ再生中のSEがあった場合はtrueを返します</returns>
     public bool SE_StopInLoop() {
-        bool check = false;
-        if (GetUsingSource(out var sds)) {
-            foreach (var sd in sds ) {
-                if (sd.Source.isPlaying && sd.Source.loop) {
-                    check = true;
-                    Log(sd,false);
-                    sd.Source.Stop();
-                }
+        UnityAction<SoundData> action = (SoundData sd) =>
+        {
+            if (sd.Source.isPlaying && sd.Source.loop) {
+                Log(sd, false);
+                sd.Source.Stop();
             }
-            if (!check) {
-                Log("ループ再生されているSEはありませんでした。", true);
-            }
-        }
-        return check;
+        };
+       bool check = GetUsingSource(action);
+        Log("ループ再生されているSEはありませんでした。", true,check);
+        return check;       
     }
 
     /// <summary>ループ中ではない再生中のSEを全て停止させます。 </summary>
     /// <returns>ループではない再生中のSEがあった場合はtrueを返します</returns>
     public bool SE_StopNotLoop()
     {
-        bool check = false;
-        if (GetUsingSource(out var sds)) {
-            foreach (var sd in sds) {
-                if (sd.Source.isPlaying && !sd.Source.loop) {
-                    check = true;
-                    Log(sd,false);
-                    sd.Source.Stop();
-                }
+        UnityAction<SoundData> action = (SoundData sd) =>
+        {
+            if (sd.Source.isPlaying && !sd.Source.loop) {
+                Log(sd, false);
+                sd.Source.Stop();
             }
-            if (!check) {
-                Log("ループ再生以外の再生されているSEはありませんでした。", true);
-            }
-        }
+        };
+        bool check = GetUsingSource(action);
+        Log("ループ再生以外の再生されているSEはありませんでした。", true, check);
         return check;
     }
 
@@ -572,11 +549,8 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
         if (IsIncludingBGM) {
             BGM_Stop();
         }
-        if (GetUsingSource(out var sds)) {
-            foreach (var ad in sds) {
-                ad.Source.Stop();
-            }
-        }
+        UnityAction<SoundData> action = (SoundData sd) => { sd.Source.Stop(); };
+        GetUsingSource(action);
     }
 
     /// <summary>再生中の全ての音源をフェード停止させます。</summary>
@@ -591,18 +565,16 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
             BGM_StopFade(fadeTime,endVolume,action);
             check = true;
         }
-        if (GetUsingSource(out List<SoundData> sds)) {
-            check = true;
-            if (IncludingBGM && m_BGMData.Source.isPlaying) {
-                foreach (var sd in sds) {
-                    StartCoroutine(FadeSound(sd, fadeTime, endVolume, null, true, false));
-                }
-            }
-            else {
+        if (check) {
+            GetUsingSource((SoundData sd) => { StartCoroutine(FadeSound(sd, fadeTime, endVolume, null, true, false)); });
+        }
+        else {
                 SoundData restSd = null;
                 float resttime = 0;
                 //残り秒数が一番長いSEを探す
-                foreach (var sd in sds) {
+                foreach (var sd in m_SEDatas) {
+                if (sd.Source.isPlaying) {
+                    check = true;
                     float rt = sd.Source.clip.length - sd.Source.time;
                     if (rt > resttime) {
                         if (restSd != null) { StartCoroutine(FadeSound(restSd, fadeTime, endVolume, null, true, false)); }
@@ -614,8 +586,8 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
                     }
                 }
                 //残り秒数が一番長いSEにactionを渡す
-                StartCoroutine(FadeSound(restSd, fadeTime,endVolume, action, true, StopAction));
-            }
+                StartCoroutine(FadeSound(restSd, fadeTime, endVolume, action, true, StopAction));
+            }            
         }
         return check;
     }
@@ -658,34 +630,31 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     /// <param name="clipName">音源名称指定</param>
     /// <returns>指定された音源が再生されていた場合はtrueを返します</returns>
     public bool SE_Pause(string clipName) {
-        bool check = false;
-        if (GetUsingSource(out var sds)) {
-            foreach (var sd in sds) {
-                if(sd.Source.clip.name == clipName) {
-                    check = true;
-                    Log("\n" + clipName + "がポーズされます。" + "\nID : " + sd.ID, false);
-                    sd.Source.Pause();
-                }
+        UnityAction<SoundData> action = (SoundData sd) =>
+        {
+            if (sd.Source.clip.name == clipName) {
+                Log("\n" + clipName + "がポーズされます。" + "\nID : " + sd.ID, false);
+                sd.Source.Pause();
             }
-        }
-        if(!check) Log("指定された音源名のSEは再生されていませんでした。\n音源名 : " + clipName,true);
+        };
+        bool check = GetUsingSource(action);
+        Log("指定された音源名のSEは再生されていませんでした。\n音源名 : " + clipName, true,check);
         return check;
     }
     /// <summary>指定されたSEをポーズします。</summary>
     /// <param name="clipName">音源ID指定</param>
     /// <returns>指定された音源が再生されていた場合はtrueを返します</returns>
     public bool SE_Pause(int id) {
-        if (GetUsingSource(out var sds)) {
-            foreach (var sd in sds) {
-                if (sd.ID == id) {
-                    Log("\n" + sd.Source.clip.name + "がポーズされます。" + "\nID : " + sd.ID, false);
-                    sd.Source.Pause();
-                    return true;
-                }
+        UnityAction<SoundData> action = (SoundData sd) =>
+        {
+            if (sd.ID == id) {
+                Log("\n" + sd.Source.clip.name + "がポーズされます。" + "\nID : " + sd.ID, false);
+                sd.Source.Pause();
             }
-        }
-        Log("指定されたIDのSEは再生されていませんでした。\nID : " + id, true);
-        return false;
+        };
+        bool check = GetUsingSource(action);
+        Log("指定されたIDのSEは再生されていませんでした。\nID : " + id, true,check);
+        return check;
     }
 
     /// <summary>指定された音源名のSEをポーズ解除します。</summary>
@@ -696,17 +665,15 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
             Log("現在再生フラグがオフになっているため、再生できません。", true);
             return false;
         }
-        bool check = false;
-        if (GetPausingSource(out List<SoundData> sds)) {
-            foreach (var sd in sds) {
-                if (sd.Source.clip.name == clipName) {
-                    check = true;
-                    Log("\n" + clipName + "のポーズが解除されます。" + "\nID : " + sd.ID, false);
-                    sd.Source.UnPause();
-                }
+        UnityAction<SoundData> action = (SoundData sd) =>
+        {
+            if (sd.Source.clip.name == clipName) {
+                Log("\n" + clipName + "のポーズが解除されます。" + "\nID : " + sd.ID, false);
+                sd.Source.UnPause();
             }
-        }
-        if (!check)Log("指定された音源名のSEはポーズされていませんでした。\n音源名 : " + clipName, true);
+        };
+        bool check = GetPausingSource(action);
+        Log("指定された音源名のSEはポーズされていませんでした。\n音源名 : " + clipName, true,check);
         return check;
     }
     /// <summary>指定された音源名のSEをポーズ解除します。</summary>
@@ -717,17 +684,16 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
             Log("現在再生フラグがオフになっているため、再生できません。", true);
             return false;
         }
-        if (GetPausingSource(out List<SoundData> sds)) {
-            foreach (var sd in sds) {
-                if (sd.ID == id) {
-                    Log("\n" + sd.Source.clip.name + "のポーズが解除されます。" + "\nID : " + sd.ID, false);
-                    sd.Source.UnPause();
-                    return true;
-                }
+        UnityAction<SoundData> action = (SoundData sd) =>
+        {
+            if (sd.ID == id) {
+                Log("\n" + sd.Source.clip.name + "のポーズが解除されます。" + "\nID : " + sd.ID, false);
+                sd.Source.UnPause();
             }
-        }
-        Log("指定されたIDのSEはポーズされていませんでした。    ID : " + id, true);
-        return false;
+        };
+        bool check = GetPausingSource(action);
+        Log("指定されたIDのSEはポーズされていませんでした。    ID : " + id, true, check);
+        return check;
     }
 
 
@@ -738,13 +704,12 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
         if (IsIncludingBGM) {
             BGM_Pause();
         }
-
-        if (GetUsingSource(out var sds)) {
-            foreach (var sd in sds) {
-                sd.Source.Pause();
-                Log(sd.Source.clip.name + "(SE)がポーズされます", false);
-            }
-        }
+        UnityAction<SoundData> action = (SoundData sd) =>
+        {
+            sd.Source.Pause();
+            Log(sd.Source.clip.name + "(SE)がポーズされます", false);
+        };
+        GetUsingSource(action);
     }
 
     /// <summary>全てのポーズされている音源を再開させます</summary>
@@ -758,14 +723,13 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
         if (IsIncludingBGM) {
             BGM_Restert();
         }
-
-        if (GetPausingSource(out List<SoundData> sds)) {
-            foreach (var sd in sds) {
-                    Log(sd,false);
-                    sd.Source.UnPause();
-                    Log(sd.Source.clip.name + "(SE)がポーズ解除されます", false);               
-            }
-        }
+        UnityAction<SoundData> action = (SoundData sd) =>
+        {
+            Log(sd, false);
+            sd.Source.UnPause();
+            Log(sd.Source.clip.name + "(SE)がポーズ解除されます", false);
+        };
+        GetPausingSource(action);
     }
 
 
@@ -775,8 +739,14 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     /// <returns>音源情報を返します。見つからなかった場合はnullを返します。</returns>
     public AudioClip GetAudioClip(string clipName) { GetClip(out var clip, clipName, true); return clip;}
 
-    //現在再生されている音源数を取得します。TODO
-
+    //現在再生されているSE数を取得します。
+    public int PlaySENum() {
+        int num = 0;
+        foreach(var sd in m_SEDatas) {
+            if (sd.Source.isPlaying) num++;
+        }
+        return num;
+    }
 
     /// <summary>(デバッグ用)今再生されている音源とそのIDをすべてコンソール上に表示します</summary>    
     [Conditional("UNITY_EDITOR")]
@@ -784,18 +754,9 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
         if (m_BGMData.Source.isPlaying){
             Debug.Log("再生されているBGM : " + m_BGMData.Source.clip.name);
         }
-
-         if (GetUsingSource(out var sds)) {
-            foreach (var sd in sds) {
-                Debug.Log("再生されているサウンド : " + sd.Source.clip.name +"使用しているID : "+sd.ID);
-            }
-         }       
+        GetUsingSource((SoundData sd) => { Debug.Log("再生されているサウンド : " + sd.Source.clip.name + "使用しているID : " + sd.ID); });
       }
       
-    
-
-
-
 
     //  プライベート変数  //------------------------------------------------------------------------------------------------------------------------------
 
@@ -858,28 +819,55 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
 
     //  実行関数    //-----------------------------------------------------------------------------
 
-    /// <summary>使われていないオーディオソースの取得</summary>
-    private bool GetNotUsedSource(out SoundData s)
+    /// <summary>使われていないオーディオソースの取得(idも割り振られる)</summary>
+    private bool GetNotUsedSource(UnityAction<SoundData> action)
     {
-      for (int i = 0; i < m_SEDatas.Length; ++i) {
-          if (!m_SEDatas[i].Source.isPlaying && m_SEDatas[i].Source.time == 0) {
-                m_SEDatas[i].ID = GetID();
-                s = m_SEDatas[i];
+        if (!m_overwriteSE) {
+            for (int i = 0; i < m_SEDatas.Length; ++i) {
+                if (!m_SEDatas[i].Source.isPlaying && m_SEDatas[i].Source.time == 0) {
+                    m_SEDatas[i].ID = GetID();
+                    action(m_SEDatas[i]);
+                    return true;
+                }
+            }
+            Log("一度に鳴らせる音の最大数を超えています", true);
+            return false;
+        }
+        else {
+            SoundData d = null;
+            for (int i = 0; i < m_SEDatas.Length; ++i) {
+                if (!m_SEDatas[i].Source.isPlaying) {
+                    if (m_SEDatas[i].Source.time == 0) {
+                        m_SEDatas[i].ID = GetID();
+                        action(m_SEDatas[i]);
+                        return true;
+                    }
+                }
+                else {
+                    if (!m_SEDatas[i].Source.loop) {
+                        d = d == null ? m_SEDatas[i]: d.ID > m_SEDatas[i].ID ? d = m_SEDatas[i] : d;
+                    }
+                }
+            }
+            if (d != null) {
+                Log("SEが上書きされます。" + "上書きされるSEの名前： " + d.Source.clip.name + "  ID : " + d.ID, true);
+                d.ID = GetID();
+                action(d);
                 return true;
-          }
-      }
-        Log("一度に鳴らせる音の最大数を超えています",true);
-        s = null;
-        return false;
+            }
+            else {
+                Log("上書きできるSEがありませんでした。", true);
+                return false;
+            }
+        }
     }
 
     /// <summary>ポーズ中のオーディオソースの取得</summary>
-    private bool GetPausingSource(out List<SoundData> s) {
+    private bool GetPausingSource(UnityAction<SoundData> action) {
         bool check = false;
-        s = new List<SoundData>();
         for (int i = 0; i < m_SEDatas.Length; ++i) {
             if (!m_SEDatas[i].Source.isPlaying && m_SEDatas[i].Source.time != 0) {
-                s.Add(m_SEDatas[i]);
+                action(m_SEDatas[i]);
                 check = true;
             }
         }
@@ -887,22 +875,20 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     }
 
     /// <summary>使われているオーディオソースの取得</summary>
-    private bool GetUsingSource(out List<SoundData> s,string noneLog = null) {
-        s = new List<SoundData> ();
+    private bool GetUsingSource(UnityAction<SoundData> action,string noneLog = null) {
         bool check = false;
         for (int i = 0; i < m_SEDatas.Length; ++i) {
             if (m_SEDatas[i].Source.isPlaying) {
-                s.Add (m_SEDatas[i]);
+                action(m_SEDatas[i]);
                 check = true;
             }
         }
-        UsefulSystem.Action(() => {
+        UsefulSystem.DebugAction(() => {
             if (!check) {
                noneLog = noneLog ?? "再生されているSEはありませんでした。";
                 Log(noneLog,true);
             } 
         });
-
         return check;
     }
 
@@ -924,14 +910,13 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
             dic[name] = audio;
         }
     }
-
+   
     /// <summary>音のフェードイン、アウトを行う</summary>
     private IEnumerator FadeSound(SoundData s,float time,float ev, UnityAction action, bool stop,bool stopToAction) {
 
         //デフォルト値であれば正しい値に変更する
         time = float.IsNaN(time) ? m_standardFadeTime : time;
-        ev = float.IsNaN(ev) ? m_divisionScale : ev;
-
+        ev = float.IsNaN(ev) ?  m_standardVolume: ev;
         //フェードが重複している場合は上書きする
         if (s.fadeState != FadeState.None) {
             s.fadeState = FadeState.None;
@@ -941,7 +926,7 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
         else {
             s.fadeState = FadeState.Fading;
         }
-        float sv = s.Source.volume;
+        float sv = s.SetVolume;
         float t = 0;
         yield return null;
         while (true) {
@@ -956,19 +941,20 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
             }
             //フェードが上書きされてないかチェックする
             else if (s.fadeState == FadeState.None) {
-                Log("フェード中に新しくフェード処理が呼ばれました。フェード処理が上書きされます。", true);
+                Log("フェード処理が上書きされます。", true);
                 break;
             }
             //全ての条件を満たした場合のみフェードを進める
             else if(s.fadeState == FadeState.Fading){
-                s.Source.volume = Mathf.SmoothStep(sv, ev, t);
+                SetVolume(s,Mathf.Lerp(sv, ev, t));
+                Debug.Log(Mathf.Lerp(sv, ev, t));
                 t += Time.deltaTime / time;
             }         
             //ループを抜ける条件
             if (t >= 1) {
                 if (s.Source.isPlaying) {
                     Log(s.Source.clip.name + "のフェードが完了しました", false);
-                    s.Source.volume = ev;
+                    SetVolume(s, ev);
                     if (stop) {
                         s.Source.Stop();
                     }
@@ -1046,15 +1032,15 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
         if (PlaySoundLog) {
             string type = d.ID == 0 ? "(BGM)" : "(SE)";
             string id = d.ID != 0 ? "<color=cyan>ID : " + d.ID + "</color>" : "";
-            string str = playing ? "\n<color=cyan>" + d.Source.clip.name + type + "</color>" + "が再生されます    " + id : "color=cyan>" + d.Source.clip.name + type + "</color>" + "が停止されます" + id;
+            string str = playing ? "<color=cyan>" + d.Source.clip.name + type + "</color>" + "が再生されます    " + id : "<color=cyan>" + d.Source.clip.name + type + "</color>" + "が停止されます" + id;
             Debug.Log(str); 
         } 
     }
 
     /// <summary>ログの表示が有効な場合にメッセージをログに表示する</summary>
     [Conditional("UNITY_EDITOR")]
-    private void Log(string message,bool warning) {
-        if (PlaySoundLog) {
+    private void Log(string message,bool warning,bool ignore = false) {
+        if (PlaySoundLog && !ignore) {
             if (warning) {
                 Debug.LogWarning("<color=yellow>"+message+"</color>");
             }
