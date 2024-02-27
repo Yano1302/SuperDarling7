@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Events;
 
-public class DisplayDebag : SingletonMonoBehaviour<DisplayDebag>
+public class DisplayDebug : SingletonMonoBehaviour<DisplayDebug>
 {
     private Display Ins;
     private FadeType type;

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 
 
-public class AudioDebag :SingletonMonoBehaviour<AudioDebag>
+public class AudioDebug :SingletonMonoBehaviour<AudioDebug>
 {
     AudioManager ins;
     int ID;

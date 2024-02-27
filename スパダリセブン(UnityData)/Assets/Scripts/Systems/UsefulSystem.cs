@@ -35,7 +35,7 @@ public class UsefulSystem : SingletonMonoBehaviour<UsefulSystem>
 
     //  Static関数    //-------------------------------------------------------------------------------------------------------------------------------
 
-    /// <summary>ファイル名からファイルパスを検索します</summary>
+    /// <summary>ファイル名(拡張子込み)からファイルパスを検索します</summary>
     /// <param name="FileName">ファイル名(拡張子込み)</param>
     /// <returns>ファイルパスが見つかった場合にパスを返します</returns>
     public static string FindFilePath(string FileName)
@@ -45,7 +45,7 @@ public class UsefulSystem : SingletonMonoBehaviour<UsefulSystem>
         {
             return paths[0].Replace("\\", "/").Replace(Application.dataPath, "Assets");
         }
-        LogError("ファイルが見つかりませんでした");
+        LogError("ファイルが見つかりませんでした   ファイル名 : " + FileName);
         return null;
     }
 
@@ -151,7 +151,11 @@ public class UsefulSystem : SingletonMonoBehaviour<UsefulSystem>
 #endif
     }
 
-
+    public void InputAction(KeyCode code, UnityAction action) {
+        if (Input.GetKeyDown(code)) {
+            action();
+        }
+    }
 
     //MonoBehaviourの機能の委託-------------------------------------------------------------------------------------------------------------------------
 
