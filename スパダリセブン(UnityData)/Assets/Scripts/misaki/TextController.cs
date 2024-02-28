@@ -4,26 +4,31 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEditor;
 using Unity.VisualScripting.FullSerializer;
+using TMPro;
+using Unity.VisualScripting;
 
 // シングルトンかも
 public class TextController : MonoBehaviour
 {
+    private int talkNum = 0; // 文章の〇文字目
     //ストーリー番号
     [Header("1-1のように入力")]
     public string storynum;
-
-    private string[] words;
-    public Text textLabel;
-
-    private GameObject[] CharaImages;
-    public GameObject CharaImageBack;
-    private GameObject charaimage = null;
-
-    public GameObject talkButton;
-    private int talkNum = 0;
-
-    //csvファイル用
-    StoryTalkData[] storytalks;
+    private string words; // 文章
+    public TextMeshProUGUI textLabel; // 文章を格納するテキスト変数
+    public TextMeshProUGUI buttonText; // ボタンのテキスト変数
+    private GameObject[] charaImages; // csvファイルに記載されたキャラクター画像名を格納する配列
+    private GameObject charaimage = null; // 使用するキャラクター画像
+    public GameObject charaImageBack; // キャラクター背景
+    public GameObject talkButton; // 会話を進めるボタン
+    StoryTalkData[] storytalks; //csvファイルにある文章を格納する配列
+    enum TALKSTATE // 会話関係のステータス
+    {
+        NOTALK, // 話していない
+        TALKING, // 会話中
+        LASTTALK // 最後のセリフ
+    }
+    [SerializeField]TALKSTATE talkState = TALKSTATE.NOTALK; // 会話ステータス変数
 
     void Awake()
     {
@@ -32,71 +37,84 @@ public class TextController : MonoBehaviour
         //　先ほど用意したcsvファイルを読み込ませる。
         //　ファイルは「Resources」フォルダを作り、そこに入れておくこと。
         //　Resources.Load 内はcsvファイルの名前。今回は Story1-1 や Story2-5 のようにステージ番号によって読み込むファイルが変えられるようにしている。
-        textasset = Resources.Load("Story" + storynum, typeof(TextAsset)) as TextAsset;
-        //　CSVSerializerを用いてcsvファイルを配列に流し込む。
-        storytalks = CSVSerializer.Deserialize<StoryTalkData>(textasset.text);
+        textasset = Resources.Load("Story/Story" + storynum, typeof(TextAsset)) as TextAsset;
 
-        CharaImages = new GameObject[storytalks.Length];
-
+        /// CSVSerializerを用いてcsvファイルを配列に流し込む。///
+        storytalks = CSVSerializer.Deserialize<StoryTalkData>(textasset.text); // CSVのテキストデータを配列に格納する
+        charaImages = new GameObject[storytalks.Length]; // キャラクター画像格納配列のサイズを文章の数と同じにする
+        // プロジェクト内のTalkCharaImageフォルダにある画像を対応させたい文章ごとに格納する
         for (int i = 0; i < storytalks.Length; i++)
         {
-            CharaImages[i] = (GameObject)Resources.Load("TalkCharaImage/" + storytalks[i].talkingChara + "Talk");
+            charaImages[i] = (GameObject)Resources.Load("TalkCharaImage/" + storytalks[i].talkingChara + "Talk");
         }
+        /// ここまで ///
     }
-
     public void Start()
     {
-        talkButton.SetActive(false);
-        OnTalkButtonClicked();
+        buttonText.text = "会話開始"; // ボタンテキストを"会話開始"に変更
     }
-
     // ボタンを押すと会話スタート
     public void OnTalkButtonClicked()
     {
+        // 会話ステータスが話していないなら
+        if (talkState == TALKSTATE.NOTALK)
+        {
+            buttonText.text = "次へ"; // ボタンテキストを"次へ"に変更
+            talkState = TALKSTATE.TALKING; // 会話ステータスを会話中に変更
+        }
         // 会話フィールドをリセットする。
         textLabel.text = "";
-
-        //キャラクター画像を生成
-        if (charaimage != null)
+        if (charaimage != null) // キャラクター画像が表示されていれば
         {
-            Destroy(charaimage);
+            Destroy(charaimage); // 画像を破壊する
         }
-
-        charaimage = Instantiate(CharaImages[talkNum], CharaImageBack.transform);
-
-        StartCoroutine(Dialogue());
-
         // トークボタンを非表示にする。
-        talkButton.SetActive(false);
+        if (talkState != TALKSTATE.LASTTALK)
+        {
+            //キャラクター画像を生成
+            charaimage = Instantiate(charaImages[talkNum], charaImageBack.transform);
+            StartCoroutine(Dialogue()); // 文章を表示するコルーチンを開始
+            talkButton.SetActive(false);
+        }
+        else if (talkState == TALKSTATE.LASTTALK)
+        {
+            talkNum = default;
+            talkState = TALKSTATE.NOTALK; // 会話ステータスを話していないに変更
+            buttonText.text = "会話開始"; // ボタンテキストを"会話開始"に変更
+        }
     }
-
-    // コルーチンを使って、１文字ごと表示する。
+    /// <summary>
+    /// 文章を表示するコルーチン
+    /// </summary>
+    /// <returns></returns>
     IEnumerator Dialogue()
     {
-        // 半角スペースで文字を分割する。
-        words = storytalks[talkNum].talks.Split(' ');
-
-        foreach (var word in words)
+        // 文字列を取得
+        words = storytalks[talkNum].talks;
+        // 各文字に対して繰り返し処理を行います C#のIEnumerable機能により一文字ずつ取り出せる
+        foreach (char c in words)
         {
-            // 0.1秒刻みで１文字ずつ表示する。
-            textLabel.text = textLabel.text + word;
-            yield return new WaitForSeconds(0.1f);
+            // 文字を textLabel に追加します
+            textLabel.text += c;
+            // 次の文字を表示する前に少し待ちます
+            yield return new WaitForSeconds(0.05f); // 必要に応じてこの待ち時間を調整してください
         }
-
-        // 次のセリフがある場合には、トークボタンを表示する。
-        if (talkNum + 1 < storytalks.Length)
+        // 次のダイアログに移動
+        talkNum++;
+        // すべてのダイアログを表示した後、追加のダイアログがあるかどうかをチェック
+        if (talkNum >= storytalks.Length)
         {
-            talkButton.SetActive(true);
+            buttonText.text = "会話終了"; // ボタンテキストを"会話終了"に変更
+            talkState = TALKSTATE.LASTTALK; // 会話ステータスを最後のセリフに変更
         }
+        talkButton.SetActive(true); // talkButton を表示します
 
-        // 次のセリフをセットする。
-        talkNum = talkNum + 1;
     }
 }
 
-[System.Serializable]
-public class StoryTalkData
+[System.Serializable] // サブプロパティを埋め込む
+public class StoryTalkData // StoryTalkDataの中にtalkingCharaとtalksを配置する
 {
-    public string talkingChara;
-    public string talks;
+    public string talkingChara; // 話しているキャラクター名
+    public string talks; // 文章
 }
