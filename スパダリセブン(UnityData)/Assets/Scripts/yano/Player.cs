@@ -4,13 +4,15 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    Camera cam;
-    Rigidbody2D m_rb;
-    public float m_speed;
-   
+    //  変数一覧    //
+    private Camera m_camera;        //追従用カメラ
+    private Rigidbody2D m_rb;       //移動用rigidbody
+    [SerializeField]        
+    private float m_speed;          //移動スピード
+
     void Start()
     {
-        cam = Camera.main;
+        m_camera = Camera.main;
         m_rb = GetComponent<Rigidbody2D>();
     }
     private void Update() {
@@ -18,7 +20,7 @@ public class Player : MonoBehaviour
     }
 
     private void LateUpdate() {
-        cam.transform.position = new Vector3(transform.position.x,transform.position.y,-10);
+        m_camera.transform.position = new Vector3(transform.position.x,transform.position.y,-10);
     }
 
 

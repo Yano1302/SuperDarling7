@@ -25,8 +25,6 @@ public class MapSetting : SingletonMonoBehaviour<MapSetting>
     
     //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
 
-
-
     public void CreateMap(int mapNumber) {
         mapNumber -= 1;
         _Create(mapNumber);
@@ -57,16 +55,19 @@ public class MapSetting : SingletonMonoBehaviour<MapSetting>
     }
 
     private void _Create(int mapNumber) {
-        //‰Eã‚©‚ç“Ç‚İ‚Ş
-        for (int i = 0; i < m_mapData[mapNumber].Count; i++){
+        //¶‰º‚©‚ç“Ç‚İ‚Ş
+        int heightCount = m_mapData[mapNumber].Count - 1;
+        for (int i = heightCount; i >= 0; i--){
             //‰¡ˆê—ñ•ª“Ç‚İ‚Ş
             string line = m_mapData[mapNumber][i];
             for (int j = 0; j < line.Length; j++) {
                 //“Ç‚İ‚ñ‚¾ID(CharŒ^)‚ğintŒ^‚É•ÏŠ·
                 int typeNum = line[j] - '0';
                 if(typeNum >= 0) {
-                    Vector2 vec = new Vector2(Width * j, Height * i);
+                    Vector2 vec = new Vector2(Width * j, Height * (heightCount - i));
                     Instantiate(MapObject[typeNum], vec, Quaternion.identity);
+                    if (typeNum == 0)
+                        Instantiate(MapObject[1],vec,Quaternion.identity);
                 } 
             }
         }
