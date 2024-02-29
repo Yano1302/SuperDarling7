@@ -10,6 +10,8 @@ using Unity.VisualScripting;
 public class TextController : DebugSetting
 {
     private int talkNum = 0; // ダイヤログ番号
+    [SerializeField]private float textBaseSpeed = 0.05f; // テキスト送りのベーススピード
+    public float playerTextSpeed = 5f; // プレイヤーが指定したテキスト送りのスピード度合
     private bool talkSkip = false; // ボタンがクリックされたかどうかを示すフラグ
     [Header("1-1のように入力")]
     public string storynum; //ストーリー番号
@@ -84,40 +86,36 @@ public class TextController : DebugSetting
         /// ここまで ///
         Debug.Log("Story" + storynum + "を読み込みました");
     }
-
-    // ボタンを押すと会話スタート
+    /// <summary>
+    /// 会話に関するボタン関数
+    /// </summary>
+    /// <param name="storynum"></param>
     public void OnTalkButtonClicked(string storynum = "")
     {
-        // 会話ステータスが話していないなら
-        if (talkState == TALKSTATE.NOTALK)
+        if (talkState == TALKSTATE.NOTALK) // 会話ステータスが話していないなら
         {
-            if(storynum != "")
-            {
-                StorySetUp(storynum);
-            }
+            // ストーリー番号があれば
+            if (storynum != "") StorySetUp(storynum); // 対応する会話文をセット
             TalkState = TALKSTATE.TALKING; // 会話ステータスを会話中に変更
         }
-        else if (talkState == TALKSTATE.TALKING)
+        else if (talkState == TALKSTATE.TALKING) // 会話ステータスが話し中なら
         {
             talkSkip = true; // トークスキップフラグを立てる
             TalkState = TALKSTATE.NEXTTALK; // 会話ステータスを次のセリフに変更
             return;
         }
-        // 会話フィールドをリセットする。
-        textLabel.text = "";
-        //textLabel.text = storytalks[talkNum].talks; // 一括で全文を表示
+        textLabel.text = ""; // 会話フィールドをリセットする。
         if (charaimage != null) // キャラクター画像が表示されていれば
         {
             Destroy(charaimage); // 画像を破壊する
         }
-        // トークボタンを非表示にする。
-        if (talkState != TALKSTATE.LASTTALK)
+        if (talkState != TALKSTATE.LASTTALK) // 会話ステータスが話し中なら
         {
             //キャラクター画像を生成
             charaimage = Instantiate(charaImages[talkNum], charaImageBack.transform);
             StartCoroutine(Dialogue()); // 文章を表示するコルーチンを開始
         }
-        else if (talkState == TALKSTATE.LASTTALK)
+        else if (talkState == TALKSTATE.LASTTALK) // 会話ステータスが最後のセリフなら
         {
             Debug.Log("会話を終了");
             talkNum = default; // リセットする
@@ -141,26 +139,28 @@ public class TextController : DebugSetting
             // ボタンがクリックされたらフラグを立ててループを抜ける
             if (talkSkip) break;
             // 次の文字を表示する前に少し待ちます
-            yield return new WaitForSeconds(0.05f); // 必要に応じてこの待ち時間を調整してください
+            yield return new WaitForSeconds(CalculataTextSpeed());
         }
-        if (talkSkip == true) // トークスキップフラグが立ったら
-        {
-            // 全文を表示
-            textLabel.text = storytalks[talkNum].talks;
-        }
+        // トークスキップフラグが立ったら
+        if (talkSkip == true) textLabel.text = storytalks[talkNum].talks; // 全文を表示
         talkNum++; // 次のダイアログに移動
         talkState = TALKSTATE.NEXTTALK; // 会話ステータスを次のセリフに変更
         talkSkip = false; // トークスキップフラグをfalseにする
-        // すべてのダイアログを表示した後、追加のダイアログがあるかどうかをチェック
-        if (talkNum >= storytalks.Length)
-        {
-            TalkState = TALKSTATE.LASTTALK; // 会話ステータスを最後のセリフに変更
-        }
-        talkButton.SetActive(true); // talkButton を表示します
+        // 次のダイアログで最後なら会話ステータスを最後のセリフに変更
+        if (talkNum >= storytalks.Length) TalkState = TALKSTATE.LASTTALK;
+    }
+    /// <summary>
+    /// テキストスピードを計算する関数
+    /// </summary>
+    /// <returns></returns>
+    private float CalculataTextSpeed()
+    {
+        // 基礎スピード*10段階のうちのどれか(5が基準)
+        return textBaseSpeed / (playerTextSpeed / 5);
     }
 }
 [System.Serializable] // サブプロパティを埋め込む
-public class StoryTalkData // StoryTalkDataの中にtalkingCharaとtalksを配置する
+public class StoryTalkData // StoryTalkDataの中にtalkingCharaとnameとtalksを配置する
 {
     public string talkingChara; // キャラクター画像名
     public string name; // キャラクター名
