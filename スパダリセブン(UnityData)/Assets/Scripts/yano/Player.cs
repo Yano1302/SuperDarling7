@@ -4,32 +4,55 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    //  変数一覧    //
-    private Camera m_camera;        //追従用カメラ
-    private Rigidbody2D m_rb;       //移動用rigidbody
-    [SerializeField]        
-    private float m_speed;          //移動スピード
+    //  Config変数    //
+    [SerializeField]
+    private float m_speed = 1.0f;       //移動スピード
+    [SerializeField]
+    private bool isMoving = true;       //移動可能フラグ
 
-    void Start()
-    {
-        m_camera = Camera.main;
+    //  パブリック変数・関数 //
+
+    /// <summary>インスタンスを取得します</summary>
+    public static Player Instance { get { return m_instance; } }
+    /// <summary>移動可能かどうかを設定します。</summary>
+    public bool CanMoving { get { return isMoving; }set { isMoving = value; if (!value) { m_rb.velocity = Vector2.zero; } } }
+    
+    public Vector2 Direction { get { return m_direction; } }
+
+    // プライベート変数・関数 //
+    private CameraManager m_CamIns;         //カメラマネージャーインスタンス
+    private Rigidbody2D m_rb;               //移動用rigidbody
+    private static Player m_instance;       //このクラスのインスタンス　TODO:シングルトンに変えるかも
+    private Vector3 m_direction;            //プレイヤーの向き
+
+    private void Awake() {
+       m_instance = GetComponent<Player>();
         m_rb = GetComponent<Rigidbody2D>();
     }
-    private void Update() {
+
+    private void Start()
+    {       
+        m_CamIns = CameraManager.Instance;
+        m_CamIns.SetTarget = transform;
+    }
+
+    private void FixedUpdate() {
         Move();
     }
 
-    private void LateUpdate() {
-        m_camera.transform.position = new Vector3(transform.position.x,transform.position.y,-10);
-    }
-
-
     /// <summary>移動処理を行います</summary>
     void Move() {
-        //キーの入力を取得する
-        float x = Input.GetAxis("Horizontal");         //左右
-        float y = Input.GetAxis("Vertical");           //上下
-        //移動する
-        m_rb.velocity = new Vector3(x, y) * m_speed;
+        if (CanMoving) {
+            //キーの入力を取得する
+            m_direction.x = Input.GetAxis("Horizontal");
+            m_direction.y = Input.GetAxis("Vertical");
+            //移動する
+            m_rb.velocity = m_direction.normalized * m_speed;
+            if (m_direction.magnitude > 0) {
+                float z = Vector2.Angle(Vector2.up, m_direction);
+                z = m_direction.x < 0 ? z : -z;
+                transform.eulerAngles = new Vector3(0, 0, z);     
+            }           
+        }
     }
 }

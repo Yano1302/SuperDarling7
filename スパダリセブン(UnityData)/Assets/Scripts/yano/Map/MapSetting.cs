@@ -5,9 +5,9 @@ using UnityEngine.UI;
 
 public enum MapType {
     player,
-    white,
-    black,
-
+    road,
+    wall,
+    catchtrap,
 }
 
 public class MapSetting : SingletonMonoBehaviour<MapSetting>
@@ -55,7 +55,7 @@ public class MapSetting : SingletonMonoBehaviour<MapSetting>
     }
 
     private void _Create(int mapNumber) {
-        //ç∂â∫Ç©ÇÁì«Ç›çûÇﬁ
+        //âEè„Ç©ÇÁì«Ç›çûÇﬁ
         int heightCount = m_mapData[mapNumber].Count - 1;
         for (int i = heightCount; i >= 0; i--){
             //â°àÍóÒï™ì«Ç›çûÇﬁ
@@ -66,8 +66,10 @@ public class MapSetting : SingletonMonoBehaviour<MapSetting>
                 if(typeNum >= 0) {
                     Vector2 vec = new Vector2(Width * j, Height * (heightCount - i));
                     Instantiate(MapObject[typeNum], vec, Quaternion.identity);
-                    if (typeNum == 0)
-                        Instantiate(MapObject[1],vec,Quaternion.identity);
+                    if (typeNum != 1 && typeNum != 2) {
+                        Instantiate(MapObject[1], vec, Quaternion.identity);
+                    }
+                       
                 } 
             }
         }
