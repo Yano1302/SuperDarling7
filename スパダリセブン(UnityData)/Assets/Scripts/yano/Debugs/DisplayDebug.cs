@@ -7,6 +7,7 @@ using UnityEngine.Events;
 public class DisplayDebug : SingletonMonoBehaviour<DisplayDebug>
 {
     private Display Ins;
+    [SerializeField]
     private FadeType type;
 
     private void Start() {
