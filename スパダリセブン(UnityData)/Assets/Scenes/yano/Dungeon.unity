@@ -745,6 +745,34 @@ PrefabInstance:
       propertyPath: m_Name
       value: EscapeButton
       objectReference: {fileID: 0}
+    - target: {fileID: 7880418887323594401, guid: 7ecfdd5d8324f3240817c354c0a9f555, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7973411688626278698, guid: 7ecfdd5d8324f3240817c354c0a9f555, type: 3}
+      propertyPath: m_Color.b
+      value: 0.96981126
+      objectReference: {fileID: 0}
+    - target: {fileID: 7973411688626278698, guid: 7ecfdd5d8324f3240817c354c0a9f555, type: 3}
+      propertyPath: m_Color.g
+      value: 0.44583842
+      objectReference: {fileID: 0}
+    - target: {fileID: 7973411688626278698, guid: 7ecfdd5d8324f3240817c354c0a9f555, type: 3}
+      propertyPath: m_Color.r
+      value: 0.3860946
+      objectReference: {fileID: 0}
+    - target: {fileID: 8974694627433740894, guid: 7ecfdd5d8324f3240817c354c0a9f555, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8974694627433740894, guid: 7ecfdd5d8324f3240817c354c0a9f555, type: 3}
+      propertyPath: m_Color.g
+      value: 0.40073332
+      objectReference: {fileID: 0}
+    - target: {fileID: 8974694627433740894, guid: 7ecfdd5d8324f3240817c354c0a9f555, type: 3}
+      propertyPath: m_Color.r
+      value: 0.50287557
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
