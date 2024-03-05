@@ -1,8 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.Events;
+
 
 public class DisplayDebug : SingletonMonoBehaviour<DisplayDebug>
 {
@@ -23,10 +23,8 @@ public class DisplayDebug : SingletonMonoBehaviour<DisplayDebug>
         DA(KeyCode.UpArrow, () => ChangeType(true));
         DA(KeyCode.DownArrow, () => ChangeType(false));
 
-
-        DA(KeyCode.Z, () => SetAfterAlpha(true));
-        DA(KeyCode.X, () => SetAfterAlpha(false));
-        DA(KeyCode.C, () => SetAlpha());
+        DA(KeyCode.Z, () => { float f = Random.Range(0.0f, 1.0f); Log("ランダム値 : "+f); Ins.CurrentAlpha = f;});
+        
     }
       
       
@@ -34,11 +32,10 @@ public class DisplayDebug : SingletonMonoBehaviour<DisplayDebug>
          
 
     void DA(KeyCode code, UnityAction action) {
-        if (Input.GetKey(code)) {
+        if (Input.GetKeyDown(code)) {
             action();
         }
     }
-
 
     void ChangeType(bool Up) {
         if (Up) {
@@ -53,21 +50,6 @@ public class DisplayDebug : SingletonMonoBehaviour<DisplayDebug>
         }
     }
 
-    void SetAfterAlpha(bool fadeIn) {
-        if (fadeIn) {
-            Ins.MaxAlpha = Random.Range(0.5f, 1.0f);
-            Debug.Log("MaxAlpha(明転時の画面の明るさ)が変更されました : " + Ins.MaxAlpha);
-        }
-        else {
-            Ins.MinAlpha = Random.Range(0.0f, 0.4f);
-            Debug.Log("MinAlpha(暗転時の画面の明るさ)が変更されました : " + Ins.MinAlpha);
-        }
-    }
-
-    void SetAlpha() {
-        float ram = Random.Range(0.0f, 1.0f);
-        Ins.CurrentAlpha = ram;
-        Debug.Log("画面の明るさを変更します　: " + ram);
-    }
+    void Log(object o) {Debug.Log(o);}
 }
 

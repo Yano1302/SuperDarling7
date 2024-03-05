@@ -2,6 +2,8 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using System.Diagnostics;
+using Debug = UnityEngine.Debug;
 
 
 //フェードイン・アウト時のフェードタイプ
@@ -20,42 +22,22 @@ public enum FadeType
 }
 
 public class Display : SingletonMonoBehaviour<Display> {
-    // アタッチ用変数　//-----------------------------------------------------------------------------------------------------------------
-    [SerializeField, Header("フェード用UIオブジェクト")]
-    private Image m_FadeObject;
-    [SerializeField, Header("フェード用シェーダー"), EnumIndex(typeof(FadeType))]
-    private Shader[] m_FadeShaders;
+  
     // パブリック変数 //------------------------------------------------------------------------------------------------------------------
 
     /// <summary>フェード完了までの時間</summary>
     public float FadeTime { get { return m_fadeTime; } set { m_fadeTime = value > 0 ? value : 0; } }
     /// <summary>フェードイン(明転)後の画面の明るさ(0～1)</summary>
-    public float MaxAlpha {
-        get {
-            return 1 - m_minAlpha;
-        }
-        set {
-            Debug.Assert(value > m_minAlpha, "MaxAlphaにMinAlphaと同じか小さい値が代入されています\n※フェードインが正常に機能しない可能性があります");
-            m_minAlpha = 1 - value;
-        }
-    }
+    public float MaxAlpha { get {return m_maxAlpha;}set {m_maxAlpha = Mathf.Clamp(value, 0.0f, 1.0f);Debug.Assert(m_maxAlpha > m_minAlpha, "MaxAlphaにMinAlphaと同じか小さい値が代入されています\n※フェードインが正常に機能しない可能性があります"); }}
     /// <summary>フェードアウト(暗転)後の画面の明るさ(0～1)</summary>
-    public float MinAlpha {
-        get {
-            return 1 - m_maxAlpha;
-        }
-        set {
-            Debug.Assert(value < m_maxAlpha, "MinAlphaにMaxAlphaと同じか大きい値が代入されています\n※フェードアウトが正常に機能しない可能性があります");
-            m_maxAlpha =  1 - value;
-        }
-    }
+    public float MinAlpha {get {return m_minAlpha;}set {m_minAlpha = Mathf.Clamp(value, 0.0f, 1.0f);Debug.Assert(m_minAlpha < m_maxAlpha, "MinAlphaにMaxAlphaと同じか大きい値が代入されています\n※フェードアウトが正常に機能しない可能性があります");}}
     /// <summary>現在の画面の明るさを取得・変更します</summary>
     public float CurrentAlpha {
         get {
             int index = (int)CurrentFadeType;
-            if (m_CurrentFadeType == FadeType.Entire) {
-                
-                return 1 - Mathf.SmoothStep(
+            if (m_currentFadeType == FadeType.Entire) {
+                //shaderの補間はSmoothstepなので厳密には違う
+                    return 1 - Mathf.Lerp(
                     m_FadeObject.material.GetFloat(m_pID[index].m_ID_minAlpha),
                     m_FadeObject.material.GetFloat(m_pID[index].m_ID_maxAlpha),
                     m_FadeObject.material.GetFloat(m_pID[index].m_ID_Fade));
@@ -71,33 +53,33 @@ public class Display : SingletonMonoBehaviour<Display> {
         }
         set {
             int index = (int)CurrentFadeType;
-            float v = value < 0 ? 1 : value > 1 ? 0 : 1 - value;
-            if (m_CurrentFadeType == FadeType.Entire) {
-               
-                if (v < m_minAlpha) {
-                    UsefulSystem.Log("MaxAlphaが変更されます : " + MaxAlpha);
-                    m_FadeObject.material.SetFloat(m_pID[index].m_ID_minAlpha, v);
-                    m_FadeObject.material.SetFloat(m_pID[index].m_ID_Fade, 0);
-                }
-                else if (v > m_maxAlpha) {
-                    UsefulSystem.Log("MinAlphaが変更されます : " + MinAlpha);
-                    m_FadeObject.material.SetFloat(m_pID[index].m_ID_maxAlpha, v);
-                    m_FadeObject.material.SetFloat(m_pID[index].m_ID_Fade, 1);
+            float v = Mathf.Clamp(value, 0, 1);
+            if (m_currentFadeType == FadeType.Entire) 
+            {
+                if (v > m_maxAlpha || v < m_minAlpha) {
+                    Log("画面の明るさが変更されます : " + v,false);
+                    float t = m_FadeObject.material.GetFloat(m_pID[index].m_ID_Fade);
+                    if(t <= 1) {
+                        m_FadeObject.material.SetFloat(m_pID[index].m_ID_maxAlpha, 1 - v);
+                    }
+                    else {
+                        m_FadeObject.material.SetFloat(m_pID[index].m_ID_minAlpha, 1 - v);
+                        m_FadeObject.material.SetFloat(m_pID[index].m_ID_Fade, 0);
+                    }                  
                 }
                 else {
                     float start = m_FadeObject.material.GetFloat(m_pID[index].m_ID_minAlpha);
                     float end = m_FadeObject.material.GetFloat(m_pID[index].m_ID_maxAlpha);
-                    m_FadeObject.material.SetFloat(m_pID[index].m_ID_Fade, (v - start) / (end - start));
-                    Debug.Log("t : " + (1 - (v - start) / (end - start)));
+                    m_FadeObject.material.SetFloat(m_pID[index].m_ID_Fade, 1 - (v - start) / (end - start));
+                    Log("画面の明るさが変更されます : " + ((v - start) / (end - start)),false);
                 }
             }
             else {
+                Log("画面の明るさが変更されます : " + v,false);
                 if(m_FadeObject.material.GetFloat(m_pID[index].m_ID_Fade) < 1) {
-                   // m_FadeObject.material.SetFloat(m_pID[index].m_ID_Fade,0);
-                    m_FadeObject.material.SetFloat(m_pID[index].m_ID_minAlpha,v);
+                    m_FadeObject.material.SetFloat(m_pID[index].m_ID_minAlpha, 1 - v);
                 }else {
-                  //  m_FadeObject.material.SetFloat(m_pID[index].m_ID_Fade, 1);
-                    m_FadeObject.material.SetFloat(m_pID[index].m_ID_maxAlpha, v);
+                    m_FadeObject.material.SetFloat(m_pID[index].m_ID_maxAlpha, 1 - v);
                 }
 
             }
@@ -107,7 +89,9 @@ public class Display : SingletonMonoBehaviour<Display> {
     /// <summary>現在フェード関数が実行中であるかどうか(true : 実行中　false : 実行していない)</summary>
     public bool IsFading { get { return m_IsFading; } private set { m_IsFading = value; } }
     /// <summary>現在のフェードタイプ</summary>
-    public FadeType CurrentFadeType { get {return m_CurrentFadeType; } private set { m_CurrentFadeType = value; } }
+    public FadeType CurrentFadeType { get { return m_currentFadeType; } private set { m_currentFadeType = value; if (value != m_currentFadeType) Log("フェードタイプが " + m_currentFadeType + " から " + value + " に変更されます", false); } }
+    /// <summary>シーンを切り替えた際に自動でフェードインするかどうか</summary>
+    public bool AutoFading { get { return m_autoFading; } set { m_autoFading = value; } }
 
 
     // パブリック関数　//-----------------------------------------------------------------------------------------------------------------
@@ -139,13 +123,27 @@ public class Display : SingletonMonoBehaviour<Display> {
     //　プライベート変数・関数 //----------------------------------------------------------------------------------------------------------
 
     //  変数一覧  //
-    private FadeType m_CurrentFadeType = FadeType.Entire;     //現在のフェードタイプ
-    private bool m_IsFading = false;                             //現在フェードを行っているかどうか
-
+    [Header("------コンフィグ ----------------------------------------------------------------------------------------------------------------")]
+    [SerializeField,Header("フェードタイプ")]
+    private FadeType m_currentFadeType = FadeType.Entire;       //現在のフェードタイプ
+    [SerializeField,Header("シーン切り替え時に自動でフェードインするかどうか")]
+    private bool m_autoFading = true;
+    private bool m_IsFading = false;                             //現在フェードを行っているかどうか  
+    [SerializeField,Header("フェード時間")]
     private  float m_fadeTime = 1.0f;                             //FadeTime用
-    private  float m_minAlpha = 0.0f;                             //フェードオブジェクトの最小α値
-    private  float m_maxAlpha = 1.0f;                             //フェードオブジェクトの最大α値  
+    [SerializeField,Header("フェードイン後の画面の明るさ(0 ~ 1)")]
+    private  float m_maxAlpha = 1.0f;                           //画面の明るさの最大値  
+    [SerializeField, Header("フェードアウト後の画面の明るさ(0 ~ 1)")]
+    private float m_minAlpha = 0.0f;                           　//画面の明るさの最小値
     private  float m_timeScale =1.0f;                            //保存用タイムスケール
+    [SerializeField,Header("ログの表示を有効にするかどうか(エラーメッセージは除く)")]
+    private bool m_Log = true;
+
+    [Header("------シェーダーとフェードオブジェクト-------------------------------------------------------------------------------------------")]
+    [SerializeField, Header("フェード用UIオブジェクト")]
+    private Image m_FadeObject;
+    [SerializeField, Header("フェード用シェーダー"), EnumIndex(typeof(FadeType))]
+    private Shader[] m_FadeShaders;
 
     private static PropertiesID[] m_pID;                         //プロパティのID
 
@@ -172,14 +170,23 @@ public class Display : SingletonMonoBehaviour<Display> {
                 m_pID[i].m_ID_maxAlpha = Shader.PropertyToID("_MaxAlpha");
                 m_pID[i].m_ID_minAlpha = Shader.PropertyToID("_MinAlpha");
             }
+            //正しい値になっているか確認する
+            m_maxAlpha = Mathf.Clamp(m_maxAlpha, 0.0f, 1.0f);
+            m_minAlpha = Mathf.Clamp(m_minAlpha, 0.0f, 1.0f);
+            Debug.Assert(m_maxAlpha > m_minAlpha,"MinAlphaがMaxAlphaを上回っています。設定を確認してください。");
             //フェード可能フラグを立てる
             m_FadeObject.enabled = true;
             //フェードの初期化
-            int index = (int)FadeType.Entire;
+            int index = (int)m_currentFadeType;
             m_FadeObject.material.shader = m_FadeShaders[index];
             m_FadeObject.material.SetFloat(m_pID[index].m_ID_Fade,1);
-            m_FadeObject.material.SetFloat(m_pID[index].m_ID_maxAlpha,m_maxAlpha);
-            m_FadeObject.material.SetFloat(m_pID[index].m_ID_minAlpha,m_minAlpha);
+            m_FadeObject.material.SetFloat(m_pID[index].m_ID_maxAlpha,1 - m_minAlpha);
+            m_FadeObject.material.SetFloat(m_pID[index].m_ID_minAlpha, 1 - m_maxAlpha);
+        }
+
+        if (m_autoFading) {
+            UsefulSystem.Log("AutoFadingがtrueの為、自動でフェードインします。");
+            FadeIn(CurrentFadeType);
         }
     }
 
@@ -210,7 +217,7 @@ public class Display : SingletonMonoBehaviour<Display> {
 
     /// <summary>フェードの準備を行います。フェード可能であればtrueを返します</summary>
     private bool PrepareForFade(FadeType type,bool fadeOut) {
-        if (m_IsFading) { UsefulSystem.LogError("フェードの呼び出しが重複しています。重複しているフェードの処理は行われません"); return false; }
+        if (m_IsFading) { Log("フェードの呼び出しが重複しています。重複しているフェードの処理は行われません",true); return false; }
         //フェード中に変更
         IsFading = true;
         //タイムスケールを保存する
@@ -236,8 +243,8 @@ public class Display : SingletonMonoBehaviour<Display> {
         float t = m_FadeObject.material.GetFloat(m_pID[index].m_ID_Fade);
         float ct = t < 1 ? 1 - t : 1;
         //初めと終わりの明るさを設定する
-        m_FadeObject.material.SetFloat(m_pID[index].m_ID_maxAlpha, 1-CurrentAlpha);
-        m_FadeObject.material.SetFloat(m_pID[index].m_ID_minAlpha, m_minAlpha);
+        m_FadeObject.material.SetFloat(m_pID[index].m_ID_maxAlpha, 1 - CurrentAlpha);
+        m_FadeObject.material.SetFloat(m_pID[index].m_ID_minAlpha, 1 - m_maxAlpha);
 
         //毎フレームの補間の仕方を設定する
         UnityAction action1 = m_timeScale == 0 ?
@@ -253,12 +260,13 @@ public class Display : SingletonMonoBehaviour<Display> {
         }
 
         //処理を反転させている場合などはここに入る
-        if(m_CurrentFadeType != type) {
-            SetFadeShader(ref m_CurrentFadeType);
-            index = (int)m_CurrentFadeType;
+        if(m_currentFadeType != type) {
+            SetFadeShader(ref m_currentFadeType);
+            index = (int)m_currentFadeType;
         }
         m_FadeObject.material.SetFloat(m_pID[index].m_ID_Fade, 0);
         IsFading = false;
+        Log("フェードが完了しました。", false);
         action?.Invoke();
     }
 
@@ -271,8 +279,8 @@ public class Display : SingletonMonoBehaviour<Display> {
         float t = m_FadeObject.material.GetFloat(m_pID[index].m_ID_Fade);
         float ct = t > 0 ? 1 - t : 1;
         //初めと終わりの明るさを設定する
-        m_FadeObject.material.SetFloat(m_pID[index].m_ID_minAlpha, 1-CurrentAlpha);
-        m_FadeObject.material.SetFloat(m_pID[index].m_ID_maxAlpha, m_maxAlpha);
+        m_FadeObject.material.SetFloat(m_pID[index].m_ID_minAlpha, 1 - CurrentAlpha);
+        m_FadeObject.material.SetFloat(m_pID[index].m_ID_maxAlpha, 1 - m_minAlpha);
 
         //毎フレームの補間の仕方を設定する
         UnityAction action1 = m_timeScale == 0 ?
@@ -288,14 +296,18 @@ public class Display : SingletonMonoBehaviour<Display> {
         }
 
         //処理を反転させている場合などはここに入る
-        if (m_CurrentFadeType != type) {
-            SetFadeShader(ref m_CurrentFadeType);
-            index = (int)m_CurrentFadeType;
+        if (m_currentFadeType != type) {
+            SetFadeShader(ref m_currentFadeType);
+            index = (int)m_currentFadeType;
         }
         m_FadeObject.material.SetFloat(m_pID[index].m_ID_Fade, 1);
         IsFading = false;
+        Log("フェードが完了しました。", false);
         action?.Invoke();
     }
+
+    [Conditional("UNITY_EDITOR")]
+    private void Log(string message,bool warning) { if (!m_Log) return;  if (warning) Debug.LogWarning(message); else Debug.Log(message); }
 
     //-------------------------------------------------------------------------------------------------------------------------------------
     #endregion

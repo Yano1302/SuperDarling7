@@ -90,7 +90,6 @@ public class UsefulSystem : SingletonMonoBehaviour<UsefulSystem>
     [Conditional("UNITY_EDITOR")] public static void LogWarning(object o) { Debug.LogWarning(o); }
     /// <summary> エディタ上でのみ有効なErrorログを表示します</summary>
     [Conditional("UNITY_EDITOR")] public static void LogError(object o) { Debug.LogError(o); }
-    /// <summary> エディタ上でのみ有効なErrorログを表示します</summary>
     /// <summary>エディタ上でのみ有効な関数を実行します</summary>
     [Conditional("UNITY_EDITOR")] public static void DebugAction(UnityAction action) { action(); }
 
