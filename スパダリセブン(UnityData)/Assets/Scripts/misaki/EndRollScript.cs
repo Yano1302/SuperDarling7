@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 
-public class EndRollScript : MonoBehaviour
+public class EndRollScript : DebugSetting
 {
     //　テキストのスクロールスピード
     [SerializeField]
@@ -20,8 +20,9 @@ public class EndRollScript : MonoBehaviour
     //　シーン移動用コルーチン
     private Coroutine endRollCoroutine;
     CreditData[] creditDates; //csvファイルにある文章を格納する配列
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake(); // デバッグログを表示するか否かスクリプタブルオブジェクトのGameSettingsを参照
         CreditSetUp(); // クレジットをセット
         this.GetComponent<TextMeshProUGUI>().text = creditDates[0].creditText; // テキストをセット
     }

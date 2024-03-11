@@ -1,4 +1,4 @@
-﻿talkingChara,name,talks
-(Template)01,NPC1,1文章目aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-(Template)02,NPC2,2文章目
-(Template)01,NPC3,3文章目
+﻿backImage,leftTalkingChara,leftHighlight,rightTalkingChara,rightHighlight,centerTalkingChara,centerHighlight,name,talks
+aozora,(Template)01,1,(Template)01,,,,NPC1,1文章目aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+yuyake,(Template)02,,(Template)02,1,(Template)03,,NPC2,2文章目
+,,,,,(Template)03,1,NPC3,3文章目
