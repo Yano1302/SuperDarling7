@@ -7,6 +7,7 @@ using UnityEngine.Events;
 public enum UIType {
     Close,          //ここは必須
     EscapeButton,   //トラップから抜け出すボタンを表示する
+    Timer,          //タイマー表示用UI
 
 }
 

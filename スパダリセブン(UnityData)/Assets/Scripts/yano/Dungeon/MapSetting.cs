@@ -4,16 +4,17 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public enum MapType {
-    player,
-    road,
-    wall,
-    catchtrap,
+    player = 0,
+    road   = 1,
+    wall   = 2,
+    catchtrap = 3,
+    pitfall = 4,
 }
 
 public class MapSetting : SingletonMonoBehaviour<MapSetting>
 {
     // Config変数  //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
-    [SerializeField, Header("作成するマップの数")]
+    [SerializeField, Header("総マップ数")]
     private int AllMapNum = 1;
     [SerializeField, Header("一マスの縦のサイズ")]
     private int Height = 1;
@@ -22,7 +23,6 @@ public class MapSetting : SingletonMonoBehaviour<MapSetting>
     [SerializeField, Header("マップオブジェクト"), EnumIndex(typeof(MapType))]
     private GameObject[] MapObject;
 
-    
     //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
 
     public void CreateMap(int mapNumber) {
@@ -31,14 +31,8 @@ public class MapSetting : SingletonMonoBehaviour<MapSetting>
     }
 
    
-
-
-
-
-
     //  プライベート変数  //------------------------------------------------------------------------------------------------------------------------------
     private List<string>[] m_mapData = null;
-
     //  プライベート関数  //------------------------------------------------------------------------------------------------------------------------------
     
     //初期化
@@ -54,6 +48,7 @@ public class MapSetting : SingletonMonoBehaviour<MapSetting>
         }
     }
 
+    //TODO　どこかからこの関数を呼び出す
     private void _Create(int mapNumber) {
         //右上から読み込む
         int heightCount = m_mapData[mapNumber].Count - 1;
@@ -73,6 +68,6 @@ public class MapSetting : SingletonMonoBehaviour<MapSetting>
                 } 
             }
         }
-
+        UIManager.Instance.OpenUI(UIType.Timer);
     }
 }

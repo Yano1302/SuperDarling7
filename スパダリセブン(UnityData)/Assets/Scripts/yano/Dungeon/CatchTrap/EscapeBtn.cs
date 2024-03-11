@@ -11,6 +11,7 @@ public class EscapeBtn : MonoBehaviour
     [SerializeField] private BtnSide Side = BtnSide.Right;
     [SerializeField] private RectTransform Rect;
     [SerializeField] private Text m_text;
+    [SerializeField] private Image m_image;
     //EscapeÇ©ÇÁê›íË
     [HideInInspector] public int RestPressNum { get { return m_CurrentPresNum; } set { m_CurrentPresNum = value; if (m_CurrentPresNum <= 0) { clear = true; Rect.gameObject.SetActive(false); } } }
     [HideInInspector] public KeyCode Key { get { return m_key; } set { m_key = value; m_text.text = value.ToString(); } }
@@ -24,9 +25,12 @@ public class EscapeBtn : MonoBehaviour
    public void Set(int pressNum) {
         RestPressNum = pressNum;
         clear = false;
+        m_image.color = Color.blue;
         //97 ~ 122 Ç™Å@A~ZÇÃîÕàÕ
         Key = (KeyCode)Random.Range(97, 122);
-        Vector3 sidePos = Side == BtnSide.Right ? Vector3.right : Vector3.left * 2;
+        Vector3 sidePos = Side == BtnSide.Right ? new Vector3(2, 0, 0) : new Vector3(-2, 0, 0);
         Rect.position = Camera.main.WorldToScreenPoint((Player.Instance.gameObject.transform.position + sidePos));
     }
+
+    public void SetColor(Color color) { m_image.color = color; }
 }
