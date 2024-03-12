@@ -6,12 +6,12 @@ using UnityEngine.Events;
 
 public class DisplayDebug : SingletonMonoBehaviour<DisplayDebug>
 {
-    private Display Ins;
+    private DisplayManager Ins;
     [SerializeField]
     private FadeType type;
 
     private void Start() {
-        Ins = Display.Instance;
+        Ins = DisplayManager.Instance;
         type = 0;
     }
 

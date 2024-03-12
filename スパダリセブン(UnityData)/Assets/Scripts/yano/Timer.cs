@@ -47,9 +47,9 @@ public class Timer:MonoBehaviour
     /// <summary> 総残り時間(秒)</summary>
     public float RemainingTime { get; set; } = 999;
     /// <summary>残り時間を分数で返します</summary>
-    public int minutes { get { return Mathf.FloorToInt(RemainingTime / 60); } }
-    /// <summary>残り時間(秒数のみ :  0 ～　59) </summary>
-    public int seconds { get { return (int)(RemainingTime % 60); } }
+    public int minutes { get { return (int)(RemainingTime / 60); } }
+  /// <summary>残り時間(秒数のみ :  0 ～　59) </summary>
+    public int seconds { get { return (int)Mathf.Ceil(RemainingTime % 60); } }
 
     /// <summary> この変数がtrueの場合にタイマーが進みます </summary>
     public bool TimeFlag { get; set; } = false;
@@ -60,23 +60,26 @@ public class Timer:MonoBehaviour
     /// <summary>タイマーの進む速度を指定できます(倍率)。速度をマイナスにした場合は残り時間が増えていきます。 </summary>
     public float TimeSpeed { get { return m_timeSpeed; } set { m_timeSpeed = value; UsefulSystem.DebugAction(() => { if (value < 0) Debug.LogWarning("徐々に残り時間が増えていきます。"); }); } }
 
+
+
+
 // private //
     private float m_timeSpeed = 1.0f; //タイマーの速度
-    private float m_count = 0.0f;      //１秒経過をカウントする
+    private float m_count = 0.0f;     //１秒経過をカウントする
 
     private void Update() {
+        if (RemainingTime <= 0) {
+            TimeUpAction?.Invoke();
+            Log("タイマーが0になりました");
+            Destroy(this);
+        }
         if (TimeFlag) {
             RemainingTime -= Time.deltaTime * TimeSpeed;
             m_count += Mathf.Abs(Time.deltaTime * TimeSpeed);
-            if(m_count > 1) {
+            if(m_count >= 1) {
                 SecondAction?.Invoke();
                 m_count -= 1;
-            }
-            if(RemainingTime < 0) {
-                TimeUpAction?.Invoke();
-                Log("タイマーが0になりました");
-                Destroy(this);                
-            }
+            }          
         }
     }
 

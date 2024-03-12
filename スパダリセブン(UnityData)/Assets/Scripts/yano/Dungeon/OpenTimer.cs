@@ -14,16 +14,21 @@ public class OpenTimer : MonoBehaviour
 
     //TODO　timerをどこかから設定する？/一旦CreateMapから呼び出します
     private void OnEnable() {
-        _Timer = Timer.SetTimer(gameObject, 100,TimeUp);
+        _Timer = Timer.SetTimer(gameObject, 30,TimeUp);
         _Timer.SecondAction = SetTimerUI;
+        SetTimerUI();
     }
 
     private void SetTimerUI() {
-        m_text.text = "0"+_Timer.minutes + " : "+_Timer.seconds;
+        string mstr = _Timer.minutes < 10 ? "0" + _Timer.minutes : _Timer.minutes.ToString();
+        string sstr = _Timer.seconds < 10 ? " :  0" + _Timer.seconds : " : " + _Timer.seconds.ToString();
+        m_text.text = mstr + sstr;
     } 
 
     private void TimeUp() {
-        Display.Instance.FadeOut(
+        UsefulSystem.Log("タイムアップです。ゲームが終了されます。");
+        
+        DisplayManager.Instance.FadeOut(
             FadeType.Entire, 
             () => {
                 //TODO　仕様が決まり次第追記する

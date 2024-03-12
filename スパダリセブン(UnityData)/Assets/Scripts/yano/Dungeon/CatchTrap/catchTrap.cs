@@ -9,7 +9,7 @@ public class catchTrap : MonoBehaviour
       if(collision.gameObject.tag == "Player") {
             CaughtTrap = gameObject;
             collision.transform.position = transform.position;
-            Player.Instance.CanMoving = false;
+            Player.Instance.CanMove = false;
             UIManager.Instance.OpenUI(UIType.EscapeButton);
         }
     }

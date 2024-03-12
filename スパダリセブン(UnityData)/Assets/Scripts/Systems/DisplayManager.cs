@@ -21,7 +21,7 @@ public enum FadeType
     CCW,
 }
 
-public class Display : SingletonMonoBehaviour<Display> {
+public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
   
     // パブリック変数 //------------------------------------------------------------------------------------------------------------------
 
