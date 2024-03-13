@@ -6,6 +6,21 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/misaki/TitleScene.unity
+    guid: 886afed2f79d266449fd14870ce6700f
+  - enabled: 1
+    path: Assets/Scenes/misaki/RequisitionsScene.unity
+    guid: 913eae7cb08754b43aadaa8ed55bf0e9
+  - enabled: 1
+    path: Assets/Scenes/misaki/StoryScene.unity
+    guid: d47896a0aa861f849b0cfae759f39373
+  - enabled: 1
+    path: Assets/Scenes/misaki/InvestigationScene.unity
+    guid: 469ca243e2ac94443ac1d24bbb8c759c
+  - enabled: 1
+    path: Assets/Scenes/misaki/SolveScene.unity
+    guid: bb16faa5795a8ec49ad698b8559c246d
+  - enabled: 1
     path: Assets/Scenes/DefaltScene.unity
     guid: 2cda990e2423bbf4892e6590ba056729
   - enabled: 1
