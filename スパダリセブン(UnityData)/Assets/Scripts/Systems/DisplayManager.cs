@@ -21,6 +21,11 @@ public enum FadeType
     CCW,
 }
 
+/// <summary>
+/// 画面の暗転、明転などを管理します<br />
+/// ※FadeImageには専用のMaterialを作成しアタッチしておいてください<br />
+/// (デフォルトのままだと全てのDefault UI Materialがバグります)
+/// </summary>
 public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
   
     // パブリック変数 //------------------------------------------------------------------------------------------------------------------
