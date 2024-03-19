@@ -170,17 +170,17 @@ public class TextController : DebugSetting
     private void InstantiateActors()
     {
         // 背景を生成
-        if (backImages[talkNum]) backImage = Instantiate(backImages[talkNum], backImageAnchor.transform);
+        if (backImages[talkNum] && backImage) backImage = Instantiate(backImages[talkNum], backImageAnchor.transform);
         // キャラクター画像を生成
         for (int i = 0; i < displayCharaAnchors; i++)
         {
             if (!charaImages[i, talkNum]) continue; // nullならコンティニューする
                                                     // 左側にキャラクター画像を生成
-            if (i == 0) leftCharaImage = Instantiate(charaImages[i, talkNum], charaAnchors[i].transform);
+            if (i == 0 && leftCharaImage) leftCharaImage = Instantiate(charaImages[i, talkNum], charaAnchors[i].transform);
             // 右側にキャラクター画像を生成
-            else if (i == 1) rightCharaImage = Instantiate(charaImages[i, talkNum], charaAnchors[i].transform);
+            else if (i == 1 && rightCharaImage) rightCharaImage = Instantiate(charaImages[i, talkNum], charaAnchors[i].transform);
             // 中央にキャラクター画像を生成
-            else centerCharaImage = Instantiate(charaImages[i, talkNum], charaAnchors[i].transform);
+            else if (i==2 && centerCharaImage) centerCharaImage = Instantiate(charaImages[i, talkNum], charaAnchors[i].transform);
         }
         // 発言者以外のキャラクター画像を灰色にする
         for (int i = 0; i < displayCharaAnchors; i++)
