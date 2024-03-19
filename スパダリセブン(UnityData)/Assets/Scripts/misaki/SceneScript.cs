@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 // maincameraなど常にいるものにアタッチすること推奨
 // スクリプト「FadeManager」と共に使用する
 
-public class SceneScript : SingletonMonoBehaviour<SceneScript>
+/*public class SceneScript : SingletonMonoBehaviour<SceneScript>
 {
     [SerializeField] GameObject fadeCanvas; //prefabのFadeCanvasを入れる
     public AudioSource SEAudioSource; // SE用オーディオソース
@@ -36,4 +36,4 @@ public class SceneScript : SingletonMonoBehaviour<SceneScript>
         SceneManager.LoadScene(sceneName);                // シーンチェンジ
     }
 }
-
+*/
