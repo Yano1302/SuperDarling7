@@ -34,6 +34,10 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     /// <summary>Jsonデータを読み込みます</summary>
     public void Load() { m_json.Load(); }
 
+    public void _Reset() { m_json.Reset(); }
+    public void _Delete() { m_json.Delete(ref m_json); }
+    public string GetPath() { return m_json.GetJsonPath(); }
+
     /// <summary>フラグの情報をログに表示します(デバッグ用)</summary>
     [System.Diagnostics.Conditional("UNITY_EDITOR")]
     public void Log() { Debug.Log(m_json.JsonToString()); }
@@ -44,14 +48,14 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
 
     // private //   
     private JsonSettings<SettingsGetItemFlags> m_json;      //Jsonファイルを読み込むクラス
-    private GameObject[] ItemWindow;                            //アイテムウィンドウ
+    private GameObject[] ItemWindow;                        //アイテムウィンドウ
 
     //初期化とJsonからのデータの読み込み
     protected override void Awake() {
         base.Awake();
         if(m_json == null) {
             //アイテム情報を読み込む
-            m_json = new JsonSettings<SettingsGetItemFlags>("ItemGetFlags");
+            m_json = new JsonSettings<SettingsGetItemFlags>("ItemGetFlags","Data1");
             //アイテムウィンドウを設定する
             int count = transform.childCount;
             Debug.Assert(count == UsefulSystem.GetEnumLength<ItemID>(),"設置されているアイテムウィンドウの個数とアイテムのIDの数が一致しません");

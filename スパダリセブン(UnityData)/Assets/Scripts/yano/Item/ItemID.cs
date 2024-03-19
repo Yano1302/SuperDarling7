@@ -23,17 +23,17 @@ public enum ItemID {
 //ID–¼‚Æbool•Ï”–¼‚ğˆê’v‚³‚¹‚é
 [Serializable]
 public class SettingsGetItemFlags {
-    public bool ID0 = false;
-    public bool ID1 = false;
-    public bool ID2 = false;
-    public bool ID3 = false;
-    public bool ID4 = false;
-    public bool ID5 = false;
-    public bool ID6 = false;
-    public bool ID7 = false;
-    public bool ID8 = false;
-    public bool ID9 = false;
-    public bool ID10 = false;
+    public bool ID0;
+    public bool ID1;
+    public bool ID2;
+    public bool ID3;
+    public bool ID4;
+    public bool ID5;
+    public bool ID6;
+    public bool ID7;
+    public bool ID8;
+    public bool ID9;
+    public bool ID10;
 
     public bool GetFlag(ItemID id) {
         switch (id) {

@@ -48,10 +48,16 @@ public class ItemDebug : MonoBehaviour
             Debug.Log("取得後のフラグ : " + ins.GetFlag(id));
         });
 
+        DA(KeyCode.M, () => {
+            Debug.Log("パス : "+ins.GetPath());
+        });
+        DA(KeyCode.A, () => {
+            ins._Delete();
+        });
     }
 
 
-        void DA(KeyCode code, UnityAction action) {
+    void DA(KeyCode code, UnityAction action) {
         if (Input.GetKeyDown(code)) {
             action();
         }
