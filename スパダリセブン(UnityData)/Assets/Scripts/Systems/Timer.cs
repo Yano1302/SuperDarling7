@@ -1,9 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
 
 /// <summary>
@@ -47,10 +44,12 @@ public class Timer:MonoBehaviour
     /// <summary> 総残り時間(秒)</summary>
     public float RemainingTime { get; set; } = 999;
     /// <summary>残り時間を分数で返します</summary>
-    public int minutes { get { return (int)(RemainingTime / 60); } }
-  /// <summary>残り時間(秒数のみ :  0 ～　59) </summary>
-    public int seconds { get { return (int)Mathf.Ceil(RemainingTime % 60); } }
-
+    public int Minutes { get { return (int)(RemainingTime / 60); } }
+ 　 /// <summary>残り時間(秒数のみ :  0 ～　59) </summary>
+    public int IntSeconds { get { return (int)Mathf.Ceil(RemainingTime % 60); } }
+    /// <summary>残り時間(秒数のみ :  0.000000 ～　59.99999) </summary>
+    public float FloatSeconds { get { return RemainingTime % 60; }  }
+    
     /// <summary> この変数がtrueの場合にタイマーが進みます </summary>
     public bool TimeFlag { get; set; } = false;
     /// <summary>タイマーが切れた場合の処理</summary>

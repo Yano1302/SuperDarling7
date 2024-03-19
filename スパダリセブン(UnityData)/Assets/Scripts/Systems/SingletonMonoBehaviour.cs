@@ -6,23 +6,23 @@ using UnityEngine;
 /// </summary>
 public abstract class SingletonMonoBehaviour<T> : MonoBehaviour where T : MonoBehaviour 
 {
+    private static T m_instance;
 
-    private static T instance;
-
+    /// <summary>インスタンスを取得します</summary>
     public static T Instance
     {
         get
         {
-            if (instance == null)
+            if (m_instance == null)
             {
-                instance = (T)FindObjectOfType(typeof(T));
+                m_instance = (T)FindObjectOfType(typeof(T));
 
-                if (instance == null)
+                if (m_instance == null)
                 {
                     Debug.LogError(typeof(T) + "をアタッチしているGameObjectがありません");
                 }
             }
-            return instance;
+            return m_instance;
         }
     }
 

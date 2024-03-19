@@ -20,8 +20,8 @@ public class OpenTimer : MonoBehaviour
     }
 
     private void SetTimerUI() {
-        string mstr = _Timer.minutes < 10 ? "0" + _Timer.minutes : _Timer.minutes.ToString();
-        string sstr = _Timer.seconds < 10 ? " :  0" + _Timer.seconds : " : " + _Timer.seconds.ToString();
+        string mstr = _Timer.Minutes < 10 ? "0" + _Timer.Minutes : _Timer.Minutes.ToString();
+        string sstr = _Timer.IntSeconds < 10 ? " :  0" + _Timer.IntSeconds : " : " + _Timer.IntSeconds.ToString();
         m_text.text = mstr + sstr;
     } 
 

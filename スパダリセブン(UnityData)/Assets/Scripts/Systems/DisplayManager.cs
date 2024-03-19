@@ -21,6 +21,11 @@ public enum FadeType
     CCW,
 }
 
+/// <summary>
+/// 画面の暗転、明転などを管理します<br />
+/// ※FadeImageには専用のMaterialを作成しアタッチしておいてください<br />
+/// (デフォルトのままだと全てのDefault UI Materialがバグります)
+/// </summary>
 public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
   
     // パブリック変数 //------------------------------------------------------------------------------------------------------------------
@@ -38,15 +43,15 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
             if (m_currentFadeType == FadeType.Entire) {
                 //shaderの補間はSmoothstepなので厳密には違う
                     return 1 - Mathf.Lerp(
-                    m_FadeObject.material.GetFloat(m_pID[index].m_ID_minAlpha),
-                    m_FadeObject.material.GetFloat(m_pID[index].m_ID_maxAlpha),
-                    m_FadeObject.material.GetFloat(m_pID[index].m_ID_Fade));
+                    m_fadeImage.material.GetFloat(m_pID[index].m_ID_minAlpha),
+                    m_fadeImage.material.GetFloat(m_pID[index].m_ID_maxAlpha),
+                    m_fadeImage.material.GetFloat(m_pID[index].m_ID_Fade));
             }
             else {
-                if (m_FadeObject.material.GetFloat(m_pID[index].m_ID_Fade) == 1) {
-                    return 1- m_FadeObject.material.GetFloat(m_pID[index].m_ID_maxAlpha);
+                if (m_fadeImage.material.GetFloat(m_pID[index].m_ID_Fade) == 1) {
+                    return 1- m_fadeImage.material.GetFloat(m_pID[index].m_ID_maxAlpha);
                 } else {
-                    return 1- m_FadeObject.material.GetFloat(m_pID[index].m_ID_minAlpha);
+                    return 1- m_fadeImage.material.GetFloat(m_pID[index].m_ID_minAlpha);
                 }
             }
          
@@ -58,28 +63,28 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
             {
                 if (v > m_maxAlpha || v < m_minAlpha) {
                     Log("画面の明るさが変更されます : " + v,false);
-                    float t = m_FadeObject.material.GetFloat(m_pID[index].m_ID_Fade);
+                    float t = m_fadeImage.material.GetFloat(m_pID[index].m_ID_Fade);
                     if(t <= 1) {
-                        m_FadeObject.material.SetFloat(m_pID[index].m_ID_maxAlpha, 1 - v);
+                        m_fadeImage.material.SetFloat(m_pID[index].m_ID_maxAlpha, 1 - v);
                     }
                     else {
-                        m_FadeObject.material.SetFloat(m_pID[index].m_ID_minAlpha, 1 - v);
-                        m_FadeObject.material.SetFloat(m_pID[index].m_ID_Fade, 0);
+                        m_fadeImage.material.SetFloat(m_pID[index].m_ID_minAlpha, 1 - v);
+                        m_fadeImage.material.SetFloat(m_pID[index].m_ID_Fade, 0);
                     }                  
                 }
                 else {
-                    float start = m_FadeObject.material.GetFloat(m_pID[index].m_ID_minAlpha);
-                    float end = m_FadeObject.material.GetFloat(m_pID[index].m_ID_maxAlpha);
-                    m_FadeObject.material.SetFloat(m_pID[index].m_ID_Fade, 1 - (v - start) / (end - start));
+                    float start = m_fadeImage.material.GetFloat(m_pID[index].m_ID_minAlpha);
+                    float end = m_fadeImage.material.GetFloat(m_pID[index].m_ID_maxAlpha);
+                    m_fadeImage.material.SetFloat(m_pID[index].m_ID_Fade, 1 - (v - start) / (end - start));
                     Log("画面の明るさが変更されます : " + ((v - start) / (end - start)),false);
                 }
             }
             else {
                 Log("画面の明るさが変更されます : " + v,false);
-                if(m_FadeObject.material.GetFloat(m_pID[index].m_ID_Fade) < 1) {
-                    m_FadeObject.material.SetFloat(m_pID[index].m_ID_minAlpha, 1 - v);
+                if(m_fadeImage.material.GetFloat(m_pID[index].m_ID_Fade) < 1) {
+                    m_fadeImage.material.SetFloat(m_pID[index].m_ID_minAlpha, 1 - v);
                 }else {
-                    m_FadeObject.material.SetFloat(m_pID[index].m_ID_maxAlpha, 1 - v);
+                    m_fadeImage.material.SetFloat(m_pID[index].m_ID_maxAlpha, 1 - v);
                 }
 
             }
@@ -141,7 +146,7 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
 
     [Header("------シェーダーとフェードオブジェクト-------------------------------------------------------------------------------------------")]
     [SerializeField, Header("フェード用UIオブジェクト")]
-    private Image m_FadeObject;
+    private Image m_fadeImage;
     [SerializeField, Header("フェード用シェーダー"), EnumIndex(typeof(FadeType))]
     private Shader[] m_FadeShaders;
 
@@ -161,7 +166,7 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
     protected override void Awake() {
         base.Awake();
         if (m_pID == null) {          
-            Debug.Assert(m_FadeObject != null, "フェードオブジェクトがアタッチされていません");
+            Debug.Assert(m_fadeImage != null, "フェードオブジェクトがアタッチされていません");
             Debug.Assert(m_FadeShaders.Length > 0 && m_FadeShaders.Length == UsefulSystem.GetEnumLength<FadeType>(), "シェーダーがアタッチされていません");
             m_pID = new PropertiesID[m_FadeShaders.Length];
             //各IDを取得
@@ -175,13 +180,13 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
             m_minAlpha = Mathf.Clamp(m_minAlpha, 0.0f, 1.0f);
             Debug.Assert(m_maxAlpha > m_minAlpha,"MinAlphaがMaxAlphaを上回っています。設定を確認してください。");
             //フェード可能フラグを立てる
-            m_FadeObject.enabled = true;
+            m_fadeImage.enabled = true;
             //フェードの初期化
             int index = (int)m_currentFadeType;
-            m_FadeObject.material.shader = m_FadeShaders[index];
-            m_FadeObject.material.SetFloat(m_pID[index].m_ID_Fade,1);
-            m_FadeObject.material.SetFloat(m_pID[index].m_ID_maxAlpha,1 - m_minAlpha);
-            m_FadeObject.material.SetFloat(m_pID[index].m_ID_minAlpha, 1 - m_maxAlpha);
+            m_fadeImage.material.shader = m_FadeShaders[index];
+            m_fadeImage.material.SetFloat(m_pID[index].m_ID_Fade,1);
+            m_fadeImage.material.SetFloat(m_pID[index].m_ID_maxAlpha,1 - m_minAlpha);
+            m_fadeImage.material.SetFloat(m_pID[index].m_ID_minAlpha, 1 - m_maxAlpha);
         }
 
         if (m_autoFading) {
@@ -195,7 +200,7 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
     /// <summary>対応するシェーダーに設定します。</summary>
     private void SetFadeShader(ref FadeType type,bool reverse = false) {
         //フェードの度合を保存しておく
-        float t = m_FadeObject.material.GetFloat(m_pID[(int)CurrentFadeType].m_ID_Fade); 
+        float t = m_fadeImage.material.GetFloat(m_pID[(int)CurrentFadeType].m_ID_Fade); 
         //フェードタイプを更新
         CurrentFadeType = type;
         //インデックスを取得
@@ -212,7 +217,7 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
             index = (int)type;
         }
         //シェーダーを設定     
-        m_FadeObject.material.shader = m_FadeShaders[(index)];
+        m_fadeImage.material.shader = m_FadeShaders[(index)];
     }
 
     /// <summary>フェードの準備を行います。フェード可能であればtrueを返します</summary>
@@ -222,15 +227,16 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
         IsFading = true;
         //タイムスケールを保存する
         m_timeScale = Time.timeScale;
-        //UIを前面に移動
-        m_FadeObject.transform.SetAsLastSibling();
-
+        //フェードUIを前面に移動
+        m_fadeImage.transform.SetAsLastSibling();
+        //フェードUIのレイキャスト設定
+        m_fadeImage.raycastTarget = fadeOut;
         //マテリアル等の設定
         SetFadeShader(ref type,fadeOut);
         //tの値が中途半端ではまずいフェードタイプの場合は_Fadeを１か０にする
         if(type != FadeType.Entire) {
             float t = fadeOut ? 0 : 1;
-            m_FadeObject.material.SetFloat(m_pID[(int)type].m_ID_Fade,t);
+            m_fadeImage.material.SetFloat(m_pID[(int)type].m_ID_Fade,t);
         }
         return true;
     }
@@ -240,11 +246,11 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
         //インデックスを取得
         int index = (int)type;
         //現在の補間情報を取得する
-        float t = m_FadeObject.material.GetFloat(m_pID[index].m_ID_Fade);
+        float t = m_fadeImage.material.GetFloat(m_pID[index].m_ID_Fade);
         float ct = t < 1 ? 1 - t : 1;
         //初めと終わりの明るさを設定する
-        m_FadeObject.material.SetFloat(m_pID[index].m_ID_maxAlpha, 1 - CurrentAlpha);
-        m_FadeObject.material.SetFloat(m_pID[index].m_ID_minAlpha, 1 - m_maxAlpha);
+        m_fadeImage.material.SetFloat(m_pID[index].m_ID_maxAlpha, 1 - CurrentAlpha);
+        m_fadeImage.material.SetFloat(m_pID[index].m_ID_minAlpha, 1 - m_maxAlpha);
 
         //毎フレームの補間の仕方を設定する
         UnityAction action1 = m_timeScale == 0 ?
@@ -255,7 +261,7 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
         float startTime = Time.time;
         while (t > 0) {
             action1();
-            m_FadeObject.material.SetFloat(m_pID[index].m_ID_Fade,t);
+            m_fadeImage.material.SetFloat(m_pID[index].m_ID_Fade,t);
             yield return null;
         }
 
@@ -264,7 +270,7 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
             SetFadeShader(ref m_currentFadeType);
             index = (int)m_currentFadeType;
         }
-        m_FadeObject.material.SetFloat(m_pID[index].m_ID_Fade, 0);
+        m_fadeImage.material.SetFloat(m_pID[index].m_ID_Fade, 0);
         IsFading = false;
         Log("フェードが完了しました。", false);
         action?.Invoke();
@@ -276,11 +282,11 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
         //インデックスを取得
         int index = (int)type;
         //現在の補間情報を取得する
-        float t = m_FadeObject.material.GetFloat(m_pID[index].m_ID_Fade);
+        float t = m_fadeImage.material.GetFloat(m_pID[index].m_ID_Fade);
         float ct = t > 0 ? 1 - t : 1;
         //初めと終わりの明るさを設定する
-        m_FadeObject.material.SetFloat(m_pID[index].m_ID_minAlpha, 1 - CurrentAlpha);
-        m_FadeObject.material.SetFloat(m_pID[index].m_ID_maxAlpha, 1 - m_minAlpha);
+        m_fadeImage.material.SetFloat(m_pID[index].m_ID_minAlpha, 1 - CurrentAlpha);
+        m_fadeImage.material.SetFloat(m_pID[index].m_ID_maxAlpha, 1 - m_minAlpha);
 
         //毎フレームの補間の仕方を設定する
         UnityAction action1 = m_timeScale == 0 ?
@@ -291,7 +297,7 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
         float startTime = Time.time;
         while (t < 1) {
             action1();
-            m_FadeObject.material.SetFloat(m_pID[index].m_ID_Fade, t);
+            m_fadeImage.material.SetFloat(m_pID[index].m_ID_Fade, t);
             yield return null;
         }
 
@@ -300,7 +306,7 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
             SetFadeShader(ref m_currentFadeType);
             index = (int)m_currentFadeType;
         }
-        m_FadeObject.material.SetFloat(m_pID[index].m_ID_Fade, 1);
+        m_fadeImage.material.SetFloat(m_pID[index].m_ID_Fade, 1);
         IsFading = false;
         Log("フェードが完了しました。", false);
         action?.Invoke();
