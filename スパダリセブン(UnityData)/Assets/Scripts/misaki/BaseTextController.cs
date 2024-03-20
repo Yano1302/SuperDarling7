@@ -7,7 +7,7 @@ using Unity.VisualScripting.FullSerializer;
 using TMPro;
 using Unity.VisualScripting;
 
-public class TextController : DebugSetting
+public class BaseTextController : DebugSetting
 {
     private int talkNum = 0; // ダイヤログ番号
     public int displayCharaAnchors = 3; // キャラクター画像の表示箇所数
@@ -19,6 +19,7 @@ public class TextController : DebugSetting
     [Header("1-1のように入力")]
     public string storynum; //ストーリー番号
     private string words; // 文章
+    private int currentCharIndex = 0; // 文章の表示位置を示す変数
     public TextMeshProUGUI charaName; // キャラクター名のテキスト変数
     public TextMeshProUGUI textLabel; // 文章を格納するテキスト変数
     public TextMeshProUGUI buttonText; // ボタンのテキスト変数
@@ -39,6 +40,9 @@ public class TextController : DebugSetting
     public GameObject talkButton; // 会話を進めるボタン
     public GameObject autoButton; // オートモードに切り替えるボタン
     StoryTalkData[] storyTalks; //csvファイルにある文章を格納する配列
+
+    public bool runtimeCoroutine=false; // コルーチンが実行中かどうか
+    private Coroutine dialogueCoroutine; // コルーチンを格納する変数
     public enum TALKSTATE // 会話関係のステータス
     {
         NOTALK, // 話していない
@@ -154,45 +158,22 @@ public class TextController : DebugSetting
         if (talkState != TALKSTATE.LASTTALK) // 会話ステータスが話し中なら
         {
             InstantiateActors(); // 登場人物等を生成
-            StartCoroutine(Dialogue()); // 文章を表示するコルーチンを開始
+            StartDialogueCoroutine(); // 文章を表示するコルーチンを開始
         }
         else if (talkState == TALKSTATE.LASTTALK) // 会話ステータスが最後のセリフなら
         {
-            Debug.Log("会話を終了");
-            talkNum = default; // リセットする
-            TalkState = TALKSTATE.NOTALK; // 会話ステータスを話していないに変更
-            if (talkAuto) OnAutoModeCllicked(); // オートモードがオンであればオフにする
+            TalkEnd(); //会話を終了する
         }
     }
     /// <summary>
-    /// 登場人物等を生成する関数
+    /// 会話を終了する関数
     /// </summary>
-    private void InstantiateActors()
+    protected virtual void TalkEnd()
     {
-        // 背景を生成
-        if (backImages[talkNum] && backImage) backImage = Instantiate(backImages[talkNum], backImageAnchor.transform);
-        // キャラクター画像を生成
-        for (int i = 0; i < displayCharaAnchors; i++)
-        {
-            if (!charaImages[i, talkNum]) continue; // nullならコンティニューする
-                                                    // 左側にキャラクター画像を生成
-            if (i == 0 && leftCharaImage) leftCharaImage = Instantiate(charaImages[i, talkNum], charaAnchors[i].transform);
-            // 右側にキャラクター画像を生成
-            else if (i == 1 && rightCharaImage) rightCharaImage = Instantiate(charaImages[i, talkNum], charaAnchors[i].transform);
-            // 中央にキャラクター画像を生成
-            else if (i==2 && centerCharaImage) centerCharaImage = Instantiate(charaImages[i, talkNum], charaAnchors[i].transform);
-        }
-        // 発言者以外のキャラクター画像を灰色にする
-        for (int i = 0; i < displayCharaAnchors; i++)
-        {
-            if (charaHighlight[i, talkNum]) continue; // nullならコンティニューする
-                                                      // 左側のキャラクター画像を灰色にする
-            if (i == 0 && leftCharaImage) leftCharaImage.GetComponent<Image>().color = Color.gray;
-            // 右側のキャラクター画像を灰色にする
-            else if (i == 1 && rightCharaImage) rightCharaImage.GetComponent<Image>().color = Color.gray;
-            // 中央のキャラクター画像を灰色にする
-            else if (i == 2 && centerCharaImage) centerCharaImage.GetComponent<Image>().color = Color.gray;
-        }
+        Debug.Log("会話を終了");
+        talkNum = default; // リセットする
+        TalkState = TALKSTATE.NOTALK; // 会話ステータスを話していないに変更
+        if (talkAuto) OnAutoModeCllicked(); // オートモードがオンであればオフにする
     }
     /// <summary>
     /// 会話関係の表示を初期化する関数
@@ -209,6 +190,67 @@ public class TextController : DebugSetting
         if (rightCharaImage) Destroy(rightCharaImage);
         // 中央キャラクター画像が表示されていれば画像を破壊する
         if (centerCharaImage) Destroy(centerCharaImage);
+    }
+    /// <summary>
+    /// 登場人物等を生成する関数
+    /// </summary>
+    private void InstantiateActors()
+    {
+        // 背景を生成
+        if (backImages[talkNum]) backImage = Instantiate(backImages[talkNum], backImageAnchor.transform);
+        // キャラクター画像を生成
+        for (int i = 0; i < displayCharaAnchors; i++)
+        {
+            if (!charaImages[i, talkNum]) continue; // nullならコンティニューする
+                                                    // 左側にキャラクター画像を生成
+            if (i == 0) leftCharaImage = Instantiate(charaImages[i, talkNum], charaAnchors[i].transform);
+            // 右側にキャラクター画像を生成
+            else if (i == 1) rightCharaImage = Instantiate(charaImages[i, talkNum], charaAnchors[i].transform);
+            // 中央にキャラクター画像を生成
+            else if (i == 2) centerCharaImage = Instantiate(charaImages[i, talkNum], charaAnchors[i].transform);
+        }
+        // 発言者以外のキャラクター画像を灰色にする
+        for (int i = 0; i < displayCharaAnchors; i++)
+        {
+            if (charaHighlight[i, talkNum]) continue; // nullならコンティニューする
+                                                      // 左側のキャラクター画像を灰色にする
+            if (i == 0 && leftCharaImage) leftCharaImage.GetComponent<Image>().color = Color.gray;
+            // 右側のキャラクター画像を灰色にする
+            else if (i == 1 && rightCharaImage) rightCharaImage.GetComponent<Image>().color = Color.gray;
+            // 中央のキャラクター画像を灰色にする
+            else if (i == 2 && centerCharaImage) centerCharaImage.GetComponent<Image>().color = Color.gray;
+        }
+    }
+    /// <summary>
+    /// コルーチン開始関数
+    /// </summary>
+    private void StartDialogueCoroutine()
+    {
+        // コルーチンがすでに実行されている場合は停止
+        if (runtimeCoroutine) StopCoroutine(dialogueCoroutine);
+        // コルーチン開始
+        dialogueCoroutine = StartCoroutine(Dialogue());
+        runtimeCoroutine = true; // フラグを実行中に変更
+    }
+    /// <summary>
+    /// コルーチン一時停止関数
+    /// </summary>
+    public void PauseDialogueCoroutine()
+    {
+        // 動いているコルーチンがあれば
+        if (runtimeCoroutine)
+        {
+            StopCoroutine(dialogueCoroutine); // コルーチンを止める
+            currentCharIndex = textLabel.text.Length; // 現在の文字の表示位置を保存
+        }
+    }
+    /// <summary>
+    /// コルーチン再開関数
+    /// </summary>
+    public void ResumeDialogueCoroutine()
+    {
+        // コルーチンが止まっていれば、再開用のコルーチン開始
+        if (runtimeCoroutine) dialogueCoroutine = StartCoroutine(ResumeDialogue());
     }
     /// <summary>
     /// 文章を表示するコルーチン
@@ -229,6 +271,39 @@ public class TextController : DebugSetting
             // 次の文字を表示する前に少し待ちます
             yield return new WaitForSeconds(CalculataTextSpeed());
         }
+        NextDialogue(); // 次のダイアログに変更する
+        if (talkAuto) // オートモードであれば
+        {
+            yield return new WaitForSeconds(textDelay); // textDelay秒待つ
+            OnTalkButtonClicked(); // 次の会話を自動でスタートする
+        }
+    }
+    /// <summary>
+    /// 一時停止した箇所から表示するコルーチン
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator ResumeDialogue()
+    {
+        // 文章の残りを再表示
+        for (int i = currentCharIndex; i < words.Length; i++)
+        {
+            // 文字を textLabel に追加します
+            textLabel.text += words[i];
+            // 次の文字を表示する前に少し待ちます
+            yield return new WaitForSeconds(CalculataTextSpeed());
+        }
+        NextDialogue(); // 次のダイアログに変更する
+        if (talkAuto) // オートモードであれば
+        {
+            yield return new WaitForSeconds(textDelay); // textDelay秒待つ
+            OnTalkButtonClicked(); // 次の会話を自動でスタートする
+        }
+    }        
+    /// <summary>
+    /// 次のダイアログに変更する関数
+    /// </summary>
+    private void NextDialogue()
+    {
         // トークスキップフラグが立ったら
         if (talkSkip == true) textLabel.text = storyTalks[talkNum].talks; // 全文を表示
         talkNum++; // 次のダイアログに移動
@@ -236,11 +311,7 @@ public class TextController : DebugSetting
         talkSkip = false; // トークスキップフラグをfalseにする
         // 次のダイアログで最後なら会話ステータスを最後のセリフに変更
         if (talkNum >= storyTalks.Length) TalkState = TALKSTATE.LASTTALK;
-        if (talkAuto) // オートモードであれば
-        {
-            yield return new WaitForSeconds(textDelay); // textDelay秒待つ
-            OnTalkButtonClicked(); // 次の会話を自動でスタートする
-        }
+        runtimeCoroutine = false; // フラグを未実行に変更
     }
     /// <summary>
     /// テキストスピードを計算する関数

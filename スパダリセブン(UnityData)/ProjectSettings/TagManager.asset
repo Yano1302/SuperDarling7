@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Display
   - SceneManager
+  - Coroutine
   layers:
   - Default
   - TransparentFX

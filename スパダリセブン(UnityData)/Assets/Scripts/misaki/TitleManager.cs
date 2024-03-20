@@ -13,7 +13,8 @@ public class TitleManager : DebugSetting
     protected override void Awake()
     {
         base.Awake();
-        sceneManager=GameObject.FindGameObjectWithTag("SceneManager").GetComponent<Supadari.SceneManager>();
+        // sceneManagerを探す
+        sceneManager = GameObject.FindGameObjectWithTag("SceneManager").GetComponent<Supadari.SceneManager>();
     }
 
     // Start is called before the first frame update
@@ -40,7 +41,7 @@ public class TitleManager : DebugSetting
     /// </summary>
     public void Continue()
     {
-        sceneManager.SceneChange(1); // セーブしたシーンへ遷移する　ここをあとで変える
+        sceneManager.SceneChange(2); // セーブしたシーンへ遷移する　ここをあとで変える
         Debug.Log("コンティニューを開始");
     }
     /// <summary>

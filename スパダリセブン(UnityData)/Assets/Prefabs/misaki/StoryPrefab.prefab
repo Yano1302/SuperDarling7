@@ -196,7 +196,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7059537520028643726}
+      - m_Target: {fileID: 6134271887941804298}
         m_TargetAssemblyTypeName: 
         m_MethodName: OnTalkButtonClicked
         m_Mode: 5
@@ -714,10 +714,10 @@ GameObject:
   - component: {fileID: 4058867785164197604}
   - component: {fileID: 126235502295761352}
   - component: {fileID: 7485089733202069826}
-  - component: {fileID: 7059537520028643726}
+  - component: {fileID: 6134271887941804298}
   m_Layer: 5
   m_Name: StoryPrefab
-  m_TagString: Untagged
+  m_TagString: Coroutine
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -808,7 +808,7 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &7059537520028643726
+--- !u!114 &6134271887941804298
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -817,7 +817,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5749960558590850381}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9246aa1aad2977c4cb32d739dc0599ec, type: 3}
+  m_Script: {fileID: 11500000, guid: bae442e28373f1e4998d87b95f32589e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   debugSettings: {fileID: 11400000, guid: e0bebd3eb006f154498ddc536a46f38f, type: 2}
@@ -834,7 +834,7 @@ MonoBehaviour:
   - {fileID: 334807841081607988}
   - {fileID: 6518243437487702969}
   - {fileID: 3559244845222888558}
-  talkButton: {fileID: 698754324211332985}
+  talkButton: {fileID: 5834978918210617697}
   autoButton: {fileID: 6283082347245159690}
 --- !u!1 &5834978918210617697
 GameObject:
@@ -1091,7 +1091,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7059537520028643726}
+      - m_Target: {fileID: 6134271887941804298}
         m_TargetAssemblyTypeName: 
         m_MethodName: OnAutoModeCllicked
         m_Mode: 1
