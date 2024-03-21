@@ -13,6 +13,10 @@ public class RequisitionController : BaseTextController
         base.Awake();
         sceneManager = GameObject.FindGameObjectWithTag("SceneManager").GetComponent<Supadari.SceneManager>();
     }
+    private void Start()
+    {
+        OnTalkButtonClicked();
+    }
     protected override void StorySetUp(string storynum)
     {
         Debug.Log(storynum + "を読み込みます");
@@ -75,6 +79,15 @@ public class RequisitionController : BaseTextController
             // 中央のキャラクター画像を灰色にする
             if (i == 0 && centerCharaImage) centerCharaImage.GetComponent<Image>().color = Color.gray;
         }
-
+    }
+    public override void TalkEnd()
+    {
+        Debug.Log("会話を終了");
+        talkNum = default; // リセットする
+        if (talkState == TALKSTATE.LASTTALK)
+        {
+            sceneManager.SceneChange(2); // ストーリーへシーン遷移する
+        }
+        TalkState = TALKSTATE.NOTALK; // 会話ステータスを話していないに変更
     }
 }

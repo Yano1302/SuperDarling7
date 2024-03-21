@@ -154,9 +154,9 @@ public class BaseTextController : DebugSetting
             TalkState = TALKSTATE.NEXTTALK; // 会話ステータスを次のセリフに変更
             return;
         }
-        InitializeTalkField(); // 表示されているテキスト等を初期化
         if (talkState != TALKSTATE.LASTTALK) // 会話ステータスが話し中なら
         {
+            InitializeTalkField(); // 表示されているテキスト等を初期化
             InstantiateActors(); // 登場人物等を生成
             StartDialogueCoroutine(); // 文章を表示するコルーチンを開始
         }
