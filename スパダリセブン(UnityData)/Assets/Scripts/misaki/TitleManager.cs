@@ -16,18 +16,6 @@ public class TitleManager : DebugSetting
         // sceneManager‚ğ’T‚·
         sceneManager = GameObject.FindGameObjectWithTag("SceneManager").GetComponent<Supadari.SceneManager>();
     }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
     /// <summary>
     /// NewGame‚ğƒNƒŠƒbƒN‚µ‚½‚Æ‚«‚ÌŠÖ”
     /// </summary>

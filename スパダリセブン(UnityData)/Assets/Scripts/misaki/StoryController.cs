@@ -11,7 +11,7 @@ public class StoryController : BaseTextController
         base.Awake();
         sceneManager = GameObject.FindGameObjectWithTag("SceneManager").GetComponent<Supadari.SceneManager>();
     }
-    protected override void TalkEnd()
+    public override void TalkEnd()
     {
         base.TalkEnd();
         sceneManager.SceneChange(3); // ’Tõ‰æ–Ê‚ÖƒV[ƒ“‘JˆÚ‚·‚é

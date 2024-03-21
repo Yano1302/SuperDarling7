@@ -9,7 +9,7 @@ using Unity.VisualScripting;
 
 public class BaseTextController : DebugSetting
 {
-    private int talkNum = 0; // ダイヤログ番号
+    protected int talkNum = 0; // ダイヤログ番号
     public int displayCharaAnchors = 3; // キャラクター画像の表示箇所数
     [SerializeField]private float textBaseSpeed = 0.05f; // テキスト送りのベーススピード
     public float playerTextSpeed = 5f; // プレイヤーが指定したテキスト送りのスピード度合
@@ -24,24 +24,24 @@ public class BaseTextController : DebugSetting
     public TextMeshProUGUI textLabel; // 文章を格納するテキスト変数
     public TextMeshProUGUI buttonText; // ボタンのテキスト変数
 
-    private GameObject[] backImages; // csvファイルに記載された背景の格納配列
-    private GameObject backImage = null; // 使用する背景画像
+    protected GameObject[] backImages; // csvファイルに記載された背景の格納配列
+    protected GameObject backImage = null; // 使用する背景画像
     [Header("背景表示箇所")]
-    [SerializeField] GameObject backImageAnchor; // 背景表示箇所
+    [SerializeField] protected GameObject backImageAnchor; // 背景表示箇所
 
-    private bool[,] charaHighlight; // csvファイルに記載されたキャラクターを光らせるかを格納する2次元配列
-    private GameObject[,] charaImages; // csvファイルに記載されたキャラクター画像名を格納する2次元配列
+    protected bool[,] charaHighlight; // csvファイルに記載されたキャラクターを光らせるかを格納する2次元配列
+    protected GameObject[,] charaImages; // csvファイルに記載されたキャラクター画像名を格納する2次元配列
     private GameObject leftCharaImage = null; // 使用するキャラクター画像(左側)
     private GameObject rightCharaImage = null; // 使用するキャラクター画像(右側)
-    private GameObject centerCharaImage = null; // 使用するキャラクター画像(中央側)
+    protected GameObject centerCharaImage = null; // 使用するキャラクター画像(中央側)
     [Header("キャラクター表示箇所 [0]...左側 [1]...右側 [2]...中央")]
-    [SerializeField] GameObject[] charaAnchors = new GameObject[3]; // キャラクター表示箇所
+    [SerializeField] protected GameObject[] charaAnchors = new GameObject[3]; // キャラクター表示箇所
 
     public GameObject talkButton; // 会話を進めるボタン
     public GameObject autoButton; // オートモードに切り替えるボタン
-    StoryTalkData[] storyTalks; //csvファイルにある文章を格納する配列
+    protected StoryTalkData[] storyTalks; //csvファイルにある文章を格納する配列
 
-    public bool runtimeCoroutine=false; // コルーチンが実行中かどうか
+    public bool runtimeCoroutine = false; // コルーチンが実行中かどうか
     private Coroutine dialogueCoroutine; // コルーチンを格納する変数
     public enum TALKSTATE // 会話関係のステータス
     {
@@ -50,7 +50,7 @@ public class BaseTextController : DebugSetting
         NEXTTALK, // 次のセリフ
         LASTTALK // 最後のセリフ
     }
-    private TALKSTATE talkState; // 会話ステータス変数
+    public TALKSTATE talkState; // 会話ステータス変数
     public TALKSTATE TalkState
     {
         get { return talkState; }
@@ -84,7 +84,7 @@ public class BaseTextController : DebugSetting
     /// 対応する会話文をセットする関数
     /// </summary>
     /// <param name="storynum">読み込むCSVファイルの名前 例(1-1)</param>
-    private void StorySetUp(string storynum)
+    protected virtual void StorySetUp(string storynum)
     {
         Debug.Log("Story"+storynum+"を読み込みます");
         //　テキストファイルの読み込みを行ってくれるクラス
@@ -100,7 +100,7 @@ public class BaseTextController : DebugSetting
         backImages = new GameObject[storyTalks.Length];
         // キャラクター画像格納用2次元配列のサイズを[会話中の最大表示人数,文章の数]にする
         charaImages = new GameObject[displayCharaAnchors, storyTalks.Length];
-        // 
+        // キャラクターハイライト格納用2次元配列のサイズを[会話中の最大表示人数,文章の数]にする
         charaHighlight = new bool[displayCharaAnchors, storyTalks.Length];
         // プロジェクト内のTalkCharaImageフォルダにある画像を対応させたい文章ごとに格納する
         for (int i = 0; i < storyTalks.Length; i++)
@@ -116,7 +116,7 @@ public class BaseTextController : DebugSetting
                 if (i == 0) charaImages[i, j] = (GameObject)Resources.Load("TalkCharaImage/" + storyTalks[j].leftTalkingChara);
                 // charaImages[1,j]には右側に表示するキャラクター画像を格納する
                 else if (i == 1) charaImages[i, j] = (GameObject)Resources.Load("TalkCharaImage/" + storyTalks[j].rightTalkingChara);
-                // charaImages[2,j]には右側に表示するキャラクター画像を格納する
+                // charaImages[2,j]には中央に表示するキャラクター画像を格納する
                 else charaImages[i, j] = (GameObject)Resources.Load("TalkCharaImage/" + storyTalks[j].centerTalkingChara);
             }
         }
@@ -127,9 +127,9 @@ public class BaseTextController : DebugSetting
             {
                 // charaHighlight[0,j]には左側に表示するキャラクター画像が光るかどうかを格納する
                 if (i == 0 && storyTalks[j].leftHighlight == "1") charaHighlight[i, j] = true;
-                // charaHighlight[1,j]には左側に表示するキャラクター画像が光るかどうかを格納する
+                // charaHighlight[1,j]には右側に表示するキャラクター画像が光るかどうかを格納する
                 else if (i == 1 && storyTalks[j].rightHighlight == "1") charaHighlight[i, j] = true;
-                // charaHighlight[2,j]には左側に表示するキャラクター画像が光るかどうかを格納する
+                // charaHighlight[2,j]には中央に表示するキャラクター画像が光るかどうかを格納する
                 else if (i == 2 && storyTalks[j].centerHighlight == "1") charaHighlight[i, j] = true;
             }
         }
@@ -168,7 +168,7 @@ public class BaseTextController : DebugSetting
     /// <summary>
     /// 会話を終了する関数
     /// </summary>
-    protected virtual void TalkEnd()
+    public virtual void TalkEnd()
     {
         Debug.Log("会話を終了");
         talkNum = default; // リセットする
@@ -194,7 +194,7 @@ public class BaseTextController : DebugSetting
     /// <summary>
     /// 登場人物等を生成する関数
     /// </summary>
-    private void InstantiateActors()
+    protected virtual void InstantiateActors()
     {
         // 背景を生成
         if (backImages[talkNum]) backImage = Instantiate(backImages[talkNum], backImageAnchor.transform);
@@ -258,7 +258,7 @@ public class BaseTextController : DebugSetting
     /// <returns></returns>
     IEnumerator Dialogue()
     {
-        Debug.Log("Story" + storynum + "の" + (talkNum + 1) + "列目を再生");
+        Debug.Log(storynum + "の" + (talkNum + 1) + "列目を再生");
         charaName.text = storyTalks[talkNum].name; // 話しているキャラクター名を表示
         words = storyTalks[talkNum].talks; // 文章を取得
         // 各文字に対して繰り返し処理を行います C#のIEnumerable機能により一文字ずつ取り出せる
