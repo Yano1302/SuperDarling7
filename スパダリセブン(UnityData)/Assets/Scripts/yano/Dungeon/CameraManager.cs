@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraManager : SingletonMonoBehaviour<CameraManager>
+public class CameraManager : MonoBehaviour
 {
     //  パブリック変数  //
 
@@ -21,8 +21,7 @@ public class CameraManager : SingletonMonoBehaviour<CameraManager>
     private Camera m_mainCamera;     //メインカメラ
     private const float posZ = -10;  //カメラのZ座標    
 
-    protected override void Awake() {
-        base.Awake();
+    protected void Awake() {
         m_target = null;
         m_mainCamera = Camera.main;
     }

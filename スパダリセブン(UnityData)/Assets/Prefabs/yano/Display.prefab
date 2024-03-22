@@ -52,7 +52,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_currentFadeType: 0
   m_autoFading: 1
-  m_fadeTime: 1
+  m_fadeTime: 0.5
   m_maxAlpha: 1
   m_minAlpha: 0
   m_Log: 1

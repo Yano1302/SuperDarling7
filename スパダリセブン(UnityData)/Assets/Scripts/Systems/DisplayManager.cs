@@ -4,6 +4,7 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using System.Diagnostics;
 using Debug = UnityEngine.Debug;
+using UnityEngine.SceneManagement;
 
 
 //フェードイン・アウト時のフェードタイプ
@@ -150,7 +151,7 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
     [SerializeField, Header("フェード用シェーダー"), EnumIndex(typeof(FadeType))]
     private Shader[] m_FadeShaders;
 
-    private static PropertiesID[] m_pID;                         //プロパティのID
+    private static PropertiesID[] m_pID;                            //プロパティのID
 
     //シェーダーID
     private struct PropertiesID {
@@ -165,10 +166,12 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
     //  初期化関数  //
     protected override void Awake() {
         base.Awake();
-        if (m_pID == null) {          
+        if (m_pID == null) {        
             Debug.Assert(m_fadeImage != null, "フェードオブジェクトがアタッチされていません");
             Debug.Assert(m_FadeShaders.Length > 0 && m_FadeShaders.Length == UsefulSystem.GetEnumLength<FadeType>(), "シェーダーがアタッチされていません");
             m_pID = new PropertiesID[m_FadeShaders.Length];
+            //シーン切り替えの際にフラグが有効であればフェードインを行う
+            SceneManager.sceneLoaded += AutoFadeIn;
             //各IDを取得
             for (int i = 0; i < m_FadeShaders.Length; i++) {             
                 m_pID[i].m_ID_Fade = Shader.PropertyToID("_Fade");
@@ -187,11 +190,6 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
             m_fadeImage.material.SetFloat(m_pID[index].m_ID_Fade,1);
             m_fadeImage.material.SetFloat(m_pID[index].m_ID_maxAlpha,1 - m_minAlpha);
             m_fadeImage.material.SetFloat(m_pID[index].m_ID_minAlpha, 1 - m_maxAlpha);
-        }
-
-        if (m_autoFading) {
-            UsefulSystem.Log("AutoFadingがtrueの為、自動でフェードインします。");
-            FadeIn(CurrentFadeType);
         }
     }
 
@@ -310,6 +308,14 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
         IsFading = false;
         Log("フェードが完了しました。", false);
         action?.Invoke();
+    }
+
+    /// <summary>自動フェードインの処理を行います</summary>
+    private void AutoFadeIn(Scene scene, LoadSceneMode mode) {
+        if (m_autoFading) {
+            UsefulSystem.Log("AutoFadingがtrueの為、自動でフェードインします。");
+            FadeIn(CurrentFadeType);
+        }
     }
 
     [Conditional("UNITY_EDITOR")]

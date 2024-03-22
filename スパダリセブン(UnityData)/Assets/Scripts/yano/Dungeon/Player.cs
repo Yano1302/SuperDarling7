@@ -32,7 +32,7 @@ public class Player : MonoBehaviour
 
     private void Start()
     {       
-        m_CamIns = CameraManager.Instance;
+        m_CamIns = Camera.main.GetComponent<CameraManager>();
         m_CamIns.SetTarget = transform;
     }
 
