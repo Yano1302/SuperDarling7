@@ -98,8 +98,8 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
     public FadeType CurrentFadeType { get { return m_currentFadeType; } private set { m_currentFadeType = value; if (value != m_currentFadeType) Log("フェードタイプが " + m_currentFadeType + " から " + value + " に変更されます", false); } }
     /// <summary>シーンを切り替えた際に自動でフェードインするかどうか</summary>
     public bool AutoFading { get { return m_autoFading; } set { m_autoFading = value; } }
-
-
+    /// <summary>フェード後の呼び出し関数を設定します。デリゲードは関数呼び出し後に破棄されます。</summary>
+    public UnityAction FadeAction {set { m_action = value; } }
     // パブリック関数　//-----------------------------------------------------------------------------------------------------------------
 
     /// <summary>画面を徐々に明るくします。呼び出し時のタイムスケールは無視されます</summary>
@@ -107,7 +107,8 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
     /// <param name="action">フェード後に実行したい関数があれば記載してください</param>
     public void FadeIn(FadeType type, UnityAction action = null) {
         if (PrepareForFade(type, false)) {
-            StartCoroutine(_FadeInSetting(type, action));
+            m_action = action;
+            StartCoroutine(_FadeInSetting(type));
         }
     }
 
@@ -116,7 +117,8 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
     /// <param name="action">フェード後に実行したい関数があれば記載してください</param>
     public void FadeOut(FadeType type, UnityAction action = null) {
         if (PrepareForFade(type, true)) {
-            StartCoroutine(_FadeOutSetting(type, action));
+            m_action = action;
+            StartCoroutine(_FadeOutSetting(type));
         }   
     }
 
@@ -151,7 +153,6 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
     [SerializeField, Header("フェード用シェーダー"), EnumIndex(typeof(FadeType))]
     private Shader[] m_FadeShaders;
 
-    private static PropertiesID[] m_pID;                            //プロパティのID
 
     //シェーダーID
     private struct PropertiesID {
@@ -160,6 +161,9 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
         public int m_ID_minAlpha;                                   //_MinAlpha用ID
     }
 
+    private static PropertiesID[] m_pID;                            //プロパティのID
+    private UnityAction m_action = null;
+   
 
     //  関数一覧   //----------------------------------------------------------------------------------------------------------------------
 
@@ -241,7 +245,7 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
     }
 
     /// <summary>画面のフェードインの実際の処理を行います</summary>
-    private IEnumerator _FadeInSetting(FadeType type, UnityAction action) {
+    private IEnumerator _FadeInSetting(FadeType type) {
         Log("フェードインを開始します", false);
         //インデックスを取得
         int index = (int)type;
@@ -272,11 +276,11 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
         m_fadeImage.material.SetFloat(m_pID[index].m_ID_Fade, 0);
         IsFading = false;
         Log("フェードが完了しました。", false);
-        action?.Invoke();
+        Action();
     }
 
     /// <summary>画面のフェードアウトの実際の処理を行います</summary>
-    private IEnumerator _FadeOutSetting(FadeType type, UnityAction action) {
+    private IEnumerator _FadeOutSetting(FadeType type) {
         Log("フェードアウトを開始します", false);
         //インデックスを取得
         int index = (int)type;
@@ -307,7 +311,7 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
         m_fadeImage.material.SetFloat(m_pID[index].m_ID_Fade, 1);
         IsFading = false;
         Log("フェードが完了しました。", false);
-        action?.Invoke();
+        Action();
     }
 
     /// <summary>自動フェードインの処理を行います</summary>
@@ -317,6 +321,9 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
             FadeIn(CurrentFadeType);
         }
     }
+
+    /// <summary>保存されているunityactionがある場合に実行します</summary>
+    private void Action() { m_action?.Invoke(); m_action = null; }
 
     [Conditional("UNITY_EDITOR")]
     private void Log(string message,bool warning) { if (!m_Log) return;  if (warning) Debug.LogWarning(message); else Debug.Log(message); }
