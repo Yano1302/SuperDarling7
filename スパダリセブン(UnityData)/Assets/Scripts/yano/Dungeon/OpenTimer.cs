@@ -6,22 +6,24 @@ using UnityEngine.UI;
 
 public class OpenTimer : MonoBehaviour
 {
+    [SerializeField, Header("時間設定(秒)")]
+    private float DefaultTimer = 60f;
     [SerializeField, Header("時間を表示するUIテキスト")]
     private Text m_text;
-
+    
     private Timer _Timer;
 
 
     //TODO　timerをどこかから設定する？/一旦CreateMapから呼び出します
     private void OnEnable() {
-        _Timer = Timer.SetTimer(gameObject, 30,TimeUp);
+        _Timer = Timer.SetTimer(gameObject, DefaultTimer,TimeUp);
         _Timer.SecondAction = SetTimerUI;
         SetTimerUI();
     }
 
     private void SetTimerUI() {
-        string mstr = _Timer.minutes < 10 ? "0" + _Timer.minutes : _Timer.minutes.ToString();
-        string sstr = _Timer.seconds < 10 ? " :  0" + _Timer.seconds : " : " + _Timer.seconds.ToString();
+        string mstr = _Timer.Minutes < 10 ? "0" + _Timer.Minutes : _Timer.Minutes.ToString();
+        string sstr = _Timer.IntSeconds < 10 ? " :  0" + _Timer.IntSeconds : " : " + _Timer.IntSeconds.ToString();
         m_text.text = mstr + sstr;
     } 
 

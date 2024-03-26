@@ -17,7 +17,7 @@ namespace Supadari
         // Start is called before the first frame update
         void Start()
         {
-            UnityEngine.SceneManagement.SceneManager.sceneUnloaded += SceneUnLoaded;
+           // UnityEngine.SceneManagement.SceneManager.sceneUnloaded += SceneUnLoaded;
         }
         void SceneUnLoaded(Scene scene)
         {
@@ -27,11 +27,11 @@ namespace Supadari
         /// シーン遷移を行う関数
         /// </summary>
         /// <param name="LoadScene">シーン番号</param>
-        public async void SceneChange(int LoadScene)
+        public void SceneChange(int LoadScene)
         {
-            displayManager.FadeOut(FadeType.Entire); // フェードアウトする
-            await Task.Delay((int)displayManager.FadeTime * 1000); // 暗転するまで待つ(int型でミリ秒単位)
-            UnityEngine.SceneManagement.SceneManager.LoadScene(LoadScene); // 指定のシーンに遷移する
+            displayManager.FadeOut(FadeType.Entire,()=> UnityEngine.SceneManagement.SceneManager.LoadScene(LoadScene)); // フェードアウトする
+           // await Task.Delay((int)displayManager.FadeTime * 1000); // 暗転するまで待つ(int型でミリ秒単位)
+           // UnityEngine.SceneManagement.SceneManager.LoadScene(LoadScene); // 指定のシーンに遷移する
         }
     }
 }

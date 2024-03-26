@@ -9,6 +9,7 @@ public enum MapType {
     wall   = 2,
     catchtrap = 3,
     pitfall = 4,
+    Goal = 5,
 }
 
 public class MapSetting : SingletonMonoBehaviour<MapSetting>

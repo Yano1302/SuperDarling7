@@ -1,0 +1,13 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+//TODO âºíuÇ´Ç»ÇÃÇ≈Ç†Ç∆Ç≈ÇØÇ∑
+public class returnTitle : MonoBehaviour
+{
+  publicÅ@void Title(bool clear) 
+  {
+        Supadari.SceneManager.Instance.SceneChange(0);
+        UIManager.Instance.CloseALLUI();
+  }
+}

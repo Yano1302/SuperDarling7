@@ -15,7 +15,7 @@ public class Player : MonoBehaviour
     /// <summary>インスタンスを取得します</summary>
     public static Player Instance { get { return m_instance; } }
     /// <summary>移動可能かどうかを設定します。</summary>
-    public bool CanMove { get { return isMoving; }set { isMoving = value; if (!value) { m_rb.velocity = Vector2.zero; } } }
+    public bool MoveFlag { get { return isMoving; }set { isMoving = value; if (!value) { m_rb.velocity = Vector2.zero; } } }
     
     public Vector2 Direction { get { return m_direction; } }
 
@@ -32,7 +32,7 @@ public class Player : MonoBehaviour
 
     private void Start()
     {       
-        m_CamIns = CameraManager.Instance;
+        m_CamIns = Camera.main.GetComponent<CameraManager>();
         m_CamIns.SetTarget = transform;
     }
 
@@ -42,7 +42,7 @@ public class Player : MonoBehaviour
 
     /// <summary>移動処理を行います</summary>
     void Move() {
-        if (CanMove) {
+        if (MoveFlag) {
             //キーの入力を取得する
             m_direction.x = Input.GetAxis("Horizontal");
             m_direction.y = Input.GetAxis("Vertical");

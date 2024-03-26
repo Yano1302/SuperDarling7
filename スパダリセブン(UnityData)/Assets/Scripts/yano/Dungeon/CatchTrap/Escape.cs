@@ -34,7 +34,7 @@ public class Escape : MonoBehaviour
             KeyCheck(Lbtn);
             yield return null;
         }
-        Player.Instance.CanMove = true;
+        Player.Instance.MoveFlag = true;
         UIManager.Instance.CloseUI(UIType.EscapeButton);
         Destroy(catchTrap.CaughtTrap);
     }

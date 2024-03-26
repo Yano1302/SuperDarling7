@@ -8,7 +8,9 @@ public enum UIType {
     Close,          //ここは必須
     EscapeButton,   //トラップから抜け出すボタンを表示する
     Timer,          //タイマー表示用UI
-
+    ItemWindow,     //アイテムウィンドウ
+    Clear,          //答えが合っていた場合のUI画面(仮置き)
+    miss,           //答えが間違っていた場合のUI画面(仮置き)
 }
 
 /// <summary>
@@ -52,7 +54,7 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
     [EnumAction(typeof(UIType))]
     public void ReturnUI(int type) { ReturnUI((UIType)type); }
 
-    //  パブリック関数    //-------------------------------------------------------------------------------------
+    //  パブリック関数    //------------------------------------------------------------------------------------------------------
 
     /// <summary>指定されたUIを開きます</summary>
     public void OpenUI(UIType type) {
