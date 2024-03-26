@@ -9,7 +9,10 @@ public enum MapType {
     wall   = 2,
     catchtrap = 3,
     pitfall = 4,
-    Goal = 5,
+    Goal1 = 5,
+    Goal2 = 6,
+    Goal3 = 7,
+    Goal4 = 8,
 }
 
 public class MapSetting : SingletonMonoBehaviour<MapSetting>
@@ -69,6 +72,5 @@ public class MapSetting : SingletonMonoBehaviour<MapSetting>
                 } 
             }
         }
-        UIManager.Instance.OpenUI(UIType.Timer);
     }
 }
