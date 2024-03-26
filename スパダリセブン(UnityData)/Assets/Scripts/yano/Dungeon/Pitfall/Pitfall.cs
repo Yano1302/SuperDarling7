@@ -18,8 +18,8 @@ public class Pitfall : MonoBehaviour
             m_sr.enabled = true;
             m_ccol.radius = 0.5537109f;
             Player ins = Player.Instance;
-            ins.CanMove = false;
-            UsefulSystem.Instance.WaitCallBack(0.2f,()=>ins.CanMove = true);
+            ins.MoveFlag = false;
+            UsefulSystem.Instance.WaitCallBack(0.2f,()=>ins.MoveFlag = true);
             Destroy(this);
         }   
     }

@@ -27,13 +27,15 @@ public class ItemDebug : MonoBehaviour
         DA(KeyCode.X, () => ins.Save());
         DA(KeyCode.C, () => ins.Load());
 
-        DA(KeyCode.V, () => {
+        DA(KeyCode.V, () =>
+        {
             ItemID id = (ItemID)Random.Range(0, UsefulSystem.GetEnumLength<ItemID>());
             Debug.Log("所持フラグを調べる ID : " + id);
-            Debug.Log("所持フラグ : "+ins.GetFlag(id));
+            Debug.Log("所持フラグ : " + ins.GetFlag(id));
         });
 
-        DA(KeyCode.B, () => {
+        DA(KeyCode.B, () =>
+        {
             ItemID id = (ItemID)Random.Range(0, UsefulSystem.GetEnumLength<ItemID>());
             Debug.Log("破棄するフラグ : " + id);
             Debug.Log("破棄前のフラグ : " + ins.GetFlag(id));
@@ -41,19 +43,14 @@ public class ItemDebug : MonoBehaviour
             Debug.Log("破棄後のフラグ : " + ins.GetFlag(id));
         });
 
-        DA(KeyCode.N, () => {
+        DA(KeyCode.N, () =>
+        {
             ItemID id = (ItemID)Random.Range(0, UsefulSystem.GetEnumLength<ItemID>());
             Debug.Log("取得するアイテム ID : " + id);
             ins.AddItem(id);
             Debug.Log("取得後のフラグ : " + ins.GetFlag(id));
         });
 
-        DA(KeyCode.M, () => {
-            Debug.Log("パス : "+ins.GetPath());
-        });
-        DA(KeyCode.A, () => {
-            ins._Delete();
-        });
     }
 
 

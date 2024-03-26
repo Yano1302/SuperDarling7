@@ -4,13 +4,14 @@ using UnityEngine;
 
 /// <summary>
 /// アイテムの所持などを管理するクラスです
+/// TODO : 全体の構造を見直す
 /// </summary>
 public class ItemManager : SingletonMonoBehaviour<ItemManager>
 {
-    //  public //
+    //  public function //
 
-    /// <summary>アイテムを取得します。</summary>
-    /// <param name="id">取得するアイテムのID</param>
+    /// <summary>アイテムを所持します。</summary>
+    /// <param name="id">所持するアイテムのID</param>
     public void AddItem(ItemID id) {
         UsefulSystem.DebugAction(() => { if (m_json.Instance.GetFlag(id)){ Debug.LogWarning("そのアイテムは既に取得しています。"); } });  
         m_json.Instance.SetFlag(id,true);ItemWindow[(int)id].SetActive(true);
@@ -34,14 +35,22 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     /// <summary>Jsonデータを読み込みます</summary>
     public void Load() { m_json.Load(); }
 
+    /// <summary>アイテムの取得情報を初期の状態に戻します。</summary>
     public void _Reset() { m_json.Reset(); }
-    public void _Delete() { m_json.Delete(ref m_json); }
-    public string GetPath() { return m_json.GetJsonPath(); }
-
+   
     /// <summary>フラグの情報をログに表示します(デバッグ用)</summary>
     [System.Diagnostics.Conditional("UNITY_EDITOR")]
     public void Log() { Debug.Log(m_json.JsonToString()); }
 
+    public GameObject GetItemWindow(ItemID id) { return ItemWindow[(int)id]; }
+
+    //  Attach function //
+    [EnumAction(typeof(ItemID))]
+    public void Btn_ItemClick(int id) {
+        if(SolveManager.CheckScene) {
+            SolveManager.Instance.choice((ItemID)id);
+        }
+    }
 
 
 

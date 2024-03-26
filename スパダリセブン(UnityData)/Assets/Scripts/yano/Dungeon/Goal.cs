@@ -2,11 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Supadari;
+using SceneManager = Supadari.SceneManager;
 
 public class Goal : MonoBehaviour
 {
     public void OnCollisionEnter2D(Collision2D collision) {
-        //TODO SceneManager的なのが出来たら置き換える
-        DisplayManager.Instance.FadeOut(FadeType.Entire,() => SceneManager.LoadScene("SolveScene"));
+        // TODO 仮置き
+        Player.Instance.MoveFlag = false;
+        UIManager.Instance.CloseUI(UIType.Timer);
+        SceneManager.Instance.SceneChange(4);
     }
 }

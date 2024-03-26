@@ -42,8 +42,8 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
         get {
             int index = (int)CurrentFadeType;
             if (m_currentFadeType == FadeType.Entire) {
-                //shaderの補間はSmoothstepなので厳密には違う
-                    return 1 - Mathf.Lerp(
+                //shaderの補間はSmoothstepなので厳密にはちょっと違う
+                return 1 - Mathf.Lerp(
                     m_fadeImage.material.GetFloat(m_pID[index].m_ID_minAlpha),
                     m_fadeImage.material.GetFloat(m_pID[index].m_ID_maxAlpha),
                     m_fadeImage.material.GetFloat(m_pID[index].m_ID_Fade));
@@ -166,9 +166,10 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
     //  初期化関数  //
     protected override void Awake() {
         base.Awake();
-        if (m_pID == null) {        
+        if (m_pID == null) {
             Debug.Assert(m_fadeImage != null, "フェードオブジェクトがアタッチされていません");
             Debug.Assert(m_FadeShaders.Length > 0 && m_FadeShaders.Length == UsefulSystem.GetEnumLength<FadeType>(), "シェーダーがアタッチされていません");
+            Debug.Assert(m_fadeImage.material.name != "Default UI Material","Displayオブジェクトに専用のマテリアルを設定してください");
             m_pID = new PropertiesID[m_FadeShaders.Length];
             //シーン切り替えの際にフラグが有効であればフェードインを行う
             SceneManager.sceneLoaded += AutoFadeIn;
@@ -241,6 +242,7 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
 
     /// <summary>画面のフェードインの実際の処理を行います</summary>
     private IEnumerator _FadeInSetting(FadeType type, UnityAction action) {
+        Log("フェードインを開始します", false);
         //インデックスを取得
         int index = (int)type;
         //現在の補間情報を取得する
@@ -256,7 +258,6 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
           : () => { t -= Time.deltaTime / m_timeScale / FadeTime * ct; };
         
         //補間する
-        float startTime = Time.time;
         while (t > 0) {
             action1();
             m_fadeImage.material.SetFloat(m_pID[index].m_ID_Fade,t);
@@ -276,7 +277,7 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
 
     /// <summary>画面のフェードアウトの実際の処理を行います</summary>
     private IEnumerator _FadeOutSetting(FadeType type, UnityAction action) {
-
+        Log("フェードアウトを開始します", false);
         //インデックスを取得
         int index = (int)type;
         //現在の補間情報を取得する
@@ -292,7 +293,6 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
           : () => { t += Time.deltaTime / m_timeScale / FadeTime * ct; };
 
         //補間する
-        float startTime = Time.time;
         while (t < 1) {
             action1();
             m_fadeImage.material.SetFloat(m_pID[index].m_ID_Fade, t);
@@ -313,7 +313,7 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
     /// <summary>自動フェードインの処理を行います</summary>
     private void AutoFadeIn(Scene scene, LoadSceneMode mode) {
         if (m_autoFading) {
-            UsefulSystem.Log("AutoFadingがtrueの為、自動でフェードインします。");
+            Log("AutoFadingがtrueの為、自動でフェードインします。",false);
             FadeIn(CurrentFadeType);
         }
     }
