@@ -7,6 +7,7 @@ TagManager:
   - Display
   - SceneManager
   - Coroutine
+  - MapSetting
   layers:
   - Default
   - TransparentFX

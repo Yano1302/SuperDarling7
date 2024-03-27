@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 
 public class OnMouseScript : DebugSetting, IPointerEnterHandler, IPointerExitHandler
 {
-    [SerializeField] bool eventCheck=true;
+    [SerializeField] bool eventCheck = true;
     [SerializeField] RequisitionController requisitionController; // RequisitionController用変数
     [SerializeField] string storyname = null; // 表示したいテキスト名
 

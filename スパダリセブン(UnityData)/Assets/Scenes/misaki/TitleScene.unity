@@ -1687,6 +1687,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1760282260}
   m_CullTransparentMesh: 1
+--- !u!114 &1800541635 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2055553244685606147, guid: 928ff0fc2fc833f44b26840bfe64c7dc, type: 3}
+  m_PrefabInstance: {fileID: 5274056075095881032}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e4fc06659f6aca48b072c33f4a550a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1820141342
 GameObject:
   m_ObjectHideFlags: 0
@@ -2491,6 +2502,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 9069228315237934034, guid: fa4dedc1dd3eda54bb3348d897543ee0, type: 3}
+      propertyPath: uiManager
+      value: 
+      objectReference: {fileID: 1800541635}
     - target: {fileID: 9069228315237934034, guid: fa4dedc1dd3eda54bb3348d897543ee0, type: 3}
       propertyPath: displayManager
       value: 
