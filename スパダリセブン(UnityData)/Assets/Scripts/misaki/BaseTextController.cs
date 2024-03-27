@@ -50,7 +50,7 @@ public class BaseTextController : DebugSetting
         NEXTTALK, // 次のセリフ
         LASTTALK // 最後のセリフ
     }
-    public TALKSTATE talkState; // 会話ステータス変数
+    private TALKSTATE talkState; // 会話ステータス変数
     public TALKSTATE TalkState
     {
         get { return talkState; }
@@ -142,25 +142,25 @@ public class BaseTextController : DebugSetting
     /// <param name="storynum"></param>
     public void OnTalkButtonClicked(string storynum = "")
     {
-        if (talkState == TALKSTATE.NOTALK) // 会話ステータスが話していないなら
+        if (TalkState == TALKSTATE.NOTALK) // 会話ステータスが話していないなら
         {
             // ストーリー番号があれば
             if (storynum != "") StorySetUp(storynum); // 対応する会話文をセット
             TalkState = TALKSTATE.TALKING; // 会話ステータスを会話中に変更
         }
-        else if (talkState == TALKSTATE.TALKING) // 会話ステータスが話し中なら
+        else if (TalkState == TALKSTATE.TALKING) // 会話ステータスが話し中なら
         {
             talkSkip = true; // トークスキップフラグを立てる
             TalkState = TALKSTATE.NEXTTALK; // 会話ステータスを次のセリフに変更
             return;
         }
-        if (talkState != TALKSTATE.LASTTALK) // 会話ステータスが話し中なら
+        if (TalkState != TALKSTATE.LASTTALK) // 会話ステータスが話し中なら
         {
             InitializeTalkField(); // 表示されているテキスト等を初期化
             InstantiateActors(); // 登場人物等を生成
             StartDialogueCoroutine(); // 文章を表示するコルーチンを開始
         }
-        else if (talkState == TALKSTATE.LASTTALK) // 会話ステータスが最後のセリフなら
+        else if (TalkState == TALKSTATE.LASTTALK) // 会話ステータスが最後のセリフなら
         {
             TalkEnd(); //会話を終了する
         }

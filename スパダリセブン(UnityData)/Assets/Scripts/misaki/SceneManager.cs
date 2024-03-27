@@ -9,6 +9,9 @@ namespace Supadari
     public class SceneManager : SingletonMonoBehaviour <SceneManager>
     {
         [SerializeField] DisplayManager displayManager; // ディスプレイマネージャー用変数
+        private Scene currentScene; // 現在のシーン
+        public Scene CheckScene { get { return currentScene; } set { currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene(); } }
+
 
         protected override void Awake()
         {
@@ -30,8 +33,6 @@ namespace Supadari
         public void SceneChange(int LoadScene)
         {
             displayManager.FadeOut(FadeType.Entire,()=> UnityEngine.SceneManagement.SceneManager.LoadScene(LoadScene)); // フェードアウトする
-           // await Task.Delay((int)displayManager.FadeTime * 1000); // 暗転するまで待つ(int型でミリ秒単位)
-           // UnityEngine.SceneManagement.SceneManager.LoadScene(LoadScene); // 指定のシーンに遷移する
         }
     }
 }

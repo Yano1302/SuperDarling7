@@ -84,7 +84,7 @@ public class RequisitionController : BaseTextController
     {
         Debug.Log("会話を終了");
         talkNum = default; // リセットする
-        if (talkState == TALKSTATE.LASTTALK)
+        if (TalkState == TALKSTATE.LASTTALK)
         {
             sceneManager.SceneChange(2); // ストーリーへシーン遷移する
         }
