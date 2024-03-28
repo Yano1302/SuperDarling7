@@ -40,6 +40,7 @@ namespace Supadari
                 MapSetting setting = GameObject.FindGameObjectWithTag("MapSetting").GetComponent<MapSetting>(); // MapSettingを検索
                 setting.CreateMap(1); // マップを生成
                 uiManager.OpenUI(UIType.Timer); // タイマーを表示
+                uiManager.OpenUI(UIType.ItemWindow); // アイテムウィンドウを表示
             }
         }
         /// <summary>
