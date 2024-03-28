@@ -34,9 +34,9 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
     /// <summary>フェード完了までの時間</summary>
     public float FadeTime { get { return m_fadeTime; } set { m_fadeTime = value > 0 ? value : 0; } }
     /// <summary>フェードイン(明転)後の画面の明るさ(0～1)</summary>
-    public float MaxAlpha { get {return m_maxAlpha;}set {m_maxAlpha = Mathf.Clamp(value, 0.0f, 1.0f);Debug.Assert(m_maxAlpha > m_minAlpha, "MaxAlphaにMinAlphaと同じか小さい値が代入されています\n※フェードインが正常に機能しない可能性があります"); }}
+    public float MaxAlpha { get {return m_maxAlpha;}set {m_maxAlpha = Mathf.Clamp(value, 0.0f, 1.0f); Debug.Assert(m_maxAlpha > m_minAlpha, "MaxAlphaにMinAlphaと同じか小さい値が代入されています\n※フェードインが正常に機能しない可能性があります"); }}
     /// <summary>フェードアウト(暗転)後の画面の明るさ(0～1)</summary>
-    public float MinAlpha {get {return m_minAlpha;}set {m_minAlpha = Mathf.Clamp(value, 0.0f, 1.0f);Debug.Assert(m_minAlpha < m_maxAlpha, "MinAlphaにMaxAlphaと同じか大きい値が代入されています\n※フェードアウトが正常に機能しない可能性があります");}}
+    public float MinAlpha {get {return m_minAlpha;}set {m_minAlpha = Mathf.Clamp(value, 0.0f, 1.0f); Debug.Assert(m_minAlpha < m_maxAlpha, "MinAlphaにMaxAlphaと同じか大きい値が代入されています\n※フェードアウトが正常に機能しない可能性があります");}}
     /// <summary>現在の画面の明るさを取得・変更します</summary>
     public float CurrentAlpha {
         get {
@@ -182,7 +182,7 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
             //正しい値になっているか確認する
             m_maxAlpha = Mathf.Clamp(m_maxAlpha, 0.0f, 1.0f);
             m_minAlpha = Mathf.Clamp(m_minAlpha, 0.0f, 1.0f);
-            Debug.Assert(m_maxAlpha > m_minAlpha,"MinAlphaがMaxAlphaを上回っています。設定を確認してください。");
+            Debug.Assert(m_maxAlpha > m_minAlpha, "MinAlphaがMaxAlphaを上回っています。設定を確認してください。");
             //フェード可能フラグを立てる
             m_fadeImage.enabled = true;
             //フェードの初期化
@@ -191,6 +191,11 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
             m_fadeImage.material.SetFloat(m_pID[index].m_ID_Fade,1);
             m_fadeImage.material.SetFloat(m_pID[index].m_ID_maxAlpha,1 - m_minAlpha);
             m_fadeImage.material.SetFloat(m_pID[index].m_ID_minAlpha, 1 - m_maxAlpha);
+            KeyDebug.SetKeyDebug(
+                gameObject,
+                new KeyDebugData("名前", () => { FadeIn(FadeType.Entire); }),
+                new KeyDebugData("名前", () => { FadeOut(FadeType.Entire); })
+                );
         }
     }
 

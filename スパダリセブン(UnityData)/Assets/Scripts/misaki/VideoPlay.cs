@@ -231,7 +231,7 @@ namespace Art.Sample
             // タップ確認
             if (Input.GetMouseButtonUp(0))
             {
-                Debug.Log("push");
+                UnityEngine.Debug.Log("push");
                 Stop();
             }
         }

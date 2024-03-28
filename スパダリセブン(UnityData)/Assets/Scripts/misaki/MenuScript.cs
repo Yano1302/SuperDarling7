@@ -48,7 +48,7 @@ public class MenuScript : SingletonMonoBehaviour <MenuScript>
         // ウィンドウを開いているなら再度開かないようにリターン
         if (openWindow)
         {
-            Debug.Log("openWindowが" + openWindow + "です");
+            UnityEngine.Debug.Log("openWindowが" + openWindow + "です");
             return;
         }
         menuWindow.SetActive(true); // ウィンドウを可視化する
@@ -64,7 +64,7 @@ public class MenuScript : SingletonMonoBehaviour <MenuScript>
         // ウィンドウを閉じているなら再度閉じないようにリターン
         if (!openWindow)
         {
-            Debug.Log("openWindowが" + openWindow + "です");
+            UnityEngine.Debug.Log("openWindowが" + openWindow + "です");
             return;
         }
         menuWindow.SetActive(false); // ウィンドウを不可視にする
@@ -77,14 +77,14 @@ public class MenuScript : SingletonMonoBehaviour <MenuScript>
     /// </summary>
     public void Save()
     {
-        Debug.Log("セーブ機能はあとで作ります");
+        UnityEngine.Debug.Log("セーブ機能はあとで作ります");
     }
     /// <summary>
     /// ロードボタンをクリックしたときの関数
     /// </summary>
     public void Load()
     {
-        Debug.Log("ロード機能はあとで作ります");
+        UnityEngine.Debug.Log("ロード機能はあとで作ります");
     }
     /// <summary>
     /// タイトルへ戻るボタンをクリックしたときの関数

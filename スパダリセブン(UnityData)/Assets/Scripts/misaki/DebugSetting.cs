@@ -11,6 +11,6 @@ public class DebugSetting : MonoBehaviour
     // Start is called before the first frame update
     protected virtual void Awake()
     {
-        Debug.unityLogger.logEnabled = debugSettings.debugLogEnabled;   //デバッグログを非表示にする
+        UnityEngine.Debug.unityLogger.logEnabled = debugSettings.debugLogEnabled;   //デバッグログを非表示にする
     }
 }

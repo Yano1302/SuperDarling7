@@ -36,17 +36,17 @@ public class CSVImportExampleFromWeb : Editor
 
         if (www.error != null)
         {
-            Debug.Log("UnityWebRequest.error:" + www.error);
+            UnityEngine.Debug.Log("UnityWebRequest.error:" + www.error);
         }
         else if (www.downloadHandler.text == "" || www.downloadHandler.text.IndexOf("<!DOCTYPE") != -1)
         {
-            Debug.Log("Uknown Format:" + www.downloadHandler.text);
+            UnityEngine.Debug.Log("Uknown Format:" + www.downloadHandler.text);
         }
         else
         {
             ImportRankingData(www.downloadHandler.text, assetfile);
 #if DEBUG_LOG || UNITY_EDITOR
-            Debug.Log("Imported Asset: " + assetfile);
+            UnityEngine.Debug.Log("Imported Asset: " + assetfile);
 #endif
         }
     }

@@ -6,15 +6,16 @@ using UnityEngine;
 
 /// <summary>
 /// Jsonファイルを読み書きする為のクラスです
+/// newで
 /// </summary>
 /// <typeparam name="T">[System.Serializable]属性を付けたJsonファイルと同じ形式のクラス</typeparam>
 public class JsonSettings<T> where T : class {
 
-    // 変数 //
+// 変数 //---------------------------------------------------------------------------
     /// <summary>T型のクラスのインスタンスを取得します。</summary>
-    public T Instance{ get { return m_instance; } }
+    public T TInstance{ get { return m_tInstance; } }
 
-    //コンストラクタ
+//コンストラクタ // -----------------------------------------------------------------
     /// <summary>Jsonを管理するクラスを作成します</summary>
     /// <param name="jsonFileName">Jsonファイル名(拡張子抜き)</param>
     public JsonSettings(string jsonFileName,string dataFileName) {
@@ -26,13 +27,13 @@ public class JsonSettings<T> where T : class {
         }
         Load();
     }
-   
     
-    //  関数  //
+//  関数  //-------------------------------------------------------------------------
+
     /// <summary> Jsonデータにインスタンスの情報を書き込みます。</summary>
     public void Save() {
         //stringに変換する
-        string jsonstr = JsonUtility.ToJson(Instance);
+        string jsonstr = JsonUtility.ToJson(TInstance);
         //ファイル書き込み用のライターを開く
         StreamWriter writer = new StreamWriter(m_jsonPath,false);
         //書き込み
@@ -47,7 +48,7 @@ public class JsonSettings<T> where T : class {
         //JSONファイルを読み込む
         var json = File.ReadAllText(m_jsonPath);
         //オブジェクト化する
-        m_instance = JsonUtility.FromJson<T>(json);
+        m_tInstance = JsonUtility.FromJson<T>(json);
     }
 
     /// <summary>データを初期値に戻します。</summary>
@@ -58,8 +59,10 @@ public class JsonSettings<T> where T : class {
     /// <summary>データを削除します。インスタンスも破棄されます。</summary>
     public void Delete(ref JsonSettings<T> data) {
         File.Delete(data.GetJsonPath());
+        m_tInstance = null;
         data = null;
     }
+
     /// <summary>データを保存しているJsonファイルのパスを取得します。</summary>
     public string GetJsonPath() { return m_jsonPath; }
 
@@ -71,14 +74,16 @@ public class JsonSettings<T> where T : class {
         var ins = JsonUtility.FromJson<T>(json);
         return JsonUtility.ToJson(ins, true);}
 
+//------------------------------------------------------------------------------------
 
 
 
-    //　プライベート変数・関数　// 
+
+//　プライベート変数・関数　// 
     private string m_jsonFileName;
     private string m_jsonPath;
     private string m_jsonDefaultPath;
-    private T m_instance;
+    private T m_tInstance;
 
     private JsonSettings() { }
 
@@ -86,7 +91,7 @@ public class JsonSettings<T> where T : class {
         //デフォルトのJSONファイルを読み込む
         var json = File.ReadAllText(m_jsonDefaultPath);
         //オブジェクト化する
-        m_instance = JsonUtility.FromJson<T>(json);
+        m_tInstance = JsonUtility.FromJson<T>(json);
         //初期値をセーブする
         Save();
     }

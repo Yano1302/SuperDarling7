@@ -22,7 +22,7 @@ public class TitleManager : DebugSetting
     public void NewGame()
     {
         sceneManager.SceneChange(1); // 依頼画面へシーン遷移する
-        Debug.Log("ニューゲームを開始");
+        UnityEngine.Debug.Log("ニューゲームを開始");
     }
     /// <summary>
     /// Continueをクリックしたときの関数
@@ -30,7 +30,7 @@ public class TitleManager : DebugSetting
     public void Continue()
     {
         sceneManager.SceneChange(2); // セーブしたシーンへ遷移する　ここをあとで変える
-        Debug.Log("コンティニューを開始");
+        UnityEngine.Debug.Log("コンティニューを開始");
     }
     /// <summary>
     /// SettingGameボタンをクリックしたときの関数
@@ -40,7 +40,7 @@ public class TitleManager : DebugSetting
         // ウィンドウを開いているなら再度開かないようにリターン
         if (openWindow)
         {
-            Debug.Log("openWindowが" + openWindow + "です");
+            UnityEngine.Debug.Log("openWindowが" + openWindow + "です");
             return;
         }
         settingWindow.SetActive(true); // ウィンドウを可視化する
@@ -54,7 +54,7 @@ public class TitleManager : DebugSetting
         // ウィンドウを閉じているなら再度閉じないようにリターン
         if (!openWindow)
         {
-            Debug.Log("openWindowが" + openWindow + "です");
+            UnityEngine.Debug.Log("openWindowが" + openWindow + "です");
             return;
         }
         settingWindow.SetActive(false); // ウィンドウを不可視にする

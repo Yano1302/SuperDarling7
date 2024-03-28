@@ -31,7 +31,7 @@ public class EndRollScript : DebugSetting
     /// </summary>
     private void CreditSetUp()
     {
-        Debug.Log("Creditを読み込みます");
+        UnityEngine.Debug.Log("Creditを読み込みます");
         //　テキストファイルの読み込みを行ってくれるクラス
         TextAsset textasset = new TextAsset();
         //　先ほど用意したcsvファイルを読み込ませる。
@@ -42,7 +42,7 @@ public class EndRollScript : DebugSetting
         /// CSVSerializerを用いてcsvファイルを配列に流し込む。///
         creditDates = CSVSerializer.Deserialize<CreditData>(textasset.text); // CSVのテキストデータを配列に格納する
         /// ここまで ///
-        Debug.Log("Creditを読み込みました");
+        UnityEngine.Debug.Log("Creditを読み込みました");
     }
     // Update is called once per frame
     void Update()

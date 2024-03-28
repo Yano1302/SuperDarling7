@@ -57,7 +57,7 @@ public class Timer:MonoBehaviour
     /// <summary>１秒ごとに行う関数(この1秒はTimeSpeedの影響を受けます。※速度をマイナスにした場合でも正常に動くはずです) </summary>
     public UnityAction SecondAction { get; set; } = null;   
     /// <summary>タイマーの進む速度を指定できます(倍率)。速度をマイナスにした場合は残り時間が増えていきます。 </summary>
-    public float TimeSpeed { get { return m_timeSpeed; } set { m_timeSpeed = value; UsefulSystem.DebugAction(() => { if (value < 0) Debug.LogWarning("徐々に残り時間が増えていきます。"); }); } }
+    public float TimeSpeed { get { return m_timeSpeed; } set { m_timeSpeed = value; UsefulSystem.DebugAction(() => { if (value < 0) UnityEngine.Debug.LogWarning("徐々に残り時間が増えていきます。"); }); } }
 
 
 
@@ -90,7 +90,7 @@ public class Timer:MonoBehaviour
 
     //Other Fanction 
     [Conditional("UNITY_EDITOR")]
-    private void Log(string message) {Debug.Log(message);}
+    private void Log(string message) { UnityEngine.Debug.Log(message);}
 
 
 

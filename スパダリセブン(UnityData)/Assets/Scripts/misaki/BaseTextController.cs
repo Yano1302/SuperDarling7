@@ -86,7 +86,7 @@ public class BaseTextController : DebugSetting
     /// <param name="storynum">読み込むCSVファイルの名前 例(1-1)</param>
     protected virtual void StorySetUp(string storynum)
     {
-        Debug.Log("Story"+storynum+"を読み込みます");
+        UnityEngine.Debug.Log("Story"+ storynum + "を読み込みます");
         //　テキストファイルの読み込みを行ってくれるクラス
         TextAsset textasset = new TextAsset();
         //　先ほど用意したcsvファイルを読み込ませる。
@@ -134,7 +134,7 @@ public class BaseTextController : DebugSetting
             }
         }
         /// ここまで ///
-        Debug.Log("Story" + storynum + "を読み込みました");
+        UnityEngine.Debug.Log("Story" + storynum + "を読み込みました");
     }
     /// <summary>
     /// 会話に関するボタン関数
@@ -170,7 +170,7 @@ public class BaseTextController : DebugSetting
     /// </summary>
     public virtual void TalkEnd()
     {
-        Debug.Log("会話を終了");
+        UnityEngine.Debug.Log("会話を終了");
         talkNum = default; // リセットする
         TalkState = TALKSTATE.NOTALK; // 会話ステータスを話していないに変更
         if (talkAuto) OnAutoModeCllicked(); // オートモードがオンであればオフにする
@@ -258,7 +258,7 @@ public class BaseTextController : DebugSetting
     /// <returns></returns>
     IEnumerator Dialogue()
     {
-        Debug.Log(storynum + "の" + (talkNum + 1) + "列目を再生");
+        UnityEngine.Debug.Log(storynum + "の" + (talkNum + 1) + "列目を再生");
         charaName.text = storyTalks[talkNum].name; // 話しているキャラクター名を表示
         words = storyTalks[talkNum].talks; // 文章を取得
         // 各文字に対して繰り返し処理を行います C#のIEnumerable機能により一文字ずつ取り出せる

@@ -16,12 +16,12 @@ public class DataManager : DebugSetting // MasterData‚ğjsonŒ`®‚É•Ï‚¦‚Ä•Û‘¶E“Ç‚
     }
     private void CheckSaveData() // ŠJn‚Éƒtƒ@ƒCƒ‹ƒ`ƒFƒbƒNA“Ç‚İ‚İ‚·‚éŠÖ”
     {
-        Debug.Log("‹N“®ƒ[ƒhŠJn");
+        UnityEngine.Debug.Log("‹N“®ƒ[ƒhŠJn");
         data = new MasterData(); // data‚ÉMasterDataŒ^‚ğ‘ã“ü
         filepath = Application.dataPath + "/Resources/Json/" + fileName; // ƒpƒX–¼æ“¾
         if (!File.Exists(filepath)) // ƒtƒ@ƒCƒ‹‚ª‚È‚¢‚Æ‚«
         {
-            Debug.Log("saveƒf[ƒ^‚ğì‚ë‚¤‚Æ‚µ‚Ä‚¢‚Ü‚·");
+            UnityEngine.Debug.Log("saveƒf[ƒ^‚ğì‚ë‚¤‚Æ‚µ‚Ä‚¢‚Ü‚·");
             Save(data); // ƒtƒ@ƒCƒ‹ì¬
         }
         data = Load(filepath); // ƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚ñ‚Ådata‚ÉŠi”[
@@ -32,7 +32,7 @@ public class DataManager : DebugSetting // MasterData‚ğjsonŒ`®‚É•Ï‚¦‚Ä•Û‘¶E“Ç‚
         StreamWriter writer = new StreamWriter(filepath, false); // ƒtƒ@ƒCƒ‹‘‚«‚İw’è
         writer.WriteLine(json); // json•ÏŠ·‚µ‚½î•ñ‚ğ‘‚«‚İ
         writer.Close(); // ƒtƒ@ƒCƒ‹‚ğ•Â‚¶‚é
-        Debug.Log("ƒZ[ƒu‚µ‚Ä‚¢‚Ü‚·" + json);
+        UnityEngine.Debug.Log("ƒZ[ƒu‚µ‚Ä‚¢‚Ü‚·" + json);
     }
     MasterData Load(string path) // jsonƒf[ƒ^‚ğ“Ç‚İ‚ŞŠÖ”
     {
@@ -41,18 +41,18 @@ public class DataManager : DebugSetting // MasterData‚ğjsonŒ`®‚É•Ï‚¦‚Ä•Û‘¶E“Ç‚
             StreamReader reader = new StreamReader(path); // ƒtƒ@ƒCƒ‹“Ç‚İ‚İw’è
             string json = reader.ReadToEnd(); // ƒtƒ@ƒCƒ‹“à—e‘S‚Ä“Ç‚İ‚İ
             reader.Close(); // ƒtƒ@ƒCƒ‹‚ğ•Â‚¶‚é
-            Debug.Log("ƒ[ƒh‚µ‚Ä‚¢‚Ü‚·" + json);
+            UnityEngine.Debug.Log("ƒ[ƒh‚µ‚Ä‚¢‚Ü‚·" + json);
             return JsonUtility.FromJson<MasterData>(json); // jsonƒtƒ@ƒCƒ‹‚ğŒ^‚É–ß‚µ‚Ä•Ô‚·
         }
         else
         {
-            Debug.LogError("ƒtƒ@ƒCƒ‹‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ" + path);
+            UnityEngine.Debug.LogError("ƒtƒ@ƒCƒ‹‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ" + path);
             return null; // null‚ğ•Ô‚·
         }
     }
     public void ResetMasterData() // ƒf[ƒ^‚ğ‰Šú‰»‚·‚éŠÖ”
     {
-        Debug.Log("ƒ}ƒXƒ^[ƒf[ƒ^‚Ì‰Šú‰»‚ğs‚¢‚Ü‚·");
+        UnityEngine.Debug.Log("ƒ}ƒXƒ^[ƒf[ƒ^‚Ì‰Šú‰»‚ğs‚¢‚Ü‚·");
         data = new MasterData(); // data‚ÉMasterDataŒ^‚ğ‘ã“ü
         Save(data); // ƒZ[ƒu‚·‚é
     }

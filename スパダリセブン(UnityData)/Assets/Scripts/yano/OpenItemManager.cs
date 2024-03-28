@@ -7,8 +7,11 @@ public class OpenItemManager : MonoBehaviour
 {   
     void Start()
     {
+        //マップ生成
         MapSetting.Instance.CreateMap(1);
-        UIManager.Instance.OpenUI(UIType.ItemWindow);
-        UIManager.Instance.OpenUI(UIType.Timer);
+        //アイテムウィンドウの表示(アイテムウィンドウの状態の更新も必要かも？)
+        var UIins = UIManager.Instance;
+        UIins.OpenUI(UIType.ItemWindow);
+        UIins.OpenUI(UIType.Timer);
     }
 }

@@ -95,13 +95,13 @@ public class OPMovieScript : MonoBehaviour
           }
         stateText.text = "Started";
 
-        Debug.Log("Started");
+        UnityEngine.Debug.Log("Started");
     }
 
     private void PlayEnd() // 再生終了関数
     {
         stateText.text = "PlayEnd";
-        Debug.Log("PlayEnd");
+        UnityEngine.Debug.Log("PlayEnd");
 
 
         if (opVideo.State == Art.Sample.VideoPlay.PlayState.Loaded) // 動画を読み込み中なら
@@ -126,13 +126,13 @@ public class OPMovieScript : MonoBehaviour
     private void ErrorReceived(string message) // エラーデバッグ関数
     {
         stateText.text = "ErrorReceived";
-        Debug.LogError("ErrorReceived : " + message);
+        UnityEngine.Debug.LogError("ErrorReceived : " + message);
     }
 
     private void PrepareCompleted() // 事前ダウンロードデバッグ関数
     {
         stateText.text = "PrepareCompleted";
-        Debug.Log("PrepareCompleted");
+        UnityEngine.Debug.Log("PrepareCompleted");
 
         
         if (opVideo.State == Art.Sample.VideoPlay.PlayState.Loaded)
