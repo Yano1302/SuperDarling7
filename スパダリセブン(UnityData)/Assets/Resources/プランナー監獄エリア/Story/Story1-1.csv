@@ -1,4 +1,5 @@
 ﻿backImage,leftTalkingChara,leftHighlight,rightTalkingChara,rightHighlight,centerTalkingChara,centerHighlight,name,talks
-aozora,(Template)01,1,(Template)01,,,,NPC1,左のきゃらがしゃべるよ
+aozora,(Template)01,1,(Template)01,,,,NPC1,"左のきゃらが
+しゃべるよ"
 yuyake,(Template)02,,(Template)02,1,(Template)03,,NPC2,右のきゃらがしゃべるよ
 ,,,,,(Template)03,1,NPC3,この会話が終わったら探索シーンに行くよ

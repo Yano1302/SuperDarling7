@@ -25,7 +25,7 @@ public class RequisitionController : BaseTextController
         //　先ほど用意したcsvファイルを読み込ませる。
         //　ファイルは「Resources」フォルダを作り、そこに入れておくこと。
         //　Resources.Load 内はcsvファイルの名前。
-        textasset = Resources.Load("Requisition/" + storynum, typeof(TextAsset)) as TextAsset;
+        textasset = Resources.Load("プランナー監獄エリア/Requisition/" + storynum, typeof(TextAsset)) as TextAsset;
 
         /// CSVSerializerを用いてcsvファイルを配列に流し込む。///
         storyTalks = CSVSerializer.Deserialize<StoryTalkData>(textasset.text); // CSVのテキストデータを配列に格納する
@@ -84,10 +84,10 @@ public class RequisitionController : BaseTextController
     {
         UnityEngine.Debug.Log("会話を終了");
         talkNum = default; // リセットする
-        if (talkState == TALKSTATE.LASTTALK)
+        if (TalkState == EnumList.TALKSTATE.LASTTALK)
         {
-            sceneManager.SceneChange(2); // ストーリーへシーン遷移する
+            sceneManager.SceneChange(EnumList.SCENENAME.StoryScene); // ストーリーへシーン遷移する
         }
-        TalkState = TALKSTATE.NOTALK; // 会話ステータスを話していないに変更
+        TalkState = EnumList.TALKSTATE.NOTALK; // 会話ステータスを話していないに変更
     }
 }
