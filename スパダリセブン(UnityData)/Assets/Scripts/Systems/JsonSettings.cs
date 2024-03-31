@@ -1,7 +1,4 @@
-using System;
 using System.IO;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -18,10 +15,11 @@ public class JsonSettings<T> where T : class {
 //コンストラクタ // -----------------------------------------------------------------
     /// <summary>Jsonを管理するクラスを作成します</summary>
     /// <param name="jsonFileName">Jsonファイル名(拡張子抜き)</param>
-    public JsonSettings(string jsonFileName,string dataFileName) {
+    /// <param name="newDataFileName">新しく作られるデータのファイル名</param>
+    public JsonSettings(string jsonFileName,string newDataFileName) {
         m_jsonFileName = jsonFileName + ".json";
         m_jsonDefaultPath = UsefulSystem.FindFilePath(m_jsonFileName);
-        m_jsonPath = m_jsonDefaultPath.Substring(0, m_jsonDefaultPath.Length - 4) + dataFileName + ".json";
+        m_jsonPath = m_jsonDefaultPath.Substring(0, m_jsonDefaultPath.Length - 4) + newDataFileName + ".json";
         if (!File.Exists(m_jsonPath)) {
             SettingData();
         }

@@ -27,6 +27,9 @@ public class MapSetting : SingletonMonoBehaviour<MapSetting>
     [SerializeField, Header("マップオブジェクト"), EnumIndex(typeof(MapType))]
     private GameObject[] MapObject;
 
+    [SerializeField]
+    private Text text;
+
     //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
 
     public void CreateMap(int mapNumber) {
@@ -67,10 +70,9 @@ public class MapSetting : SingletonMonoBehaviour<MapSetting>
                     Instantiate(MapObject[typeNum], vec, Quaternion.identity);
                     if (typeNum != 1 && typeNum != 2) {
                         Instantiate(MapObject[1], vec, Quaternion.identity);
-                    }
-                       
+                    }                     
                 } 
             }
-        }
+        }     
     }
 }

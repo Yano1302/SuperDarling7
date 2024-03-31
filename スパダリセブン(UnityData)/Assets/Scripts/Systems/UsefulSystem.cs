@@ -64,6 +64,11 @@ public class UsefulSystem : SingletonMonoBehaviour<UsefulSystem>
         return lines;
     }
 
+
+   
+
+
+
     /// <summary>Vector3‚Ì—v‘f”“¯m‚ğŠ|‚¯‡‚í‚¹‚Ü‚·</summary>
     /// <returns>Š|‚¯‡‚í‚¹‚½Vector3</returns>
     public static Vector3 Mul(in Vector3 a, in Vector3 b) { return new Vector3(a.x * b.x, a.y * b.y, a.z * b.z); }
