@@ -1,5 +1,4 @@
 using System;
-using System;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,7 +12,7 @@ public class JsonSettings<T> where T : class {
 
     // 変数 //
     /// <summary>T型のクラスのインスタンスを取得します。</summary>
-    public T Instance{ get { return m_instance; } }
+    public T TInstance{ get { return m_tInstance; } }
 
     //コンストラクタ
     /// <summary>Jsonを管理するクラスを作成します</summary>
@@ -33,7 +32,7 @@ public class JsonSettings<T> where T : class {
     /// <summary> Jsonデータにインスタンスの情報を書き込みます。</summary>
     public void Save() {
         //stringに変換する
-        string jsonstr = JsonUtility.ToJson(Instance);
+        string jsonstr = JsonUtility.ToJson(TInstance);
         //ファイル書き込み用のライターを開く
         StreamWriter writer = new StreamWriter(m_jsonPath,false);
         //書き込み
@@ -48,7 +47,7 @@ public class JsonSettings<T> where T : class {
         //JSONファイルを読み込む
         var json = File.ReadAllText(m_jsonPath);
         //オブジェクト化する
-        m_instance = JsonUtility.FromJson<T>(json);
+        m_tInstance = JsonUtility.FromJson<T>(json);
     }
 
     /// <summary>データを初期値に戻します。</summary>
@@ -79,7 +78,7 @@ public class JsonSettings<T> where T : class {
     private string m_jsonFileName;
     private string m_jsonPath;
     private string m_jsonDefaultPath;
-    private T m_instance;
+    private T m_tInstance;
 
     private JsonSettings() { }
 
@@ -87,7 +86,7 @@ public class JsonSettings<T> where T : class {
         //デフォルトのJSONファイルを読み込む
         var json = File.ReadAllText(m_jsonDefaultPath);
         //オブジェクト化する
-        m_instance = JsonUtility.FromJson<T>(json);
+        m_tInstance = JsonUtility.FromJson<T>(json);
         //初期値をセーブする
         Save();
     }

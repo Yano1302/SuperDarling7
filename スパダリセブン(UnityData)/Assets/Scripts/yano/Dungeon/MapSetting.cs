@@ -27,9 +27,6 @@ public class MapSetting : SingletonMonoBehaviour<MapSetting>
     [SerializeField, Header("マップオブジェクト"), EnumIndex(typeof(MapType))]
     private GameObject[] MapObject;
 
-    [SerializeField]
-    private Text text;
-
     //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
 
     public void CreateMap(int mapNumber) {
