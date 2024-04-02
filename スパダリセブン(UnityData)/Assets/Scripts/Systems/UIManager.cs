@@ -160,8 +160,9 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
             m_UIList = new List<UIType>() { UIType.Close};
             UnityEngine.Debug.Assert(UIObjects.Length > 1,"UIオブジェクトがアタッチされていません");
             for (int i = 1; i < UIObjects.Length; i++) {
-                UnityEngine.Debug.Assert(UIObjects[i] != null, (UIType)i + "に対応するUIオブジェクトがアタッチされていません。");
-                UIObjects[i].SetActive(false);
+                Debug.Assert(UIObjects[i] != null, (UIType)i + "に対応するUIオブジェクトがアタッチされていません。");
+                if (UIObjects[i].activeSelf)
+                    UIObjects[i].SetActive(false);
             }
             foreach(var ui in FirstOpenUIs) {
                 OpenUI(ui);
