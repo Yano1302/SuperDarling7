@@ -84,10 +84,10 @@ public class RequisitionController : BaseTextController
     {
         UnityEngine.Debug.Log("会話を終了");
         talkNum = default; // リセットする
-        if (TalkState == EnumList.TALKSTATE.LASTTALK)
+        if (TalkState == TALKSTATE.LASTTALK)
         {
-            sceneManager.SceneChange(EnumList.SCENENAME.StoryScene); // ストーリーへシーン遷移する
+            sceneManager.SceneChange(SCENENAME.StoryScene); // ストーリーへシーン遷移する
         }
-        TalkState = EnumList.TALKSTATE.NOTALK; // 会話ステータスを話していないに変更
+        TalkState = TALKSTATE.NOTALK; // 会話ステータスを話していないに変更
     }
 }

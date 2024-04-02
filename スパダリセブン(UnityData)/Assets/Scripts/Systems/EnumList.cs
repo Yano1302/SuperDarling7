@@ -2,8 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnumList : SingletonMonoBehaviour<EnumList>
-{
     // シーンの名称　数字はビルド番号に合わせている
     public enum SCENENAME
     {
@@ -23,4 +21,3 @@ public class EnumList : SingletonMonoBehaviour<EnumList>
         LASTTALK // 最後のセリフ
     }
 
-}

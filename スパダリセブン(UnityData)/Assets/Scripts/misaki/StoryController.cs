@@ -14,6 +14,6 @@ public class StoryController : BaseTextController
     public override void TalkEnd()
     {
         base.TalkEnd();
-        sceneManager.SceneChange(EnumList.SCENENAME.Dungeon); // ’Tõ‰æ–Ê‚ÖƒV[ƒ“‘JˆÚ‚·‚é
+        sceneManager.SceneChange(SCENENAME.Dungeon); // ’Tõ‰æ–Ê‚ÖƒV[ƒ“‘JˆÚ‚·‚é
     }
 }

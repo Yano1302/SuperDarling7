@@ -195,11 +195,6 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
             m_fadeImage.material.SetFloat(m_pID[index].m_ID_Fade,1);
             m_fadeImage.material.SetFloat(m_pID[index].m_ID_maxAlpha,1 - m_minAlpha);
             m_fadeImage.material.SetFloat(m_pID[index].m_ID_minAlpha, 1 - m_maxAlpha);
-            KeyDebug.SetKeyDebug(
-                gameObject,
-                new KeyDebugData("名前", () => { FadeIn(FadeType.Entire); }),
-                new KeyDebugData("名前", () => { FadeOut(FadeType.Entire); })
-                );
         }
     }
 
@@ -238,7 +233,7 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
         //フェードUIを前面に移動
         m_fadeImage.transform.SetAsLastSibling();
         //フェードUIのレイキャスト設定
-        m_fadeImage.raycastTarget = fadeOut;
+        m_fadeImage.raycastTarget = fadeOut? true : m_fadeImage.raycastTarget;
         //マテリアル等の設定
         SetFadeShader(ref type,fadeOut);
         //tの値が中途半端ではまずいフェードタイプの場合は_Fadeを１か０にする
@@ -282,6 +277,7 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
         IsFading = false;
         Log("フェードが完了しました。", false);
         Action();
+        m_fadeImage.raycastTarget = false;
     }
 
     /// <summary>画面のフェードアウトの実際の処理を行います</summary>

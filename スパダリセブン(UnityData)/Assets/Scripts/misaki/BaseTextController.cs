@@ -44,8 +44,8 @@ public class BaseTextController : DebugSetting
     public bool runtimeCoroutine = false; // コルーチンが実行中かどうか
     private Coroutine dialogueCoroutine; // コルーチンを格納する変数
 
-    public EnumList.TALKSTATE talkState; // 会話ステータス変数
-    public EnumList.TALKSTATE TalkState
+    public TALKSTATE talkState; // 会話ステータス変数
+    public TALKSTATE TalkState
     {
         get { return talkState; }
         set
@@ -53,16 +53,16 @@ public class BaseTextController : DebugSetting
             talkState = value;
             switch (talkState)
             {
-                case EnumList.TALKSTATE.NOTALK:
+                case TALKSTATE.NOTALK:
                     buttonText.text = "会話開始"; // ボタンテキストを"会話開始"に変更
                     break;
-                case EnumList.TALKSTATE.TALKING:
+                case TALKSTATE.TALKING:
                     buttonText.text = "Skip"; // ボタンテキストを"Skip"に変更
                     break;
-                case EnumList.TALKSTATE.NEXTTALK:
+                case TALKSTATE.NEXTTALK:
                     buttonText.text = "次へ"; // ボタンテキストを"次へ"に変更
                     break;
-                case EnumList.TALKSTATE.LASTTALK:
+                case TALKSTATE.LASTTALK:
                     buttonText.text = "会話終了"; // ボタンテキストを"会話終了"に変更
                     break;
             }
@@ -72,7 +72,7 @@ public class BaseTextController : DebugSetting
     {
         base .Awake(); // デバッグログを表示するか否かスクリプタブルオブジェクトのGameSettingsを参照
         StorySetUp(storynum); // 対応する会話文をセットする
-        TalkState = EnumList.TALKSTATE.NOTALK; // 会話ステータスを話していないに変更
+        TalkState = TALKSTATE.NOTALK; // 会話ステータスを話していないに変更
     }
     /// <summary>
     /// 対応する会話文をセットする関数
@@ -136,25 +136,25 @@ public class BaseTextController : DebugSetting
     /// <param name="storynum">読み込みたいCSV名</param>
     public void OnTalkButtonClicked(string storynum = "")
     {
-        if (TalkState == EnumList.TALKSTATE.NOTALK) // 会話ステータスが話していないなら
+        if (TalkState == TALKSTATE.NOTALK) // 会話ステータスが話していないなら
         {
             // ストーリー番号があれば
             if (storynum != "") StorySetUp(storynum); // 対応する会話文をセット
-            TalkState = EnumList.TALKSTATE.TALKING; // 会話ステータスを会話中に変更
+            TalkState = TALKSTATE.TALKING; // 会話ステータスを会話中に変更
         }
-        else if (TalkState == EnumList.TALKSTATE.TALKING) // 会話ステータスが話し中なら
+        else if (TalkState == TALKSTATE.TALKING) // 会話ステータスが話し中なら
         {
             talkSkip = true; // トークスキップフラグを立てる
-            TalkState = EnumList.TALKSTATE.NEXTTALK; // 会話ステータスを次のセリフに変更
+            TalkState = TALKSTATE.NEXTTALK; // 会話ステータスを次のセリフに変更
             return;
         }
-        if (TalkState != EnumList.TALKSTATE.LASTTALK) // 会話ステータスが話し中,なら
+        if (TalkState != TALKSTATE.LASTTALK) // 会話ステータスが話し中,なら
         {
             InitializeTalkField(); // 表示されているテキスト等を初期化
             InstantiateActors(); // 登場人物等を生成
             StartDialogueCoroutine(); // 文章を表示するコルーチンを開始
         }
-        else if (TalkState == EnumList.TALKSTATE.LASTTALK) // 会話ステータスが最後のセリフなら
+        else if (TalkState == TALKSTATE.LASTTALK) // 会話ステータスが最後のセリフなら
         {
             TalkEnd(); //会話を終了する
         }
@@ -166,7 +166,7 @@ public class BaseTextController : DebugSetting
     {
         Debug.Log("会話を終了");
         talkNum = default; // リセットする
-        TalkState = EnumList.TALKSTATE.NOTALK; // 会話ステータスを話していないに変更
+        TalkState = TALKSTATE.NOTALK; // 会話ステータスを話していないに変更
         if (talkAuto) OnAutoModeCllicked(); // オートモードがオンであればオフにする
     }
     /// <summary>
@@ -253,7 +253,7 @@ public class BaseTextController : DebugSetting
     IEnumerator Dialogue()
     {
         Debug.Log(storynum + "の" + (talkNum + 1) + "列目を再生");
-        TalkState = EnumList.TALKSTATE.TALKING; // 会話ステータスを話し中にする
+        TalkState = TALKSTATE.TALKING; // 会話ステータスを話し中にする
         charaName.text = storyTalks[talkNum].name; // 話しているキャラクター名を表示
         words = storyTalks[talkNum].talks; // 文章を取得
         // 各文字に対して繰り返し処理を行います C#のIEnumerable機能により一文字ずつ取り出せる
@@ -303,10 +303,10 @@ public class BaseTextController : DebugSetting
         if (talkSkip == true) textLabel.text = storyTalks[talkNum].talks; // 全文を表示
         talkNum++; // 次のダイアログに移動
         
-        TalkState = EnumList.TALKSTATE.NEXTTALK; // 会話ステータスを次のセリフに変更
+        TalkState = TALKSTATE.NEXTTALK; // 会話ステータスを次のセリフに変更
         talkSkip = false; // トークスキップフラグをfalseにする
         // 次のダイアログで最後なら会話ステータスを最後のセリフに変更
-        if (talkNum >= storyTalks.Length) TalkState = EnumList.TALKSTATE.LASTTALK;
+        if (talkNum >= storyTalks.Length) TalkState = TALKSTATE.LASTTALK;
         runtimeCoroutine = false; // フラグを未実行に変更
     }
     /// <summary>

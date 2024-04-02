@@ -10,9 +10,9 @@ namespace Supadari
     {
         [SerializeField] DisplayManager displayManager; // ディスプレイマネージャー用変数
         [SerializeField] UIManager uiManager; // UIマネージャー用変数
-        [SerializeField] EnumList.SCENENAME currentSceneName; // 現在のシーン名
+        [SerializeField] SCENENAME currentSceneName; // 現在のシーン名
         [SerializeField] Scene currentScene; // 現在のシーン
-        public EnumList.SCENENAME CheckSceneName { get { return currentSceneName; } }
+        public SCENENAME CheckSceneName { get { return currentSceneName; } }
         public Scene CheckScene { get { return currentScene; } }
 
         protected override void Awake()
@@ -33,9 +33,9 @@ namespace Supadari
         {
             // 現在のシーンを代入する
             currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene(); 
-            currentSceneName = (EnumList.SCENENAME)currentScene.buildIndex;
+            currentSceneName = (SCENENAME)currentScene.buildIndex;
             // 現在のシーンが探索シーンであれば
-            if (currentSceneName == EnumList.SCENENAME.Dungeon || currentSceneName == EnumList.SCENENAME.InvestigationScene)
+            if (currentSceneName == SCENENAME.Dungeon || currentSceneName == SCENENAME.InvestigationScene)
             {
                 MapSetting setting = GameObject.FindGameObjectWithTag("MapSetting").GetComponent<MapSetting>(); // MapSettingを検索
                 setting.CreateMap(1); // マップを生成
@@ -63,7 +63,7 @@ namespace Supadari
         /// シーン遷移を行う関数
         /// </summary>
         /// <param name="LoadScene">シーン名</param>
-        public void SceneChange(EnumList.SCENENAME LoadScene)
+        public void SceneChange(SCENENAME LoadScene)
         {
             displayManager.FadeOut(FadeType.Entire,()=> UnityEngine.SceneManagement.SceneManager.LoadScene((int)LoadScene)); // フェードアウトする
         }
