@@ -139,7 +139,7 @@ public class CSVSerializer
             }
             else
             {
-                UnityEngine.Debug.Log("Miss " + tmp.Name);
+                Debug.Log("Miss " + tmp.Name);
             }
         }
         return v;

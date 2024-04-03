@@ -13,14 +13,14 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     /// <summary>アイテムを所持します。</summary>
     /// <param name="id">所持するアイテムのID</param>
     public void AddItem(ItemID id) {
-        UsefulSystem.DebugAction(() => { if (m_json.TInstance.GetFlag(id)) { UnityEngine.Debug.LogWarning("そのアイテムは既に取得しています。"); } });  
+        UsefulSystem.DebugAction(() => { if (m_json.TInstance.GetFlag(id)) { Debug.LogWarning("そのアイテムは既に取得しています。"); } });  
         m_json.TInstance.SetFlag(id,true);ItemWindow[(int)id].SetActive(true);
     }
 
     /// <summary>アイテムの所持フラグを消します。</summary>
     /// <param name="id">消すアイテムのID</param>
     public void RemoveItem(ItemID id) {
-        UsefulSystem.DebugAction(() => { if (!m_json.TInstance.GetFlag(id)) { UnityEngine.Debug.LogWarning("指定されたアイテムの所持フラグは既にfalseです"); } });
+        UsefulSystem.DebugAction(() => { if (!m_json.TInstance.GetFlag(id)) { Debug.LogWarning("指定されたアイテムの所持フラグは既にfalseです"); } });
         m_json.TInstance.SetFlag(id, false); ItemWindow[(int)id].SetActive(false);
     }
 
@@ -40,7 +40,7 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
    
     /// <summary>フラグの情報をログに表示します(デバッグ用)</summary>
     [System.Diagnostics.Conditional("UNITY_EDITOR")]
-    public void Log() { UnityEngine.Debug.Log(m_json.JsonToString()); }
+    public void Log() { Debug.Log(m_json.JsonToString()); }
 
     public GameObject GetItemWindow(ItemID id) { return ItemWindow[(int)id]; }
 
@@ -64,10 +64,10 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
         base.Awake();
         if(m_json == null) {
             //アイテム情報を読み込む
-            m_json = new JsonSettings<SettingsGetItemFlags>("ItemGetFlags","Data1");
+            m_json = new JsonSettings<SettingsGetItemFlags>("Data1",Application.dataPath + "\\JsonDataFile", "ItemGetFlags");
             //アイテムウィンドウを設定する
             int count = transform.childCount;
-            UnityEngine.Debug.Assert(count == UsefulSystem.GetEnumLength<ItemID>(),"設置されているアイテムウィンドウの個数とアイテムのIDの数が一致しません");
+            Debug.Assert(count == UsefulSystem.GetEnumLength<ItemID>(),"設置されているアイテムウィンドウの個数とアイテムのIDの数が一致しません");
             ItemWindow = new GameObject[count];
             for (int i = 0; i < count; i++) {
                 ItemWindow[i] = transform.GetChild(i).gameObject;

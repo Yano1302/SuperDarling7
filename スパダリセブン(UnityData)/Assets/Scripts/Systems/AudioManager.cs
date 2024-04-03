@@ -304,7 +304,7 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
             Log(m_BGMData,true);
         }
         else {
-            UnityEngine.Debug.Assert(clip != null, "音源ファイル名が間違っているかファイルが存在しません\nファイル名 : " + clipName);
+            Debug.Assert(clip != null, "音源ファイル名が間違っているかファイルが存在しません\nファイル名 : " + clipName);
             return;
         }
         
@@ -752,9 +752,9 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     [Conditional("UNITY_EDITOR")]
     public void IsPlayingSoundLog(){
         if (m_BGMData.Source.isPlaying){
-            UnityEngine.Debug.Log("再生されているBGM : " + m_BGMData.Source.clip.name);
+            Debug.Log("再生されているBGM : " + m_BGMData.Source.clip.name);
         }
-        GetUsingSource((SoundData sd) => { UnityEngine.Debug.Log("再生されているサウンド : " + sd.Source.clip.name + "使用しているID : " + sd.ID); });
+        GetUsingSource((SoundData sd) => { Debug.Log("再生されているサウンド : " + sd.Source.clip.name + "使用しているID : " + sd.ID); });
       }
       
 
@@ -898,7 +898,7 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
         path = Application.dataPath + "/" + path;
         string[] fileNames = Directory.GetFiles(path, "*", SearchOption.AllDirectories)
             .Where(s => !s.EndsWith(".meta", System.StringComparison.OrdinalIgnoreCase)).ToArray();
-        UnityEngine.Debug.Assert(fileNames != null, "フォルダが見つかりませんでした");
+        Debug.Assert(fileNames != null, "フォルダが見つかりませんでした");
         for(int i = 0; i < fileNames.Length; i++) {
             //プレハブ名だけを抜き取る
             string[] part = fileNames[i].Split('\\');            
@@ -947,7 +947,7 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
             //全ての条件を満たした場合のみフェードを進める
             else if(s.fadeState == FadeState.Fading){
                 SetVolume(s,Mathf.Lerp(sv, ev, t));
-                UnityEngine.Debug.Log(Mathf.Lerp(sv, ev, t));
+                Debug.Log(Mathf.Lerp(sv, ev, t));
                 t += Time.deltaTime / time;
             }         
             //ループを抜ける条件
@@ -1033,7 +1033,7 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
             string type = d.ID == 0 ? "(BGM)" : "(SE)";
             string id = d.ID != 0 ? "<color=cyan>ID : " + d.ID + "</color>" : "";
             string str = playing ? "<color=cyan>" + d.Source.clip.name + type + "</color>" + "が再生されます    " + id : "<color=cyan>" + d.Source.clip.name + type + "</color>" + "が停止されます" + id;
-            UnityEngine.Debug.Log(str); 
+            Debug.Log(str); 
         } 
     }
 
@@ -1042,10 +1042,10 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     private void Log(string message,bool warning,bool ignore = false) {
         if (PlaySoundLog && !ignore) {
             if (warning) {
-                UnityEngine.Debug.LogWarning("<color=yellow>"+ message + "</color>");
+                Debug.LogWarning("<color=yellow>"+ message + "</color>");
             }
             else {
-                UnityEngine.Debug.Log(message);
+                Debug.Log(message);
             }
         }
     }

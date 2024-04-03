@@ -77,7 +77,7 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
     public void OpenUIs(UIType[] UITypes) {
 #if UNITY_EDITOR
         if (UITypes.Length == 0) {
-            UnityEngine.Debug.LogError("引数の配列の中身がありません");
+            Debug.LogError("引数の配列の中身がありません");
             return;
         }
 #endif
@@ -105,7 +105,7 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
             }
 #if UNITY_EDITOR
             else {
-                UnityEngine.Debug.LogError("指定されたUIが開かれていません");
+                Debug.LogError("指定されたUIが開かれていません");
                 return;
             }
 #endif
@@ -117,15 +117,15 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
     public void ReturnUI(UIType returnUI) {
 #if UNITY_EDITOR
         if (!m_UIList.Contains(returnUI)) {
-            UnityEngine.Debug.LogError("指定されたUIが開かれていません");
+            Debug.LogError("指定されたUIが開かれていません");
             return;
         }
         if (m_CurrentType == returnUI) {
-            UnityEngine.Debug.LogWarning("既に指定されたUIの状態です");
+            Debug.LogWarning("既に指定されたUIの状態です");
             return;
         }
         if (returnUI == UIType.Close) {
-            UnityEngine.Debug.LogWarning("全てのUIが閉じられます");
+            Debug.LogWarning("全てのUIが閉じられます");
         }
 #endif
         if (CheckCall()) {
@@ -158,9 +158,9 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
         base.Awake();
         if(m_UIList == null) {
             m_UIList = new List<UIType>() { UIType.Close};
-            UnityEngine.Debug.Assert(UIObjects.Length > 1,"UIオブジェクトがアタッチされていません");
+            Debug.Assert(UIObjects.Length > 1,"UIオブジェクトがアタッチされていません");
             for (int i = 1; i < UIObjects.Length; i++) {
-                UnityEngine.Debug.Assert(UIObjects[i] != null, (UIType)i + "に対応するUIオブジェクトがアタッチされていません。");
+                Debug.Assert(UIObjects[i] != null, (UIType)i + "に対応するUIオブジェクトがアタッチされていません。");
                 UIObjects[i].SetActive(false);
             }
             foreach(var ui in FirstOpenUIs) {
@@ -176,12 +176,12 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
 #if UNITY_EDITOR
         if (type == UIType.Close)
         {
-            UnityEngine.Debug.LogWarning("CloseUIは取得できません");
+            Debug.LogWarning("CloseUIは取得できません");
             return null;
         }
         if(UIObjects.Length < index - 1 || UIObjects[index] == null)
         {
-            UnityEngine.Debug.LogError("UIがアタッチされていません : "+ type.ToString());
+            Debug.LogError("UIがアタッチされていません : "+ type.ToString());
             return null;
         }
 #endif
@@ -206,11 +206,11 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
 #if UNITY_EDITOR
         if (!m_EnableDelay)
         {
-            UnityEngine.Debug.LogWarning("UIの開閉処理の際のディレイが無効化されています");
+            Debug.LogWarning("UIの開閉処理の際のディレイが無効化されています");
         }
         if (!m_IsAvailable)
         {
-            UnityEngine.Debug.LogWarning("m_IsAvailableがfalseなので処理が行われません");
+            Debug.LogWarning("m_IsAvailableがfalseなので処理が行われません");
         }
 #endif
         return false;
@@ -222,7 +222,7 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
 #if UNITY_EDITOR
         if (type == UIType.Close)
         {
-            UnityEngine.Debug.LogError("CloseUIは開く事が出来ません。\n呼び出し元の引数(ボタン、スクリプト等)を確認してください");
+            Debug.LogError("CloseUIは開く事が出来ません。\n呼び出し元の引数(ボタン、スクリプト等)を確認してください");
             return;
         }
 #endif
@@ -239,7 +239,7 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
 #if UNITY_EDITOR
         else
         {
-            UnityEngine.Debug.LogWarning("既にそのUIは開かれています : " + type.ToString());
+            Debug.LogWarning("既にそのUIは開かれています : " + type.ToString());
             return;
         }
 #endif
@@ -256,7 +256,7 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
 #if UNITY_EDITOR
         else
         {
-            UnityEngine.Debug.LogWarning("既に全てのUIが閉じられています");
+            Debug.LogWarning("既に全てのUIが閉じられています");
         }
 #endif
     }

@@ -90,11 +90,11 @@ public class UsefulSystem : SingletonMonoBehaviour<UsefulSystem>
     //  デバッグ用   //--------------------------------------------------------------------------------------------------------------------------------
 
     /// <summary> エディタ上でのみ有効なログを表示します</summary>
-    [Conditional("UNITY_EDITOR")] public static void Log(object o) { UnityEngine.Debug.Log(o); }
+    [Conditional("UNITY_EDITOR")] public static void Log(object o) { Debug.Log(o); }
     /// <summary> エディタ上でのみ有効なWarningログを表示します</summary>
-    [Conditional("UNITY_EDITOR")] public static void LogWarning(object o) { UnityEngine.Debug.LogWarning(o); }
+    [Conditional("UNITY_EDITOR")] public static void LogWarning(object o) { Debug.LogWarning(o); }
     /// <summary> エディタ上でのみ有効なErrorログを表示します</summary>
-    [Conditional("UNITY_EDITOR")] public static void LogError(object o) { UnityEngine.Debug.LogError(o); }
+    [Conditional("UNITY_EDITOR")] public static void LogError(object o) { Debug.LogError(o); }
     /// <summary>エディタ上でのみ有効な関数を実行します</summary>
     [Conditional("UNITY_EDITOR")] public static void DebugAction(UnityAction action) { action(); }
 
@@ -107,7 +107,7 @@ public class UsefulSystem : SingletonMonoBehaviour<UsefulSystem>
     /// <param name="action">実行する関数</param>
     public void WaitCallBack(float waitSeconds, UnityAction action) 
     {
-        UnityEngine.Debug.Assert(0 < waitSeconds, "タイマーが既に０以下です");
+        Debug.Assert(0 < waitSeconds, "タイマーが既に０以下です");
         StartCoroutine(WaitCall(waitSeconds, action)); 
     }
 
@@ -119,8 +119,8 @@ public class UsefulSystem : SingletonMonoBehaviour<UsefulSystem>
     /// <param name="action">実行する関数</param>
     public void WaitCallBack(float[] Timer, int index, UnityAction action)
     {
-        UnityEngine.Debug.Assert(index < Timer.Length, "インデックスがタイマー配列の範囲外です");
-        UnityEngine.Debug.Assert(0 < Timer[index], "タイマーが既に０以下です");
+        Debug.Assert(index < Timer.Length, "インデックスがタイマー配列の範囲外です");
+        Debug.Assert(0 < Timer[index], "タイマーが既に０以下です");
 
         Func<Task> AsyncFunc = async () =>
         {
@@ -256,7 +256,7 @@ public class UsefulSystem : SingletonMonoBehaviour<UsefulSystem>
                 return index;
             }
         }
-        UnityEngine.Debug.LogError("一致する値が見つかりませんでした : " + type);
+        Debug.LogError("一致する値が見つかりませんでした : " + type);
         return 0;
     }
 
