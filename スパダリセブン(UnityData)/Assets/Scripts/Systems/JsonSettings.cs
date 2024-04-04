@@ -8,7 +8,7 @@ using UnityEngine;
 /// Jsonファイルを読み書きする為のクラスです
 /// </summary>
 /// <typeparam name="T">[System.Serializable]属性を付けたJsonファイルと同じ形式のクラス</typeparam>
-public class JsonSettings<T> where T : class {
+public class JsonSettings<T> where T : class,new(){
 
     // 変数 //
     /// <summary>T型のクラスのインスタンスを取得します。</summary>
@@ -16,27 +16,36 @@ public class JsonSettings<T> where T : class {
 
     //コンストラクタ
     /// <summary>Jsonを管理するクラスを作成します</summary>
-    /// <param name="jsonFileName">Jsonファイル名(拡張子抜き)</param>
-    public JsonSettings(string jsonFileName,string dataFileName) {
-        m_jsonFileName = jsonFileName + ".json";
-        m_jsonDefaultPath = UsefulSystem.FindFilePath(m_jsonFileName);
-        m_jsonPath = m_jsonDefaultPath.Substring(0, m_jsonDefaultPath.Length - 4) + dataFileName + ".json";
+    /// <param name="defaultJsonFileName">Jsonファイル名(拡張子抜き)</param>
+    public JsonSettings(string dataFileName,string saveFolderPath, string defaultJsonFileName) {
+        m_jsonFileName = dataFileName + ".json";
+        m_jsonDefaultPath = UsefulSystem.FindFilePath(defaultJsonFileName + ".json");
+        m_jsonPath = saveFolderPath + "\\" + m_jsonFileName;
         if (!File.Exists(m_jsonPath)) {
             SettingData();
         }
-        Load();
+        Load(); 
     }
-   
-    
-    //  関数  //
-    /// <summary> Jsonデータにインスタンスの情報を書き込みます。</summary>
-    public void Save() {
+
+    /// <summary>マスターデータも自動で作成</summary>
+    /// <param name="dataFileName"></param>
+    public JsonSettings(string dataFileName,string saveFolderPath) {
+        m_jsonFileName = dataFileName + ".json";
+        m_jsonPath = Application.dataPath + saveFolderPath + "\\" + m_jsonFileName;
+        m_tInstance = new T();
+        Save();
+    }
+
+
+        //  関数  //
+        /// <summary> Jsonデータにインスタンスの情報を書き込みます。</summary>
+        public void Save() {
         //stringに変換する
-        string jsonstr = JsonUtility.ToJson(TInstance);
+        string jsonStr = JsonUtility.ToJson(TInstance);
         //ファイル書き込み用のライターを開く
-        StreamWriter writer = new StreamWriter(m_jsonPath,false);
+        StreamWriter writer = new StreamWriter(m_jsonPath,true);
         //書き込み
-        writer.Write(jsonstr);
+        writer.Write(jsonStr);
         //ライターを閉じる処理
         writer.Flush();
         writer.Close();
@@ -77,12 +86,11 @@ public class JsonSettings<T> where T : class {
     //　プライベート変数・関数　// 
     private string m_jsonFileName;
     private string m_jsonPath;
-    private string m_jsonDefaultPath;
+    private string m_jsonDefaultPath = null;
     private T m_tInstance;
-
     private JsonSettings() { }
 
-    private void SettingData() { 
+    private void SettingData() {
         //デフォルトのJSONファイルを読み込む
         var json = File.ReadAllText(m_jsonDefaultPath);
         //オブジェクト化する
