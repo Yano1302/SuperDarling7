@@ -10,6 +10,7 @@ public class StoryController : BaseTextController
     {
         base.Awake();
         sceneManager = GameObject.FindGameObjectWithTag("SceneManager").GetComponent<Supadari.SceneManager>();
+        playerTextSpeed = sceneManager.saveData.m_tInstance.textSpeed; // テキストスピードを設定
     }
     public override void TalkEnd()
     {

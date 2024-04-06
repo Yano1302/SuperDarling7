@@ -22,7 +22,7 @@ using UnityEngine;
     }
 public enum SETTINGSTATE
 {
-    BGM, // BGMの設定
-    SE, // SEの設定
-    TEXTSPEED // テキストスピードの設定
+    BGM = 0, // BGMの設定
+    SE = 1, // SEの設定
+    TEXTSPEED = 2 // テキストスピードの設定
 }

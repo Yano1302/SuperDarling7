@@ -6,14 +6,18 @@ using System.Threading.Tasks;
 
 namespace Supadari
 {
-    public class SceneManager : SingletonMonoBehaviour <SceneManager>
+    public class SceneManager : SingletonMonoBehaviour<SceneManager>
     {
         [SerializeField] DisplayManager displayManager; // ディスプレイマネージャー用変数
         [SerializeField] UIManager uiManager; // UIマネージャー用変数
+        [SerializeField] AudioManager audioManager; // オーディオマネージャー変数
         [SerializeField] SCENENAME currentSceneName; // 現在のシーン名
         [SerializeField] Scene currentScene; // 現在のシーン
-        public SCENENAME CheckSceneName { get { return currentSceneName; } }
-        public Scene CheckScene { get { return currentScene; } }
+        public SCENENAME CheckSceneName { get { return currentSceneName; } } // 現在のシーン名を取得
+        public Scene CheckScene { get { return currentScene; } } // 現在のシーンを取得
+        // セーブデータを読み込み
+        public JsonSettings<MasterData> saveData = new JsonSettings<MasterData>("SaveData", "/Resources/プランナー監獄エリア/Json", "MasterData");
+
 
         protected override void Awake()
         {
@@ -23,6 +27,7 @@ namespace Supadari
         void Start()
         {
             UnityEngine.SceneManagement.SceneManager.sceneLoaded += SceneLoaded;
+            audioManager.BGM_Play("BGM", saveData.m_tInstance.volumeBGM);
         }
         /// <summary>
         /// イベントハンドラー　シーン遷移時の関数

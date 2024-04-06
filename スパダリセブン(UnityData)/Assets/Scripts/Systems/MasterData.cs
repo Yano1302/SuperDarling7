@@ -6,7 +6,7 @@ using System;
 // 岬作成のセーブ・ロードするクラスのスクリプトです
 // セーブ・ロードしたい変数はここに記載してください
 [Serializable]
-public class MasterData : MonoBehaviour // jsonデータとして保存するclass
+public class MasterData // jsonデータとして保存するclass
 {
     // 下記は例です
     /*
@@ -14,7 +14,7 @@ public class MasterData : MonoBehaviour // jsonデータとして保存するclass
     public string rhythmHighScoreRank = "D"; // リズムハイスコアランク
     */
     // 証拠？
-    public GameObject[] evidences = new GameObject[10];
+    //public GameObject[] evidences = new GameObject[10];
     // シーン番号？
     public int sceneNum = 0;
     // BGM音量

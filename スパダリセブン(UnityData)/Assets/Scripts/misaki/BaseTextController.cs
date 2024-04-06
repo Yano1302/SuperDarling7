@@ -12,7 +12,7 @@ public class BaseTextController : DebugSetting
     protected int talkNum = 0; // ダイヤログ番号
     public int displayCharaAnchors = 3; // キャラクター画像の表示箇所数
     [SerializeField]private float textBaseSpeed = 0.05f; // テキスト送りのベーススピード
-    public float playerTextSpeed = 5f; // プレイヤーが指定したテキスト送りのスピード度合
+    public float playerTextSpeed = 0.5f; // プレイヤーが指定したテキスト送りのスピード度合
     public float textDelay = 1.5f; // テキストとテキストの間の時間(オートモードのみ使用)
     private bool talkSkip = false; // ボタンがクリックされたかどうかを示すフラグ
     private bool talkAuto = false; // 会話がオート状態なのかを示すフラグ
@@ -316,7 +316,7 @@ public class BaseTextController : DebugSetting
     private float CalculataTextSpeed()
     {
         // 基礎スピード*10段階のうちのどれか(5が基準)
-        return textBaseSpeed / (playerTextSpeed / 5);
+        return textBaseSpeed / (playerTextSpeed / 0.5f);
     }
     /// <summary>
     /// オートモードを切り替える関数

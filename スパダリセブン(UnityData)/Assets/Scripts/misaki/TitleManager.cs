@@ -57,6 +57,7 @@ public class TitleManager : DebugSetting
             Debug.Log("openWindowが" + openWindow + "です");
             return;
         }
+        sceneManager.saveData.Save(); // 変更した設定を保存する
         settingWindow.SetActive(false); // ウィンドウを不可視にする
         openWindow = false; // falseにする
     }

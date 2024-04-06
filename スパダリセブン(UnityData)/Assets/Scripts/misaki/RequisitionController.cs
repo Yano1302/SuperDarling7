@@ -12,6 +12,7 @@ public class RequisitionController : BaseTextController
     {
         base.Awake();
         sceneManager = GameObject.FindGameObjectWithTag("SceneManager").GetComponent<Supadari.SceneManager>();
+        playerTextSpeed = sceneManager.saveData.m_tInstance.textSpeed; // テキストスピードを設定
     }
     private void Start()
     {
