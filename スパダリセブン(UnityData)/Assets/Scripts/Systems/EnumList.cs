@@ -20,4 +20,9 @@ using UnityEngine;
         NEXTTALK, // 次のセリフ
         LASTTALK // 最後のセリフ
     }
-
+public enum SETTINGSTATE
+{
+    BGM, // BGMの設定
+    SE, // SEの設定
+    TEXTSPEED // テキストスピードの設定
+}
