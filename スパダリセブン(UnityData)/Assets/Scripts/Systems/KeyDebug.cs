@@ -39,7 +39,7 @@ public class KeyDebug:MonoBehaviour {
     /// <param name="actionList">実行関数一覧</param>
     [System.Diagnostics.Conditional("UNITY_EDITOR")]
         public static void SetKeyDebug(GameObject obj,params KeyDebugData[]actionList) {
-            UnityEngine.Debug.Assert(actionList.Length <= DebugKeyCodes.Length,"渡した関数が対応するキーより多いのでキーが割り振られていない関数があります。");
+            Debug.Assert(actionList.Length <= DebugKeyCodes.Length,"渡した関数が対応するキーより多いのでキーが割り振られていない関数があります。");
             obj.AddComponent<KeyDebug>().SetAction(actionList);
         }
 
@@ -109,7 +109,7 @@ public class KeyDebug:MonoBehaviour {
                     var code = DebugKeyCodes[i];
                     if (Input.GetKeyDown(code)){
                         if (m_codeList.TryGetValue(code, out var action)) {
-                            UnityEngine.Debug.Log(action.ToString() + " が実行されます");
+                            Debug.Log(action.ToString() + " が実行されます");
                             action();
                         }                        
                         break;

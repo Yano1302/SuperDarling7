@@ -24,10 +24,12 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     private string c_FolderPath_SE = "Audio\\SE\\Resources";   //SEが格納されているフォルダのパス
 
     [SerializeField,Header("オーディオの最大個数(BGM込み)")]
-    private int m_maxSoundOverlap = 10;                    　　      //オーディオの最大個数(BGM込み)
-    [SerializeField, Header("音の大きさを何段階に分けるか")]
-    private int m_divisionScaleNum = 10;                             //音の大きさを何段階に分けるか
-  
+    private int m_maxSoundOverlap = 10;                    　　         //オーディオの最大個数(BGM込み)
+    [SerializeField, Header("音の大きさを何段階に分けるか(BGM)")]
+    private int m_divisionScaleNum_BGM = 10;                            //音の大きさを何段階に分けるか(BGM)
+    [SerializeField, Header("音の大きさを何段階に分けるか(SE)")]
+    private int m_divisionScaleNum_SE = 10;                             //音の大きさを何段階に分けるか(SE)
+
     [Space(10),Header("----デフォルト値-------------------------------------------------------------------------------------------------------------------")]
     [SerializeField, Header("デフォルト値で使用される音量(0～1)")]
     private float m_standardVolume = 1.0f;                           //基準の音量
@@ -35,8 +37,10 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     private float m_standardFadeTime = 1.0f;                        //デフォルトのフェード時間
 
     [Space(10), Header("----初期値------------------------------------------------------------------------------------------------------------------------")]
-    [SerializeField, Header("サウンドの段階の初期設定(0～divisionScaleNum)")]
-    private int m_divisionScale = 5;                                //サウンドのスケール
+    [SerializeField, Header("サウンドの段階の初期設定(0～divisionScaleNum_BGM)")]
+    private int m_divisionScale_BGM = 5;                               //サウンドのスケール(BGM)
+    [SerializeField, Header("サウンドの段階の初期設定(0～divisionScaleNum_SE)")]
+    private int m_divisionScale_SE = 5;                                //サウンドのスケール(SE)
     [SerializeField,Header("再生可能フラグ")]
     private bool m_canPlayFlag = true;                              //再生可能フラグ
     [SerializeField, Header("ミュートかどうかのフラグ")]
@@ -61,16 +65,26 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     /// <summary>フェードにかける時間のデフォルト値を取得・変更します</summary>
     public float DefaultFadeTime { get { return m_standardFadeTime; } set { m_standardFadeTime = value; } }
 
-    /// <summary>サウンドの出力割合を設定・取得します。(0 ～ DivisionScaleNum)</summary>
-    public int DivisionScale { 
-        get { return m_divisionScale; }
+
+    public int DivisionScale_BGM {
+        get { return m_divisionScale_BGM; }
         set {
-            m_divisionScale = Mathf.Clamp(value, 0, m_divisionScaleNum);
-            SetVolume(m_BGMData,m_BGMData.SetVolume); 
+            m_divisionScale_BGM = Mathf.Clamp(value, 0, m_divisionScaleNum_BGM);
+            SetVolume(m_BGMData, m_BGMData.SetVolume);
+            Log("BGMのウンドの出力割合が " + m_divisionScale_BGM + " に変更されます。", false);
+        }
+    }
+
+
+    /// <summary>サウンドの出力割合を設定・取得します。(0 ～ DivisionScaleNum)</summary>
+    public int DivisionScale_SE { 
+        get { return m_divisionScale_SE; }
+        set {
+            m_divisionScale_SE = Mathf.Clamp(value, 0, m_divisionScaleNum_SE);
             foreach (var sd in m_SEDatas) {
                SetVolume(sd,sd.SetVolume);
             }        
-            Log("サウンドの出力割合が " + m_divisionScale + " に変更されます。", false);
+            Log("SEのサウンドの出力割合が " + m_divisionScale_SE + " に変更されます。", false);
         }
     }
 
@@ -304,7 +318,7 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
             Log(m_BGMData,true);
         }
         else {
-            UnityEngine.Debug.Assert(clip != null, "音源ファイル名が間違っているかファイルが存在しません\nファイル名 : " + clipName);
+            Debug.Assert(clip != null, "音源ファイル名が間違っているかファイルが存在しません\nファイル名 : " + clipName);
             return;
         }
         
@@ -752,9 +766,9 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     [Conditional("UNITY_EDITOR")]
     public void IsPlayingSoundLog(){
         if (m_BGMData.Source.isPlaying){
-            UnityEngine.Debug.Log("再生されているBGM : " + m_BGMData.Source.clip.name);
+            Debug.Log("再生されているBGM : " + m_BGMData.Source.clip.name);
         }
-        GetUsingSource((SoundData sd) => { UnityEngine.Debug.Log("再生されているサウンド : " + sd.Source.clip.name + "使用しているID : " + sd.ID); });
+        GetUsingSource((SoundData sd) => { Debug.Log("再生されているサウンド : " + sd.Source.clip.name + "使用しているID : " + sd.ID); });
       }
       
 
@@ -812,7 +826,8 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
             SetAudioClip(ClipList_BGM,c_FolderPath_BGM);
             SetAudioClip(ClipList_SE,c_FolderPath_SE);
             //デフォルト値の格納----------------------------------------------------      
-            m_divisionScale = Mathf.Clamp(m_divisionScale,0,m_divisionScaleNum);
+            m_divisionScale_SE = Mathf.Clamp(m_divisionScale_SE,0,m_divisionScaleNum_SE);
+            m_divisionScale_BGM = Mathf.Clamp(m_divisionScale_SE,0,m_divisionScaleNum_BGM);
         }
         //--------------------------------------------------------------------------
     }
@@ -898,7 +913,7 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
         path = Application.dataPath + "/" + path;
         string[] fileNames = Directory.GetFiles(path, "*", SearchOption.AllDirectories)
             .Where(s => !s.EndsWith(".meta", System.StringComparison.OrdinalIgnoreCase)).ToArray();
-        UnityEngine.Debug.Assert(fileNames != null, "フォルダが見つかりませんでした");
+        Debug.Assert(fileNames != null, "フォルダが見つかりませんでした");
         for(int i = 0; i < fileNames.Length; i++) {
             //プレハブ名だけを抜き取る
             string[] part = fileNames[i].Split('\\');            
@@ -947,7 +962,7 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
             //全ての条件を満たした場合のみフェードを進める
             else if(s.fadeState == FadeState.Fading){
                 SetVolume(s,Mathf.Lerp(sv, ev, t));
-                UnityEngine.Debug.Log(Mathf.Lerp(sv, ev, t));
+                Debug.Log(Mathf.Lerp(sv, ev, t));
                 t += Time.deltaTime / time;
             }         
             //ループを抜ける条件
@@ -1015,7 +1030,11 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     /// <summary>サウンドの音量を取得します。 </summary>
     private void SetVolume(SoundData sd,float volume) {
         CheckNaN(ref volume, m_standardVolume);
-        sd.Source.volume = volume * ((float)m_divisionScale / m_divisionScaleNum);
+        if(sd == m_BGMData)
+            sd.Source.volume = volume * ((float)m_divisionScale_SE / m_divisionScaleNum_BGM);
+        else 
+            sd.Source.volume = volume * ((float)m_divisionScale_SE / m_divisionScaleNum_SE);
+
         sd.SetVolume = volume;
     }
     
@@ -1033,7 +1052,7 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
             string type = d.ID == 0 ? "(BGM)" : "(SE)";
             string id = d.ID != 0 ? "<color=cyan>ID : " + d.ID + "</color>" : "";
             string str = playing ? "<color=cyan>" + d.Source.clip.name + type + "</color>" + "が再生されます    " + id : "<color=cyan>" + d.Source.clip.name + type + "</color>" + "が停止されます" + id;
-            UnityEngine.Debug.Log(str); 
+            Debug.Log(str); 
         } 
     }
 
@@ -1042,10 +1061,10 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     private void Log(string message,bool warning,bool ignore = false) {
         if (PlaySoundLog && !ignore) {
             if (warning) {
-                UnityEngine.Debug.LogWarning("<color=yellow>"+ message + "</color>");
+                Debug.LogWarning("<color=yellow>"+ message + "</color>");
             }
             else {
-                UnityEngine.Debug.Log(message);
+                Debug.Log(message);
             }
         }
     }

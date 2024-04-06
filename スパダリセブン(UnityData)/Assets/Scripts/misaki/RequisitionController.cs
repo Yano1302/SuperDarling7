@@ -19,7 +19,7 @@ public class RequisitionController : BaseTextController
     }
     protected override void StorySetUp(string storynum)
     {
-        UnityEngine.Debug.Log(storynum + "を読み込みます");
+        Debug.Log(storynum + "を読み込みます");
         //　テキストファイルの読み込みを行ってくれるクラス
         TextAsset textasset = new TextAsset();
         //　先ほど用意したcsvファイルを読み込ませる。
@@ -59,7 +59,7 @@ public class RequisitionController : BaseTextController
             }
         }
         /// ここまで ///
-        UnityEngine.Debug.Log(storynum + "を読み込みました");
+        Debug.Log(storynum + "を読み込みました");
     }
     protected override void InstantiateActors()
     {
@@ -82,7 +82,7 @@ public class RequisitionController : BaseTextController
     }
     public override void TalkEnd()
     {
-        UnityEngine.Debug.Log("会話を終了");
+        Debug.Log("会話を終了");
         talkNum = default; // リセットする
         if (TalkState == TALKSTATE.LASTTALK)
         {

@@ -42,7 +42,7 @@ public class CSVImportExamplePostprocessor : AssetPostprocessor
                 EditorUtility.SetDirty(gm);
                 AssetDatabase.SaveAssets();
 #if DEBUG_LOG || UNITY_EDITOR
-                UnityEngine.Debug.Log("Reimported Asset: " + str);
+                Debug.Log("Reimported Asset: " + str);
 #endif
             }
             if (str.IndexOf("/f1ranking2018.csv") != -1)
@@ -61,7 +61,7 @@ public class CSVImportExamplePostprocessor : AssetPostprocessor
                 EditorUtility.SetDirty(gm);
                 AssetDatabase.SaveAssets();
 #if DEBUG_LOG || UNITY_EDITOR
-                UnityEngine.Debug.Log("Reimported Asset: " + str);
+                Debug.Log("Reimported Asset: " + str);
 #endif
             }
             if (str.IndexOf("/lan.csv") != -1)
@@ -80,7 +80,7 @@ public class CSVImportExamplePostprocessor : AssetPostprocessor
                 EditorUtility.SetDirty(gm);
                 AssetDatabase.SaveAssets();
 #if DEBUG_LOG || UNITY_EDITOR
-                UnityEngine.Debug.Log("Reimported Asset: " + str);
+                Debug.Log("Reimported Asset: " + str);
 #endif
             }
             if (str.IndexOf("/const.csv") != -1)
@@ -100,7 +100,7 @@ public class CSVImportExamplePostprocessor : AssetPostprocessor
                 EditorUtility.SetDirty(gm);
                 AssetDatabase.SaveAssets();
 #if DEBUG_LOG || UNITY_EDITOR
-                UnityEngine.Debug.Log("Reimported Asset: " + str);
+                Debug.Log("Reimported Asset: " + str);
 #endif
             }
         }
