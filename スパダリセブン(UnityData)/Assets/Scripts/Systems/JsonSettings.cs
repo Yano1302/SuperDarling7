@@ -42,8 +42,8 @@ public class JsonSettings<T> where T : class,new(){
         public void Save() {
         //stringに変換する
         string jsonStr = JsonUtility.ToJson(TInstance);
-        //ファイル書き込み用のライターを開く
-        StreamWriter writer = new StreamWriter(m_jsonPath,true);
+        //ファイル書き込み用のライターを開く 上書きにしないとjsonデータが崩れるのでfalseにしています
+        StreamWriter writer = new StreamWriter(m_jsonPath,false);
         //書き込み
         writer.Write(jsonStr);
         //ライターを閉じる処理
@@ -99,5 +99,9 @@ public class JsonSettings<T> where T : class,new(){
         m_tInstance = JsonUtility.FromJson<T>(json);
         //初期値をセーブする
         Save();
+    }
+    private void Save(int saveSlotIndex)
+    {
+
     }
 }

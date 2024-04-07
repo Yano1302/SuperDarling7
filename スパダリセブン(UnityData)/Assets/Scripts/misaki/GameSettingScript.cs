@@ -7,15 +7,17 @@ using UnityEngine.UI;
 
 public class GameSettingScript : MonoBehaviour
 {
-    AudioManager audioManager; // オーディオマネージャー変数
     SceneManager sceneManager; // シーンマネージャー変数
     [EnumIndex(typeof(SETTINGSTATE))]
     [SerializeField] Slider[] slider = new Slider[3];
     void Awake()
     {
-        // オーディオマネージャーとシーンマネージャーを取得
-        audioManager = GameObject.FindGameObjectWithTag("AudioManager").GetComponent<AudioManager>();
+        // シーンマネージャーを取得
         sceneManager = GameObject.FindGameObjectWithTag("SceneManager").GetComponent<SceneManager>();
+        // 各スライダーにjsonの値を代入する
+        slider[0].value = sceneManager.enviromentalData.m_tInstance.volumeBGM;
+        slider[1].value = sceneManager.enviromentalData.m_tInstance.volumeSE;
+        slider[2].value = sceneManager.enviromentalData.m_tInstance.textSpeed;
     }
     [EnumAction(typeof(SETTINGSTATE))]
     public void Value(int stateNomber)
@@ -29,15 +31,15 @@ public class GameSettingScript : MonoBehaviour
         switch (settingState)
         {
             case SETTINGSTATE.BGM:
-                audioManager.BGM_Volume = slider[stateNomber].value;
-                sceneManager.saveData.m_tInstance.volumeBGM = slider[stateNomber].value;
+                sceneManager.audioManager.BGM_Volume = slider[stateNomber].value;
+                sceneManager.enviromentalData.m_tInstance.volumeBGM = slider[stateNomber].value;
                     break;
             case SETTINGSTATE.SE:
-                audioManager.SE_Play("SE", slider[stateNomber].value);
-                sceneManager.saveData.m_tInstance.volumeSE = slider[stateNomber].value;
+                sceneManager.audioManager.SE_Play("SE_item01", slider[stateNomber].value);
+                sceneManager.enviromentalData.m_tInstance.volumeSE = slider[stateNomber].value;
                 break;
             case SETTINGSTATE.TEXTSPEED:
-                sceneManager.saveData.m_tInstance.textSpeed = slider[stateNomber].value + 0.1f; // テキストスピード計算式に合わせるために0.1fしている
+                sceneManager.enviromentalData.m_tInstance.textSpeed = slider[stateNomber].value + 0.1f; // テキストスピード計算式に合わせるために0.1fしている
                 break;
         }
     }

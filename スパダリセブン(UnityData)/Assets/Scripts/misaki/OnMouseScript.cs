@@ -15,7 +15,7 @@ public class OnMouseScript : DebugSetting, IPointerEnterHandler, IPointerExitHan
     /// <param name="eventData"></param>
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (!eventCheck) return;
+        if (!eventCheck || requisitionController.TalkState == TALKSTATE.LASTTALK) return;
         // 一度会話を終わらせる
         requisitionController.TalkEnd();
         // storynameの文章を表示する
@@ -27,7 +27,7 @@ public class OnMouseScript : DebugSetting, IPointerEnterHandler, IPointerExitHan
     /// <param name="eventData"></param>
     public void OnPointerExit(PointerEventData eventData)
     {
-        if (!eventCheck) return;
+        if (!eventCheck || requisitionController.TalkState == TALKSTATE.LASTTALK) return;
         // 一度会話を終わらせる
         requisitionController.TalkEnd();
         // defaultの文章を表示する

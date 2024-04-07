@@ -7,38 +7,12 @@ using UnityEngine.SceneManagement;
 public class MenuScript : SingletonMonoBehaviour <MenuScript>
 {
     private bool openWindow = false; // ウィンドウを開いているかどうか
-    [SerializeField] GameObject menuButton; // メニューボタン用変数
     [SerializeField] GameObject menuWindow; // メニューウィンドウ用変数
     [SerializeField] Supadari.SceneManager sceneManager; // スパダリのシーンマネージャー用変数
     private StoryController storyController = null; // ストーリーコントローラー用変数
     protected override void Awake()
     {
         base.Awake();
-    }
-    // Start is called before the first frame update
-    void Start()
-    {
-        SceneManager.sceneLoaded += SceneLoaded;
-        SceneCheck(); // シーンをチェックし表示か非表示かを決める
-    }
-    void SceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        SceneCheck(); // シーンをチェックし表示か非表示かを決める
-    }
-    /// <summary>
-    /// シーンをチェック後、表示か非表示にする関数
-    /// </summary>
-    private void SceneCheck()
-    {
-        Scene scene = SceneManager.GetActiveScene(); // 現在のシーンを代入
-        storyController = null; // nullを代入しリセット
-        if (openWindow) Resume(); // メニューウィンドウを開いていれば閉じる
-        if (scene.buildIndex == 0) menuButton.SetActive(false); // タイトルシーン時のみ非表示
-        else menuButton.SetActive(true); // それ以外の場合表示
-        // 依頼シーンの場合は代入する
-        if (scene.buildIndex == 1) { }
-        // ストーリーシーンの場合は代入する
-        else if (scene.buildIndex == 2) storyController = GameObject.FindWithTag("Coroutine").GetComponent<StoryController>();
     }
     /// <summary>
     /// Menuボタンをクリックしたときの関数
@@ -75,16 +49,30 @@ public class MenuScript : SingletonMonoBehaviour <MenuScript>
     /// <summary>
     /// セーブボタンをクリックしたときの関数
     /// </summary>
-    public void Save()
+    /// <param name="saveSlotIndex">セーブスロットの番号</param>
+    public void Save(int saveSlotIndex)
     {
-        Debug.Log("セーブ機能はあとで作ります");
+        JsonSettings<MasterData> saveData = new JsonSettings<MasterData>(string.Format("SaveData{0}",saveSlotIndex), "/Resources/プランナー監獄エリア/Json", "MasterData");
+        // 現在のシーンを保存
+        saveData.m_tInstance.scenename = sceneManager.CheckSceneName;
+        // セーブしたことがあるをtrueにする
+        saveData.m_tInstance.haveSaved = true;
+        saveData.Save();
     }
     /// <summary>
     /// ロードボタンをクリックしたときの関数
     /// </summary>
-    public void Load()
+    /// <param name="saveSlotIndex">セーブスロットの番号</param>
+    public void Load(int saveSlotIndex)
     {
-        Debug.Log("ロード機能はあとで作ります");
+        JsonSettings<MasterData> saveData = new JsonSettings<MasterData>(string.Format("SaveData{0}", saveSlotIndex), "/Resources/プランナー監獄エリア/Json", "MasterData");
+        if (saveData.m_tInstance.haveSaved == false)
+        {
+            Debug.Log("セーブされていません");
+            return; // 一度もセーブされたことがないのならリターン
+        }
+        // ロードしてシーン遷移
+        sceneManager.SceneChange(saveData.m_tInstance.scenename);
     }
     /// <summary>
     /// タイトルへ戻るボタンをクリックしたときの関数
@@ -92,5 +80,6 @@ public class MenuScript : SingletonMonoBehaviour <MenuScript>
     public void BackTitle()
     {
         sceneManager.SceneChange(0); // タイトルシーンへ遷移する
+        Resume();
     }
 }

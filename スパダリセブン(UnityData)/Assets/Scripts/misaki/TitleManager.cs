@@ -8,19 +8,22 @@ public class TitleManager : DebugSetting
 {
     private bool openWindow = false; // ウィンドウを開いているかどうか
     private Supadari.SceneManager sceneManager; // スパダリのシーンマネージャー用変数
+    private AudioManager audioManager; // オーディオマネージャー変数
     public GameObject settingWindow; // 設定のウィンドウ変数
     
     protected override void Awake()
     {
         base.Awake();
-        // sceneManagerを探す
+        // SceneManagerとAudioManagerを探す
         sceneManager = GameObject.FindGameObjectWithTag("SceneManager").GetComponent<Supadari.SceneManager>();
+        audioManager = GameObject.FindGameObjectWithTag("AudioManager").GetComponent<AudioManager>();
     }
     /// <summary>
     /// NewGameをクリックしたときの関数
     /// </summary>
     public void NewGame()
     {
+        audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
         sceneManager.SceneChange(1); // 依頼画面へシーン遷移する
         Debug.Log("ニューゲームを開始");
     }
@@ -29,8 +32,16 @@ public class TitleManager : DebugSetting
     /// </summary>
     public void Continue()
     {
-        sceneManager.SceneChange(2); // セーブしたシーンへ遷移する　ここをあとで変える
+        audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
+        sceneManager.uiManager.OpenUI(UIType.LoadSlot); // ロードスロットを開く
+        /*if (sceneManager.saveData.m_tInstance.scenename == SCENENAME.TitleScene)
+        {
+            Debug.Log("セーブデータがありません");
+            return;
+        }
+        sceneManager.SceneChange(sceneManager.saveData.m_tInstance.scenename);
         Debug.Log("コンティニューを開始");
+        */
     }
     /// <summary>
     /// SettingGameボタンをクリックしたときの関数
@@ -43,6 +54,7 @@ public class TitleManager : DebugSetting
             Debug.Log("openWindowが" + openWindow + "です");
             return;
         }
+        audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
         settingWindow.SetActive(true); // ウィンドウを可視化する
         openWindow = true; // trueにする
     }
@@ -57,7 +69,8 @@ public class TitleManager : DebugSetting
             Debug.Log("openWindowが" + openWindow + "です");
             return;
         }
-        sceneManager.saveData.Save(); // 変更した設定を保存する
+        sceneManager.enviromentalData.Save(); // 変更した設定を保存する
+        audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
         settingWindow.SetActive(false); // ウィンドウを不可視にする
         openWindow = false; // falseにする
     }
@@ -66,6 +79,7 @@ public class TitleManager : DebugSetting
     /// </summary>
     public void EndGame()
     {
+        audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false; // Unity上でのプレイを終了
 #else
