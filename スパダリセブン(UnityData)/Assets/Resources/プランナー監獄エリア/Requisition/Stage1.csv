@@ -1,3 +1,3 @@
 ﻿backImage,centerTalkingChara,centerHighlight,name,talks
-aozora,(Template)01,1,NPC1,ステージ１でよろしいですか？
-aozora,(Template)01,1,NPC1,ストーリーシーンに移動します　もう一度クリックしてください
+quest_background,story_character02,1,友人,ステージ１でよろしいですか？
+quest_background,story_character02,1,友人,ストーリーシーンに移動します　もう一度クリックしてください

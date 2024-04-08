@@ -374,10 +374,12 @@ MonoBehaviour:
   c_FolderPath_BGM: Audio\BGM\Resources
   c_FolderPath_SE: Audio\SE\Resources
   m_maxSoundOverlap: 10
-  m_divisionScaleNum: 10
+  m_divisionScaleNum_BGM: 10
+  m_divisionScaleNum_SE: 10
   m_standardVolume: 1
   m_standardFadeTime: 1
-  m_divisionScale: 5
+  m_divisionScale_BGM: 5
+  m_divisionScale_SE: 5
   m_canPlayFlag: 1
   m_mute: 0
   m_overwriteSE: 1

@@ -41,6 +41,7 @@ public class MenuScript : SingletonMonoBehaviour <MenuScript>
             Debug.Log("openWindowが" + openWindow + "です");
             return;
         }
+        sceneManager.audioManager.SE_Play("SE_dungeon05", sceneManager.enviromentalData.m_tInstance.volumeSE);
         menuWindow.SetActive(false); // ウィンドウを不可視にする
         openWindow = false; // falseにする
         Time.timeScale = 1; // タイムスケールを0にしてFixedUpdateを止める
@@ -52,12 +53,18 @@ public class MenuScript : SingletonMonoBehaviour <MenuScript>
     /// <param name="saveSlotIndex">セーブスロットの番号</param>
     public void Save(int saveSlotIndex)
     {
-        JsonSettings<MasterData> saveData = new JsonSettings<MasterData>(string.Format("SaveData{0}",saveSlotIndex), "/Resources/プランナー監獄エリア/Json", "MasterData");
+        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
+        JsonSettings<MasterData> saveData = new JsonSettings<MasterData>(string.Format("SaveData{0}", saveSlotIndex), "/Resources/プランナー監獄エリア/Json", "MasterData");
         // 現在のシーンを保存
         saveData.m_tInstance.scenename = sceneManager.CheckSceneName;
         // セーブしたことがあるをtrueにする
-        saveData.m_tInstance.haveSaved = true;
+        if (saveData.m_tInstance.scenename != SCENENAME.TitleScene) saveData.m_tInstance.haveSaved = true;
         saveData.Save();
+        if (saveData.m_tInstance.scenename == SCENENAME.TitleScene)
+        {
+            sceneManager.SceneChange(SCENENAME.StoryScene);
+            sceneManager.uiManager.CloseUI(UIType.SaveSlot);
+        }
     }
     /// <summary>
     /// ロードボタンをクリックしたときの関数
@@ -68,9 +75,11 @@ public class MenuScript : SingletonMonoBehaviour <MenuScript>
         JsonSettings<MasterData> saveData = new JsonSettings<MasterData>(string.Format("SaveData{0}", saveSlotIndex), "/Resources/プランナー監獄エリア/Json", "MasterData");
         if (saveData.m_tInstance.haveSaved == false)
         {
+            sceneManager.audioManager.SE_Play("SE_dungeon05", sceneManager.enviromentalData.m_tInstance.volumeSE);
             Debug.Log("セーブされていません");
             return; // 一度もセーブされたことがないのならリターン
         }
+        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
         // ロードしてシーン遷移
         sceneManager.SceneChange(saveData.m_tInstance.scenename);
     }
@@ -79,7 +88,12 @@ public class MenuScript : SingletonMonoBehaviour <MenuScript>
     /// </summary>
     public void BackTitle()
     {
+        sceneManager.audioManager.SE_Play("SE_dungeon05", sceneManager.enviromentalData.m_tInstance.volumeSE);
         sceneManager.SceneChange(0); // タイトルシーンへ遷移する
         Resume();
+    }
+    public void ClickSE()
+    {
+        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
     }
 }

@@ -24,7 +24,8 @@ public class TitleManager : DebugSetting
     public void NewGame()
     {
         audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
-        sceneManager.SceneChange(1); // 依頼画面へシーン遷移する
+        sceneManager.uiManager.OpenUI(UIType.SaveSlot);
+        //sceneManager.SceneChange(1); // 依頼画面へシーン遷移する
         Debug.Log("ニューゲームを開始");
     }
     /// <summary>
@@ -34,14 +35,8 @@ public class TitleManager : DebugSetting
     {
         audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
         sceneManager.uiManager.OpenUI(UIType.LoadSlot); // ロードスロットを開く
-        /*if (sceneManager.saveData.m_tInstance.scenename == SCENENAME.TitleScene)
-        {
-            Debug.Log("セーブデータがありません");
-            return;
-        }
-        sceneManager.SceneChange(sceneManager.saveData.m_tInstance.scenename);
         Debug.Log("コンティニューを開始");
-        */
+        
     }
     /// <summary>
     /// SettingGameボタンをクリックしたときの関数
