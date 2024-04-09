@@ -20,6 +20,9 @@ public class Player : MonoBehaviour
     public Vector2 Direction { get { return m_direction; } }
 
     // プライベート変数・関数 //
+    [SerializeField, Header("視界のImageのtransform")]
+    private RectTransform m_visibility;
+
     private CameraManager m_CamIns;         //カメラマネージャーインスタンス
     private Rigidbody2D m_rb;               //移動用rigidbody
     private static Player m_instance;       //このクラスのインスタンス　TODO:シングルトンに変えるかも
@@ -51,7 +54,8 @@ public class Player : MonoBehaviour
             if (m_direction.magnitude > 0) {
                 float z = Vector2.Angle(Vector2.up, m_direction);
                 z = m_direction.x < 0 ? z : -z;
-                transform.eulerAngles = new Vector3(0, 0, z);     
+                transform.eulerAngles = new Vector3(0, 0, z);  
+                m_visibility.eulerAngles = new Vector3(0,0, z);
             }           
         }
     }

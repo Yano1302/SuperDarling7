@@ -3,9 +3,11 @@ Shader "Unlit/Triangle"
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
-        _Point("Point",float) = 0.5
-        _Width("Width",float) = 1.0         //視点の幅
-        _Range("Range",float) = 1.0         //視点の長さ
+        _PointX("OriginPointX", Range(-0.5, 0.5)) = 0       //視界の始点のUV座標(U)
+        _PointY("OriginPointY", Range(-0.5,0.5)) = 0        //視界の始点のUV座標(V)
+        _Width("Width", Range(0.0, 3.0)) = 0                //視点の幅
+        _InvAlpha("InvisibleAlpha",Range(0.0, 1.0)) = 1.0  //暗い部分のα値(低くするほど薄くなる)
+        _vAlpha("VisibleAlpha", Range(0.0, 1.0)) = 0        //見えている部分のα値
     }
     SubShader
     {
@@ -42,7 +44,10 @@ Shader "Unlit/Triangle"
 
             fixed _Width;
             fixed _Range;
-
+            fixed _PointX;
+            fixed _PointY;
+            fixed  _InvAlpha;
+            fixed  _vAlpha;
 
          
             v2f vert (appdata v)
@@ -56,18 +61,25 @@ Shader "Unlit/Triangle"
 
             fixed4 frag(v2f i) : SV_Target
             {
-                //傾きから描画範囲を特定する
-                fixed slope = _Range;               
-                fixed alpha = step((i.uv.y / slope), i.uv.x);
-                alpha += step(i.uv.x,1 -(i.uv.y / slope));
-                
+                //UV座標を中心にずらす
+                i.uv -= 0.5;
+                //補間値を調べる
+                fixed delta = _Width / (0.5 - _PointY);
+                //補間値から現在の幅の半分を調べる
+                fixed halfwidth = (i.uv.y - _PointY) * delta / 2;
+                //中心から左右に半分の幅を足し引きして幅を作る
+                float2 pos = { _PointX - halfwidth,_PointX + halfwidth };
+
+                //視点の高さがまだ満たしていない場合はくり抜かない
+                 fixed alpha = step(i.uv.y,_PointY);
+                //高さを満たした幅の中だけくり抜く
+                alpha += step(i.uv.x, pos.x);
+                alpha += step(pos.y,i.uv.x);
+
                 fixed4 col = tex2D(_MainTex, i.uv) * i.color;            
-                col.a = clamp(alpha,0,1);
+                col.a = (alpha >= 1) ? _InvAlpha : _vAlpha;
                 return col;
-            }
-
-
-           
+            }           
             ENDCG
         }
     }
