@@ -27,7 +27,8 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     private int m_maxSoundOverlap = 10;                    　　      //オーディオの最大個数(BGM込み)
     [SerializeField, Header("音の大きさを何段階に分けるか")]
     private int m_divisionScaleNum = 10;                             //音の大きさを何段階に分けるか
-  
+    
+
     [Space(10),Header("----デフォルト値-------------------------------------------------------------------------------------------------------------------")]
     [SerializeField, Header("デフォルト値で使用される音量(0～1)")]
     private float m_standardVolume = 1.0f;                           //基準の音量
@@ -35,8 +36,12 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     private float m_standardFadeTime = 1.0f;                        //デフォルトのフェード時間
 
     [Space(10), Header("----初期値------------------------------------------------------------------------------------------------------------------------")]
-    [SerializeField, Header("サウンドの段階の初期設定(0～divisionScaleNum)")]
-    private int m_divisionScale = 5;                                //サウンドのスケール
+    [SerializeField, Header("BGMの段階の初期設定(0～divisionScaleNum)")]
+    private int m_divisionScale_BGM = 5;                            //BGMサウンドのスケール
+    [SerializeField, Header("SEの段階の初期設定(0～divisionScaleNum)")]
+    private int m_divisionScale_SE = 5;                            //SEサウンドのスケール
+
+
     [SerializeField,Header("再生可能フラグ")]
     private bool m_canPlayFlag = true;                              //再生可能フラグ
     [SerializeField, Header("ミュートかどうかのフラグ")]
@@ -62,15 +67,23 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     public float DefaultFadeTime { get { return m_standardFadeTime; } set { m_standardFadeTime = value; } }
 
     /// <summary>サウンドの出力割合を設定・取得します。(0 ～ DivisionScaleNum)</summary>
-    public int DivisionScale { 
-        get { return m_divisionScale; }
+    public int DivisionScale_BGM { 
+        get { return m_divisionScale_BGM; }
         set {
-            m_divisionScale = Mathf.Clamp(value, 0, m_divisionScaleNum);
-            SetVolume(m_BGMData,m_BGMData.SetVolume); 
+            m_divisionScale_BGM = Mathf.Clamp(value, 0, m_divisionScaleNum);
+            SetVolume(m_BGMData,m_BGMData.SetVolume);
+            Log("BGMの出力割合が " + m_divisionScale_BGM + " に変更されます。", false);       
+        }
+    }
+
+    public int DivisionScale_SE {
+        get { return m_divisionScale_SE; }
+        set {
+            m_divisionScale_SE = Mathf.Clamp(value, 0, m_divisionScaleNum);
             foreach (var sd in m_SEDatas) {
-               SetVolume(sd,sd.SetVolume);
-            }        
-            Log("サウンドの出力割合が " + m_divisionScale + " に変更されます。", false);
+                SetVolume(sd, sd.SetVolume);
+            }
+            Log("BGMの出力割合が " + m_divisionScale_SE + " に変更されます。", false);
         }
     }
 
@@ -812,7 +825,8 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
             SetAudioClip(ClipList_BGM,c_FolderPath_BGM);
             SetAudioClip(ClipList_SE,c_FolderPath_SE);
             //デフォルト値の格納----------------------------------------------------      
-            m_divisionScale = Mathf.Clamp(m_divisionScale,0,m_divisionScaleNum);
+            m_divisionScale_BGM = Mathf.Clamp(m_divisionScale_BGM,0,m_divisionScaleNum);
+            m_divisionScale_SE = Mathf.Clamp(m_divisionScale_SE, 0, m_divisionScaleNum);
         }
         //--------------------------------------------------------------------------
     }
@@ -1015,7 +1029,9 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     /// <summary>サウンドの音量を取得します。 </summary>
     private void SetVolume(SoundData sd,float volume) {
         CheckNaN(ref volume, m_standardVolume);
-        sd.Source.volume = volume * ((float)m_divisionScale / m_divisionScaleNum);
+
+        float division = sd == m_BGMData ? m_divisionScale_BGM : m_divisionScale_SE;
+        sd.Source.volume = volume * (division / m_divisionScaleNum);
         sd.SetVolume = volume;
     }
     
