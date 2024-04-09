@@ -49,6 +49,7 @@ public class MapSetting : SingletonMonoBehaviour<MapSetting>
                 string path = UsefulSystem.FindFilePath("ステージ" + (i + 1)+".txt");
                 m_mapData[i] =  UsefulSystem.Reader_TextFile(path);
             }
+            KeyDebug.AddKeyDebug("マップの作成", () => { Supadari.SceneManager.Instance.SceneChange(SCENENAME.Dungeon); });
         }
     }
 
@@ -70,6 +71,6 @@ public class MapSetting : SingletonMonoBehaviour<MapSetting>
                     }                     
                 } 
             }
-        }     
+        }
     }
 }
