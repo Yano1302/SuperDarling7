@@ -3,13 +3,6 @@ using UnityEngine;
 using UnityEngine.Events;
 
 
-public class KeyDebugData {
-    private KeyDebugData() { }
-    public KeyDebugData(string methodName, UnityAction action) { this.methodName = methodName; this.action = action; }
-    public UnityAction action;
-    public string methodName;
-}
-
 /// <summary>
 /// keyCodeから関数を呼び出します。
 /// static変数のSetKeyDebugを呼び出して使用してください
@@ -38,77 +31,66 @@ public class KeyDebug:MonoBehaviour {
     /// <param name="obj">設定するオブジェクト</param>
     /// <param name="actionList">実行関数一覧</param>
     [System.Diagnostics.Conditional("UNITY_EDITOR")]
-        public static void SetKeyDebug(GameObject obj,params KeyDebugData[]actionList) {
-            Debug.Assert(actionList.Length <= DebugKeyCodes.Length,"渡した関数が対応するキーより多いのでキーが割り振られていない関数があります。");
-            obj.AddComponent<KeyDebug>().SetAction(actionList);
-        }
+    public static void AddKeyDebug(string methodName, UnityAction action) {
+        if (!m_instance) { CreateInstance(); }
+        m_instance.AddAction(methodName, action);      
+    }
 
 
     /// <summary>対応するキーリストです</summary>
-    private static readonly KeyCode[] DebugKeyCodes = {
-            KeyCode.Alpha1,   //actionlist[0]
-            KeyCode.Alpha2,   //actionlist[1]         
-            KeyCode.Alpha3,   //actionlist[2]
-            KeyCode.Alpha4,   //actionlist[3]
-            KeyCode.Alpha5,   //actionlist[4]
-            KeyCode.Alpha6,   //actionlist[5]
-            KeyCode.Alpha7,   //actionlist[6]
-            KeyCode.Alpha8,   //actionlist[7]
-            KeyCode.Alpha9,   //actionlist[8]
-            KeyCode.Alpha0,   //actionlist[9]
-            KeyCode.Q,        //actionlist[10]
-            KeyCode.W,        //actionlist[11]
-            KeyCode.E,        //actionlist[12]
-            KeyCode.R,        //actionlist[13]
-            KeyCode.T,        //actionlist[14]
-            KeyCode.Y,        //actionlist[15]
-            KeyCode.U,        //actionlist[16]
-            KeyCode.I,        //actionlist[17]
-            KeyCode.O,        //actionlist[18]
-            KeyCode.P,        //actionlist[19]
-            KeyCode.A,        //actionlist[20]
-            KeyCode.S,        //actionlist[21]
-            KeyCode.D,        //actionlist[22]
-            KeyCode.F,        //actionlist[23]
-            KeyCode.G,        //actionlist[24]
-            KeyCode.H,        //actionlist[25]
-            KeyCode.J,        //actionlist[26]
-            KeyCode.K,        //actionlist[27]
-            KeyCode.L,        //actionlist[28]
-            KeyCode.Z,        //actionlist[29]
-            KeyCode.X,        //actionlist[30]
-            KeyCode.C,        //actionlist[31]
-            KeyCode.V,        //actionlist[32]
-            KeyCode.B,        //actionlist[33]
-            KeyCode.N,        //actionlist[34]
-            KeyCode.M,        //actionlist[35]
-        };
-
+    private enum DebugKeyCodes{
+            Alpha1,
+            Alpha2,
+            Alpha3,
+            Alpha4,
+            Alpha5,
+            Alpha6,
+            Alpha7,
+            Alpha8,
+            Alpha9,
+            Alpha0,
+            Q,
+            W,
+            E,
+            R,
+            T,
+            Y,
+            U,
+            I,
+            O,
+            P,
+            A,
+            S,
+            D,
+            F,
+            G,
+            H,
+            J,
+            K,
+            L,
+            Z,
+            X,
+            C,
+            V,
+            B,
+            N,
+            M,
+    };
 
 
 
 //private 
-    //Function
-    public void SetAction(KeyDebugData[] actionList) {        
-            m_codeList = new Dictionary<KeyCode?, UnityAction>(actionList.Length);
-            ActionListToString = new string[actionList.Length];
-            for (int i = 0; i < actionList.Length; i++) {
-                m_codeList.Add(DebugKeyCodes[i],actionList[i].action);
-            string keyName = i < 10 ? ((i + 1) % 10).ToString() : DebugKeyCodes[i].ToString();
-                ActionListToString[i] = keyName + " : " + actionList[i].methodName;
-            }
-        }
 
-        private void Update() {
+    private void Update() {
             CheckKey();
         }
 
-        private void CheckKey() {
-            if (!m_running && Input.anyKeyDown){
+    private void CheckKey() {
+            if (Input.anyKeyDown){
                 for (int i = 0; i < m_codeList.Count; i++) {
-                    var code = DebugKeyCodes[i];
-                    if (Input.GetKeyDown(code)){
-                        if (m_codeList.TryGetValue(code, out var action)) {
+                    var code = m_keyCods[i];
+                    if (Input.GetKeyDown((KeyCode)code)){
+                        if (m_codeList.TryGetValue((KeyCode)code, out var action)) {
                             Debug.Log(action.ToString() + " が実行されます");
                             action();
                         }                        
@@ -117,16 +99,71 @@ public class KeyDebug:MonoBehaviour {
                 }             
             }
         }
+
+    private void AddAction(string methodName, UnityAction action) {
+        m_codeList.Add(m_keyCods[m_next], action);
+        m_instance.ActionListToString[m_next] = methodName;
+        m_next = m_next > UsefulSystem.GetEnumLength<DebugKeyCodes>() ? m_next++ : 0;
+    }
        
-       
+    private static void CreateInstance() {
+        m_instance = new GameObject("KeyDebug").AddComponent<KeyDebug>();
+        int length = UsefulSystem.GetEnumLength<DebugKeyCodes>();
+        m_instance.ActionListToString = new string[length];
+        m_instance.m_codeList = new Dictionary<KeyCode?, UnityAction>(length);
+        m_instance.m_next = 0;
+        DontDestroyOnLoad(m_instance.gameObject);
+        m_instance.gameObject.transform.SetAsFirstSibling();
+    }
 
 //Variable
 
         //インスペクター上に表示する
-        [SerializeField]
+        [SerializeField,EnumIndex(typeof(DebugKeyCodes))]
         private string[] ActionListToString;
         //キーコードと対応するデリゲード
         private Dictionary<KeyCode?, UnityAction> m_codeList;
-        //処理を行っていないか判定する
-        private bool m_running = false;
-    }
+        //インスタンス
+        private static  KeyDebug m_instance = null;
+        //次に使用するキーコード
+        private int m_next;
+
+        private KeyCode[] m_keyCods = {
+            KeyCode.Alpha1,
+            KeyCode.Alpha2,
+            KeyCode.Alpha3,
+            KeyCode.Alpha4,
+            KeyCode.Alpha5,
+            KeyCode.Alpha6,
+            KeyCode.Alpha7,
+            KeyCode.Alpha8,
+            KeyCode.Alpha9,
+            KeyCode.Alpha0,
+            KeyCode.Q,
+            KeyCode.W,
+            KeyCode.E,
+            KeyCode.R,
+            KeyCode.T,
+            KeyCode.Y,
+            KeyCode.U,
+            KeyCode.I,
+            KeyCode.O,
+            KeyCode.P,
+            KeyCode.A,
+            KeyCode.S,
+            KeyCode.D,
+            KeyCode.F,
+            KeyCode.G,
+            KeyCode.H,
+            KeyCode.J,
+            KeyCode.K,
+            KeyCode.L,
+            KeyCode.Z,
+            KeyCode.X,
+            KeyCode.C,
+            KeyCode.V,
+            KeyCode.B,
+            KeyCode.N,
+            KeyCode.M,
+        };
+ }
