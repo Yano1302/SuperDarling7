@@ -541,6 +541,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: StoryPrefab
       objectReference: {fileID: 0}
+    - target: {fileID: 6232016493671444256, guid: b6da155c055dc624c8cf3a3fd3b587f5, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 1917
+      objectReference: {fileID: 0}
+    - target: {fileID: 6232016493671444256, guid: b6da155c055dc624c8cf3a3fd3b587f5, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 261
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
