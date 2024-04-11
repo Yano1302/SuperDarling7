@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+//TODO JSONに対応させる
 public enum MapType {
     player = 0,
     road   = 1,
@@ -17,24 +18,29 @@ public enum MapType {
 
 public class MapSetting : SingletonMonoBehaviour<MapSetting>
 {
-    // Config変数  //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
-    [SerializeField, Header("総マップ数")]
-    private int AllMapNum = 1;
-    [SerializeField, Header("一マスの縦のサイズ")]
-    private int Height = 1;
-    [SerializeField,Header("一マスの横のサイズ")]
-    private int Width = 1;  
-    [SerializeField, Header("マップオブジェクト"), EnumIndex(typeof(MapType))]
-    private GameObject[] MapObject;
-
-    //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
-
+   //マップを生成します
     public void CreateMap(int mapNumber) {
         mapNumber -= 1;
         _Create(mapNumber);
     }
 
-   
+    public float GetTimer { get { return m_Timer; } }
+
+    // Config変数  //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
+    [SerializeField, Header("総マップ数")]
+    private int AllMapNum = 1;
+    [SerializeField, Header("一マスの縦のサイズ")]
+    private int Height = 1;
+    [SerializeField, Header("一マスの横のサイズ")]
+    private int Width = 1;
+    [SerializeField, Header("マップオブジェクト"), EnumIndex(typeof(MapType))]
+    private GameObject[] MapObject;
+    [SerializeField, Header("時間設定(秒)")]
+    private float m_Timer = 60f;
+
+    //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
+
+
     //  プライベート変数  //------------------------------------------------------------------------------------------------------------------------------
     private List<string>[] m_mapData = null;
     //  プライベート関数  //------------------------------------------------------------------------------------------------------------------------------

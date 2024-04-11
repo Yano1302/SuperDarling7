@@ -81,6 +81,8 @@ public class KeyDebug:MonoBehaviour {
 
 //private 
 
+    private KeyDebug() { }
+
     private void Update() {
             CheckKey();
         }
