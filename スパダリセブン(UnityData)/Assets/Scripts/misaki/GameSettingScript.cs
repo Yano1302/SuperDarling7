@@ -35,6 +35,8 @@ public class GameSettingScript : MonoBehaviour
                 sceneManager.enviromentalData.m_tInstance.volumeBGM = slider[stateNomber].value;
                     break;
             case SETTINGSTATE.SE:
+                // 音量の変更がなかった場合はSEを鳴らさないようにブレイク
+                if (slider[stateNomber].value == sceneManager.enviromentalData.m_tInstance.volumeSE) break; 
                 sceneManager.audioManager.SE_Play("SE_item01", slider[stateNomber].value);
                 sceneManager.enviromentalData.m_tInstance.volumeSE = slider[stateNomber].value;
                 break;

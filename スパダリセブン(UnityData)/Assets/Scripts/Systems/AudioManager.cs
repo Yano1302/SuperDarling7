@@ -363,7 +363,7 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
             if (GetClip(out var clip, clipName, false)) {
                 //音量などの設定
                 //デフォルト値であれば正しい値を与える
-                SetVolume(m_BGMData, volume);
+                SetVolume(sd, volume); // 岬追記　sdに変更しました
                 sd.Source.loop = IsLoop;
                 sd.Source.clip = clip;
                 sd.fadeState = FadeState.None;
