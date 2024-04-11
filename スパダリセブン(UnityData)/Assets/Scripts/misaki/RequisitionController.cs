@@ -12,6 +12,7 @@ public class RequisitionController : BaseTextController
     {
         base.Awake();
         sceneManager = GameObject.FindGameObjectWithTag("SceneManager").GetComponent<Supadari.SceneManager>();
+        playerTextSpeed = sceneManager.enviromentalData.m_tInstance.textSpeed; // テキストスピードを設定
     }
     private void Start()
     {
@@ -86,7 +87,8 @@ public class RequisitionController : BaseTextController
         talkNum = default; // リセットする
         if (TalkState == TALKSTATE.LASTTALK)
         {
-            sceneManager.SceneChange(SCENENAME.StoryScene); // ストーリーへシーン遷移する
+            sceneManager.SceneChange(SCENENAME.Dungeon);
+            return;
         }
         TalkState = TALKSTATE.NOTALK; // 会話ステータスを話していないに変更
     }

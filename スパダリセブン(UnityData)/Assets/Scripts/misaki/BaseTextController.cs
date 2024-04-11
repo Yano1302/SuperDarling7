@@ -6,13 +6,14 @@ using UnityEditor;
 using Unity.VisualScripting.FullSerializer;
 using TMPro;
 using Unity.VisualScripting;
+using Supadari;
 
 public class BaseTextController : DebugSetting
 {
     protected int talkNum = 0; // ダイヤログ番号
     public int displayCharaAnchors = 3; // キャラクター画像の表示箇所数
     [SerializeField]private float textBaseSpeed = 0.05f; // テキスト送りのベーススピード
-    public float playerTextSpeed = 5f; // プレイヤーが指定したテキスト送りのスピード度合
+    public float playerTextSpeed = 0.5f; // プレイヤーが指定したテキスト送りのスピード度合
     public float textDelay = 1.5f; // テキストとテキストの間の時間(オートモードのみ使用)
     private bool talkSkip = false; // ボタンがクリックされたかどうかを示すフラグ
     private bool talkAuto = false; // 会話がオート状態なのかを示すフラグ
@@ -37,12 +38,16 @@ public class BaseTextController : DebugSetting
     [Header("キャラクター表示箇所 [0]...左側 [1]...右側 [2]...中央")]
     [SerializeField] protected GameObject[] charaAnchors = new GameObject[3]; // キャラクター表示箇所
 
+    string[] nameBGM; // 鳴らすBGM格納配列
+
     public GameObject talkButton; // 会話を進めるボタン
     public GameObject autoButton; // オートモードに切り替えるボタン
     protected StoryTalkData[] storyTalks; //csvファイルにある文章を格納する配列
 
     public bool runtimeCoroutine = false; // コルーチンが実行中かどうか
     private Coroutine dialogueCoroutine; // コルーチンを格納する変数
+
+    [SerializeField]SceneManager sceneManager; // シーンマネージャー変数
 
     public TALKSTATE talkState; // 会話ステータス変数
     public TALKSTATE TalkState
@@ -73,6 +78,7 @@ public class BaseTextController : DebugSetting
         base .Awake(); // デバッグログを表示するか否かスクリプタブルオブジェクトのGameSettingsを参照
         StorySetUp(storynum); // 対応する会話文をセットする
         TalkState = TALKSTATE.NOTALK; // 会話ステータスを話していないに変更
+        sceneManager=GameObject.FindGameObjectWithTag("SceneManager").GetComponent<SceneManager>(); // オーディオマネージャーを取得
     }
     /// <summary>
     /// 対応する会話文をセットする関数
@@ -96,6 +102,8 @@ public class BaseTextController : DebugSetting
         charaImages = new GameObject[displayCharaAnchors, storyTalks.Length];
         // キャラクターハイライト格納用2次元配列のサイズを[会話中の最大表示人数,文章の数]にする
         charaHighlight = new bool[displayCharaAnchors, storyTalks.Length];
+        // BGMを格納する配列のサイズを[文章の数]にする
+        nameBGM = new string[storyTalks.Length];
         // プロジェクト内のTalkCharaImageフォルダにある画像を対応させたい文章ごとに格納する
         for (int i = 0; i < storyTalks.Length; i++)
         {
@@ -127,6 +135,11 @@ public class BaseTextController : DebugSetting
                 else if (i == 2 && storyTalks[j].centerHighlight == "1") charaHighlight[i, j] = true;
             }
         }
+        // BGM名を対応させたい文章ごとに格納する
+        for (int i = 0; i < storyTalks.Length; i++)
+        {
+            nameBGM[i] = storyTalks[i].BGM;
+        }
         /// ここまで ///
         Debug.Log("Story" + storynum + "を読み込みました");
     }
@@ -136,6 +149,7 @@ public class BaseTextController : DebugSetting
     /// <param name="storynum">読み込みたいCSV名</param>
     public void OnTalkButtonClicked(string storynum = "")
     {
+        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
         if (TalkState == TALKSTATE.NOTALK) // 会話ステータスが話していないなら
         {
             // ストーリー番号があれば
@@ -214,6 +228,8 @@ public class BaseTextController : DebugSetting
             // 中央のキャラクター画像を灰色にする
             else if (i == 2 && centerCharaImage) centerCharaImage.GetComponent<Image>().color = Color.gray;
         }
+        // BGMを鳴らす
+        sceneManager.audioManager.BGM_Play(nameBGM[talkNum], sceneManager.enviromentalData.m_tInstance.volumeBGM);
     }
     /// <summary>
     /// コルーチン開始関数
@@ -316,7 +332,7 @@ public class BaseTextController : DebugSetting
     private float CalculataTextSpeed()
     {
         // 基礎スピード*10段階のうちのどれか(5が基準)
-        return textBaseSpeed / (playerTextSpeed / 5);
+        return textBaseSpeed / (playerTextSpeed / 0.5f);
     }
     /// <summary>
     /// オートモードを切り替える関数
@@ -342,4 +358,5 @@ public class StoryTalkData
     public string centerHighlight; // キャラクターが光らせるか(中央)
     public string name; // キャラクター名
     public string talks; // 文章
+    public string BGM; // BGM名
 }

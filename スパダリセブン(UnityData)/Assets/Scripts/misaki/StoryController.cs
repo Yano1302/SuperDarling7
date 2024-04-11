@@ -10,10 +10,11 @@ public class StoryController : BaseTextController
     {
         base.Awake();
         sceneManager = GameObject.FindGameObjectWithTag("SceneManager").GetComponent<Supadari.SceneManager>();
+        playerTextSpeed = sceneManager.enviromentalData.m_tInstance.textSpeed; // テキストスピードを設定
     }
     public override void TalkEnd()
     {
         base.TalkEnd();
-        sceneManager.SceneChange(SCENENAME.Dungeon); // 探索画面へシーン遷移する
+        sceneManager.SceneChange(SCENENAME.RequisitionsScene);
     }
 }

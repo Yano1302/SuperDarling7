@@ -8,6 +8,7 @@ TagManager:
   - SceneManager
   - Coroutine
   - MapSetting
+  - AudioManager
   layers:
   - Default
   - TransparentFX

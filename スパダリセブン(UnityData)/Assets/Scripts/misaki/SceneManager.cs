@@ -3,17 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Threading.Tasks;
+using UnityEngine.Timeline;
 
 namespace Supadari
 {
-    public class SceneManager : SingletonMonoBehaviour <SceneManager>
+    public class SceneManager : SingletonMonoBehaviour<SceneManager>
     {
         [SerializeField] DisplayManager displayManager; // ディスプレイマネージャー用変数
-        [SerializeField] UIManager uiManager; // UIマネージャー用変数
         [SerializeField] SCENENAME currentSceneName; // 現在のシーン名
         [SerializeField] Scene currentScene; // 現在のシーン
-        public SCENENAME CheckSceneName { get { return currentSceneName; } }
-        public Scene CheckScene { get { return currentScene; } }
+        public UIManager uiManager; // UIマネージャー用変数
+        public AudioManager audioManager; // オーディオマネージャー変数
+        public SCENENAME CheckSceneName { get { return currentSceneName; } } // 現在のシーン名を取得
+        public Scene CheckScene { get { return currentScene; } } // 現在のシーンを取得
+        // セーブデータを読み込み
+        public JsonSettings<EnvironmentalData> enviromentalData = new JsonSettings<EnvironmentalData>("EnvironmentalData(0)", "/Resources/プランナー監獄エリア/Json", "EnvironmentalData");
+        //public JsonSettings<EnvironmentalData> environmentalData = new JsonSettings<EnvironmentalData>("EnvironmentalData", "/Resources/プランナー監獄エリア/Json");
+        public JsonSettings<MasterData> saveData = new JsonSettings<MasterData>("MasterData", "/Resources/プランナー監獄エリア/Json");
 
         protected override void Awake()
         {
@@ -23,6 +29,7 @@ namespace Supadari
         void Start()
         {
             UnityEngine.SceneManagement.SceneManager.sceneLoaded += SceneLoaded;
+            audioManager.BGM_Play("BGM_title", enviromentalData.m_tInstance.volumeBGM); // BGMを流す
         }
         /// <summary>
         /// イベントハンドラー　シーン遷移時の関数
@@ -42,6 +49,30 @@ namespace Supadari
                 uiManager.OpenUI(UIType.Timer); // タイマーを表示
                 uiManager.OpenUI(UIType.ItemWindow); // アイテムウィンドウを表示
             }
+            // 各シーンでのBGMを流す ストーリーシーンはCSVデータを参照して流すのでここでは流さない
+            switch(currentSceneName)
+            {
+                case SCENENAME.TitleScene:
+                    audioManager.BGM_Play("BGM_title", enviromentalData.m_tInstance.volumeBGM);
+                    break;
+                case SCENENAME.RequisitionsScene:
+                    audioManager.BGM_Play("BGM_quest", enviromentalData.m_tInstance.volumeBGM);
+                    break;
+                case SCENENAME.StoryScene:
+                    audioManager.BGM_Stop();
+                    break;
+                case SCENENAME.InvestigationScene:
+                    audioManager.BGM_Play("BGM_dungeon", enviromentalData.m_tInstance.volumeBGM);
+                    break;
+                case SCENENAME.SolveScene:
+                    audioManager.BGM_Play("BGM_solve", enviromentalData.m_tInstance.volumeBGM);
+                    break;
+                case SCENENAME.Dungeon:
+                    audioManager.BGM_Play("BGM_dungeon", enviromentalData.m_tInstance.volumeBGM);
+                    break;
+            }
+            if(currentSceneName !=SCENENAME.TitleScene) uiManager.OpenUI(UIType.Menu);
+            else uiManager.CloseUI(UIType.Menu);
         }
         /// <summary>
         /// シーン遷移を行う関数
@@ -67,6 +98,5 @@ namespace Supadari
         {
             displayManager.FadeOut(FadeType.Entire,()=> UnityEngine.SceneManagement.SceneManager.LoadScene((int)LoadScene)); // フェードアウトする
         }
-
     }
 }

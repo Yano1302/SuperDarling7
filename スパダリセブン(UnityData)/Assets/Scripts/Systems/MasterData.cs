@@ -8,14 +8,11 @@ using System;
 [Serializable]
 public class MasterData // jsonデータとして保存するclass
 {
-    // 下記は例です
-    /*
-    public float[] rhythmRanking = new float[10]; // リズムランキング
-    public string rhythmHighScoreRank = "D"; // リズムハイスコアランク
-    */
     // 証拠？
-    public GameObject[] evidences = new GameObject[10];
-    // シーン番号？
-    public int sceneNum = 0;
+    //public GameObject[] evidences = new GameObject[10];
+    // シーン名
+    public SCENENAME scenename = SCENENAME.TitleScene;
+    // セーブしたことがあるか
+    public bool haveSaved = false;
 }
 

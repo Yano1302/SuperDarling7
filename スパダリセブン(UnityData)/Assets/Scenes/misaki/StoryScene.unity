@@ -374,10 +374,12 @@ MonoBehaviour:
   c_FolderPath_BGM: Audio\BGM\Resources
   c_FolderPath_SE: Audio\SE\Resources
   m_maxSoundOverlap: 10
-  m_divisionScaleNum: 10
+  m_divisionScaleNum_BGM: 10
+  m_divisionScaleNum_SE: 10
   m_standardVolume: 1
   m_standardFadeTime: 1
-  m_divisionScale: 5
+  m_divisionScale_BGM: 5
+  m_divisionScale_SE: 5
   m_canPlayFlag: 1
   m_mute: 0
   m_overwriteSE: 1
@@ -451,6 +453,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1141651054304588338, guid: b6da155c055dc624c8cf3a3fd3b587f5, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 325.9
+      objectReference: {fileID: 0}
     - target: {fileID: 2116130829804321726, guid: b6da155c055dc624c8cf3a3fd3b587f5, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -531,13 +537,57 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3203900132753289459, guid: b6da155c055dc624c8cf3a3fd3b587f5, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: f0f0386bb02c0f54fbecc7ace9b50d67, type: 3}
     - target: {fileID: 4058867785164197604, guid: b6da155c055dc624c8cf3a3fd3b587f5, type: 3}
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 519420031}
+    - target: {fileID: 4395831855294186424, guid: b6da155c055dc624c8cf3a3fd3b587f5, type: 3}
+      propertyPath: m_text
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 4395831855294186424, guid: b6da155c055dc624c8cf3a3fd3b587f5, type: 3}
+      propertyPath: m_HorizontalAlignment
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4954410046863973549, guid: b6da155c055dc624c8cf3a3fd3b587f5, type: 3}
+      propertyPath: m_text
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 5749960558590850381, guid: b6da155c055dc624c8cf3a3fd3b587f5, type: 3}
       propertyPath: m_Name
       value: StoryPrefab
+      objectReference: {fileID: 0}
+    - target: {fileID: 6232016493671444256, guid: b6da155c055dc624c8cf3a3fd3b587f5, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 1600
+      objectReference: {fileID: 0}
+    - target: {fileID: 6232016493671444256, guid: b6da155c055dc624c8cf3a3fd3b587f5, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 280
+      objectReference: {fileID: 0}
+    - target: {fileID: 6232016493671444256, guid: b6da155c055dc624c8cf3a3fd3b587f5, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -398.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 7781172205372759384, guid: b6da155c055dc624c8cf3a3fd3b587f5, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -311.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 9065687487185491659, guid: b6da155c055dc624c8cf3a3fd3b587f5, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 1420
+      objectReference: {fileID: 0}
+    - target: {fileID: 9065687487185491659, guid: b6da155c055dc624c8cf3a3fd3b587f5, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 126
+      objectReference: {fileID: 0}
+    - target: {fileID: 9065687487185491659, guid: b6da155c055dc624c8cf3a3fd3b587f5, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -27.2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

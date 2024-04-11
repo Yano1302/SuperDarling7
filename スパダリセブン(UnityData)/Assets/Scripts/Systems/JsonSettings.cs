@@ -20,7 +20,7 @@ public class JsonSettings<T> where T : class,new(){
     public JsonSettings(string dataFileName,string saveFolderPath, string defaultJsonFileName) {
         m_jsonFileName = dataFileName + ".json";
         m_jsonDefaultPath = UsefulSystem.FindFilePath(defaultJsonFileName + ".json");
-        m_jsonPath = saveFolderPath + "\\" + m_jsonFileName;
+        m_jsonPath = Application.dataPath + saveFolderPath + "\\" + m_jsonFileName;
         if (!File.Exists(m_jsonPath)) {
             SettingData();
         }
@@ -42,8 +42,8 @@ public class JsonSettings<T> where T : class,new(){
         public void Save() {
         //stringに変換する
         string jsonStr = JsonUtility.ToJson(TInstance);
-        //ファイル書き込み用のライターを開く
-        StreamWriter writer = new StreamWriter(m_jsonPath,true);
+        //ファイル書き込み用のライターを開く 上書きにしないとjsonデータが崩れるのでfalseにしています
+        StreamWriter writer = new StreamWriter(m_jsonPath,false);
         //書き込み
         writer.Write(jsonStr);
         //ライターを閉じる処理
@@ -87,15 +87,21 @@ public class JsonSettings<T> where T : class,new(){
     private string m_jsonFileName;
     private string m_jsonPath;
     private string m_jsonDefaultPath = null;
-    private T m_tInstance;
+    public T m_tInstance; // 他スクリプトから変更するためにpublicにしています
     private JsonSettings() { }
 
     private void SettingData() {
         //デフォルトのJSONファイルを読み込む
         var json = File.ReadAllText(m_jsonDefaultPath);
+        Debug.Log(json);
+        Debug.Log(typeof(T));
         //オブジェクト化する
         m_tInstance = JsonUtility.FromJson<T>(json);
         //初期値をセーブする
         Save();
+    }
+    private void Save(int saveSlotIndex)
+    {
+
     }
 }

@@ -11,6 +11,9 @@ public enum UIType {
     ItemWindow,     //アイテムウィンドウ
     Clear,          //答えが合っていた場合のUI画面(仮置き)
     miss,           //答えが間違っていた場合のUI画面(仮置き)
+    Menu,           //メニューボタンUI　岬追記
+    SaveSlot,       //セーブスロット　岬追記
+    LoadSlot        //ロードスロット　岬追記
 }
 
 /// <summary>
