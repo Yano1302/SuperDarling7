@@ -13,7 +13,10 @@ public enum UIType {
     miss,           //答えが間違っていた場合のUI画面(仮置き)
     Menu,           //メニューボタンUI　岬追記
     SaveSlot,       //セーブスロット　岬追記
-    LoadSlot        //ロードスロット　岬追記
+    LoadSlot,       //ロードスロット　岬追記
+    StoryMenu,      //ストーリーメニューUI　岬追記
+    GameOver,       //ゲームオーバー　岬追記
+    GameClear       //ゲームクリア　岬追記
 }
 
 /// <summary>

@@ -1,11 +1,7 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEditor;
-using Unity.VisualScripting.FullSerializer;
 using TMPro;
-using Unity.VisualScripting;
 using Supadari;
 
 public class BaseTextController : DebugSetting
@@ -15,11 +11,11 @@ public class BaseTextController : DebugSetting
     [SerializeField]private float textBaseSpeed = 0.05f; // テキスト送りのベーススピード
     public float playerTextSpeed = 0.5f; // プレイヤーが指定したテキスト送りのスピード度合
     public float textDelay = 1.5f; // テキストとテキストの間の時間(オートモードのみ使用)
-    private bool talkSkip = false; // ボタンがクリックされたかどうかを示すフラグ
-    private bool talkAuto = false; // 会話がオート状態なのかを示すフラグ
+    protected bool talkSkip = false; // ボタンがクリックされたかどうかを示すフラグ
+    protected bool talkAuto = false; // 会話がオート状態なのかを示すフラグ
     [Header("1-1のように入力")]
     public string storynum; //ストーリー番号
-    private string words; // 文章
+    protected string words; // 文章
     private int currentCharIndex = 0; // 文章の表示位置を示す変数
     public TextMeshProUGUI charaName; // キャラクター名のテキスト変数
     public TextMeshProUGUI textLabel; // 文章を格納するテキスト変数
@@ -47,7 +43,8 @@ public class BaseTextController : DebugSetting
     public bool runtimeCoroutine = false; // コルーチンが実行中かどうか
     private Coroutine dialogueCoroutine; // コルーチンを格納する変数
 
-    [SerializeField]SceneManager sceneManager; // シーンマネージャー変数
+    [SerializeField]protected SceneManager sceneManager; // シーンマネージャー変数
+    [SerializeField]bool testText = false; // ボタンのテキストを表示するかどうか
 
     public TALKSTATE talkState; // 会話ステータス変数
     public TALKSTATE TalkState
@@ -59,16 +56,16 @@ public class BaseTextController : DebugSetting
             switch (talkState)
             {
                 case TALKSTATE.NOTALK:
-                    buttonText.text = "会話開始"; // ボタンテキストを"会話開始"に変更
+                    if(testText) buttonText.text = "会話開始"; // ボタンテキストを"会話開始"に変更
                     break;
                 case TALKSTATE.TALKING:
-                    buttonText.text = "Skip"; // ボタンテキストを"Skip"に変更
+                    if (testText) buttonText.text = "Skip"; // ボタンテキストを"Skip"に変更
                     break;
                 case TALKSTATE.NEXTTALK:
-                    buttonText.text = "次へ"; // ボタンテキストを"次へ"に変更
+                    if (testText) buttonText.text = "次へ"; // ボタンテキストを"次へ"に変更
                     break;
                 case TALKSTATE.LASTTALK:
-                    buttonText.text = "会話終了"; // ボタンテキストを"会話終了"に変更
+                    if (testText) buttonText.text = "会話終了"; // ボタンテキストを"会話終了"に変更
                     break;
             }
         }
@@ -78,7 +75,8 @@ public class BaseTextController : DebugSetting
         base .Awake(); // デバッグログを表示するか否かスクリプタブルオブジェクトのGameSettingsを参照
         StorySetUp(storynum); // 対応する会話文をセットする
         TalkState = TALKSTATE.NOTALK; // 会話ステータスを話していないに変更
-        sceneManager=GameObject.FindGameObjectWithTag("SceneManager").GetComponent<SceneManager>(); // オーディオマネージャーを取得
+        sceneManager = GameObject.FindGameObjectWithTag("SceneManager").GetComponent<SceneManager>(); // オーディオマネージャーを取得
+        playerTextSpeed = sceneManager.enviromentalData.m_tInstance.textSpeed; // テキストスピードを設定
     }
     /// <summary>
     /// 対応する会話文をセットする関数
@@ -93,7 +91,6 @@ public class BaseTextController : DebugSetting
         //　ファイルは「Resources」フォルダを作り、そこに入れておくこと。
         //　Resources.Load 内はcsvファイルの名前。今回は Story1-1 や Story2-5 のようにステージ番号によって読み込むファイルが変えられるようにしている。
         textasset = Resources.Load("プランナー監獄エリア/Story/Story" + storynum, typeof(TextAsset)) as TextAsset;
-
         /// CSVSerializerを用いてcsvファイルを配列に流し込む。///
         storyTalks = CSVSerializer.Deserialize<StoryTalkData>(textasset.text); // CSVのテキストデータを配列に格納する
         // 会話中背景格納配列のサイズを[文章の数]にする
@@ -147,7 +144,7 @@ public class BaseTextController : DebugSetting
     /// 会話に関するボタン関数
     /// </summary>
     /// <param name="storynum">読み込みたいCSV名</param>
-    public void OnTalkButtonClicked(string storynum = "")
+    public virtual void OnTalkButtonClicked(string storynum = "")
     {
         sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
         if (TalkState == TALKSTATE.NOTALK) // 会話ステータスが話していないなら
@@ -186,10 +183,10 @@ public class BaseTextController : DebugSetting
     /// <summary>
     /// 会話関係の表示を初期化する関数
     /// </summary>
-    private void InitializeTalkField()
+    protected void InitializeTalkField()
     {
         textLabel.text = ""; // 会話フィールドをリセットする
-        charaName.text = ""; // 話しているキャラクター名をリセットする
+        if(charaName) charaName.text = ""; // 話しているキャラクター名をリセットする
         // 背景画像が表示されていれば画像を破壊する
         if (backImage) Destroy(backImage);
         // 左側キャラクター画像が表示されていれば画像を破壊する
@@ -234,7 +231,7 @@ public class BaseTextController : DebugSetting
     /// <summary>
     /// コルーチン開始関数
     /// </summary>
-    private void StartDialogueCoroutine()
+    protected void StartDialogueCoroutine()
     {
         // コルーチンがすでに実行されている場合は停止
         if (runtimeCoroutine) StopCoroutine(dialogueCoroutine);
@@ -266,7 +263,7 @@ public class BaseTextController : DebugSetting
     /// 文章を表示するコルーチン
     /// </summary>
     /// <returns></returns>
-    IEnumerator Dialogue()
+    protected virtual IEnumerator Dialogue()
     {
         Debug.Log(storynum + "の" + (talkNum + 1) + "列目を再生");
         TalkState = TALKSTATE.TALKING; // 会話ステータスを話し中にする
@@ -313,7 +310,7 @@ public class BaseTextController : DebugSetting
     /// <summary>
     /// 次のダイアログに変更する関数
     /// </summary>
-    private void NextDialogue()
+    protected void NextDialogue()
     {
         // トークスキップフラグが立ったら
         if (talkSkip == true) textLabel.text = storyTalks[talkNum].talks; // 全文を表示
@@ -329,7 +326,7 @@ public class BaseTextController : DebugSetting
     /// テキストスピードを計算する関数
     /// </summary>
     /// <returns></returns>
-    private float CalculataTextSpeed()
+    protected float CalculataTextSpeed()
     {
         // 基礎スピード*10段階のうちのどれか(5が基準)
         return textBaseSpeed / (playerTextSpeed / 0.5f);
@@ -341,9 +338,6 @@ public class BaseTextController : DebugSetting
     {
         // talkAutoがtrueならfalseに、falseならtrueに変換
         talkAuto = !talkAuto;
-        // talkAutoがtrueなら黄色に、falseなら通常色に変更
-        if (talkAuto) autoButton.GetComponent<Image>().color = Color.yellow;
-        else autoButton.GetComponent<Image>().color = Color.white;
     }
 }
 [System.Serializable] // サブプロパティを埋め込む
