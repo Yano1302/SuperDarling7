@@ -8,8 +8,9 @@ using UnityEngine.UI;
 public class GameSettingScript : MonoBehaviour
 {
     SceneManager sceneManager; // シーンマネージャー変数
+    [SerializeField]TestTextController testTextController; // テストテキストコントローラー変数
     [EnumIndex(typeof(SETTINGSTATE))]
-    [SerializeField] Slider[] slider = new Slider[3];
+    [SerializeField] Slider[] slider = new Slider[3]; // スライダー配列
     void Awake()
     {
         // シーンマネージャーを取得
@@ -31,17 +32,20 @@ public class GameSettingScript : MonoBehaviour
         switch (settingState)
         {
             case SETTINGSTATE.BGM:
-                sceneManager.audioManager.BGM_Volume = slider[stateNomber].value;
-                sceneManager.enviromentalData.m_tInstance.volumeBGM = slider[stateNomber].value;
+                sceneManager.audioManager.BGM_Volume = slider[stateNomber].value; // BGM音量を変更する
+                sceneManager.enviromentalData.m_tInstance.volumeBGM = slider[stateNomber].value; // BGM音量を更新する
                     break;
             case SETTINGSTATE.SE:
                 // 音量の変更がなかった場合はSEを鳴らさないようにブレイク
-                if (slider[stateNomber].value == sceneManager.enviromentalData.m_tInstance.volumeSE) break; 
-                sceneManager.audioManager.SE_Play("SE_item01", slider[stateNomber].value);
-                sceneManager.enviromentalData.m_tInstance.volumeSE = slider[stateNomber].value;
+                if (slider[stateNomber].value == sceneManager.enviromentalData.m_tInstance.volumeSE) break; // 同じ値ならブレイクする
+                sceneManager.audioManager.SE_Play("SE_item01", slider[stateNomber].value); // SEを鳴らす
+                sceneManager.enviromentalData.m_tInstance.volumeSE = slider[stateNomber].value; // SE音量を更新する
                 break;
             case SETTINGSTATE.TEXTSPEED:
+                if (slider[stateNomber].value == sceneManager.enviromentalData.m_tInstance.textSpeed) break; // 同じ値ならブレイクする
                 sceneManager.enviromentalData.m_tInstance.textSpeed = slider[stateNomber].value + 0.1f; // テキストスピード計算式に合わせるために0.1fしている
+                testTextController.playerTextSpeed = sceneManager.enviromentalData.m_tInstance.textSpeed; // テキストスピードを更新する
+                testTextController.OnTalkButtonClicked(); // テストテキストを流す
                 break;
         }
     }

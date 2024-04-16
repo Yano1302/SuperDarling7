@@ -12,7 +12,7 @@ public class OnMouseScript : DebugSetting, IPointerEnterHandler, IPointerExitHan
     private Supadari.SceneManager sceneManager; // SceneManager変数
     bool onPointerCheck = false; // マウスが上に載っているかのチェック
     [SerializeField]Image barImage; // バーのイメージ変数
-    [SerializeField] float barFluctuationValue = 0.3f;
+    [SerializeField] float barFluctuationValue = 0.3f; // バーの表示速度
     private void Start()
     {
         // シーンマネージャーを取得
@@ -20,13 +20,13 @@ public class OnMouseScript : DebugSetting, IPointerEnterHandler, IPointerExitHan
     }
     private void FixedUpdate()
     {
-        if (onPointerCheck && barImage && barImage.fillAmount < 1)
+        if (onPointerCheck && barImage && barImage.fillAmount < 1) // バーを表示する許可が出た場合
         {
-            barImage.fillAmount += barFluctuationValue;
+            barImage.fillAmount += barFluctuationValue; // バーを表示する
         }
-        else if(!onPointerCheck && barImage && barImage.fillAmount>0)
+        else if (!onPointerCheck && barImage && barImage.fillAmount > 0) // バーを非表示する許可が出た場合
         {
-            barImage.fillAmount -= barFluctuationValue;
+            barImage.fillAmount -= barFluctuationValue; // バーを非表示にする
         }
     }
     /// <summary>
@@ -47,7 +47,7 @@ public class OnMouseScript : DebugSetting, IPointerEnterHandler, IPointerExitHan
         }
         else
         {
-            onPointerCheck = true;
+            onPointerCheck = true; // バーを表示する許可を出す
         }
     }
     /// <summary>
@@ -68,7 +68,7 @@ public class OnMouseScript : DebugSetting, IPointerEnterHandler, IPointerExitHan
         }
         else
         {
-            onPointerCheck = false;
+            onPointerCheck = false; // バーを非表示にする許可を出す
         }
     }
 }

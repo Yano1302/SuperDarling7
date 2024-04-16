@@ -25,7 +25,6 @@ public class TitleManager : DebugSetting
     {
         audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
         sceneManager.uiManager.OpenUI(UIType.SaveSlot);
-        //sceneManager.SceneChange(1); // 依頼画面へシーン遷移する
         Debug.Log("ニューゲームを開始");
     }
     /// <summary>

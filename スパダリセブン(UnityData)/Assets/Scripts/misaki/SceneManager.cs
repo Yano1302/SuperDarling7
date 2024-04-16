@@ -1,9 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using System.Threading.Tasks;
-using UnityEngine.Timeline;
+using UnityEngine.UI;
 
 namespace Supadari
 {
@@ -12,6 +9,8 @@ namespace Supadari
         [SerializeField] DisplayManager displayManager; // ディスプレイマネージャー用変数
         [SerializeField] SCENENAME currentSceneName; // 現在のシーン名
         [SerializeField] Scene currentScene; // 現在のシーン
+        [SerializeField] Button autoButton; // オートボタン変数
+        StoryController controller; // ストーリーコントローラー変数
         public UIManager uiManager; // UIマネージャー用変数
         public AudioManager audioManager; // オーディオマネージャー変数
         public SCENENAME CheckSceneName { get { return currentSceneName; } } // 現在のシーン名を取得
@@ -28,6 +27,7 @@ namespace Supadari
         // Start is called before the first frame update
         void Start()
         {
+            audioManager = GameObject.FindGameObjectWithTag("AudioManager").GetComponent<AudioManager>(); // audioManagerを検索して代入
             UnityEngine.SceneManagement.SceneManager.sceneLoaded += SceneLoaded;
             audioManager.BGM_Play("BGM_title", enviromentalData.m_tInstance.volumeBGM); // BGMを流す
         }
@@ -60,6 +60,8 @@ namespace Supadari
                     break;
                 case SCENENAME.StoryScene:
                     audioManager.BGM_Stop();
+                    controller = GameObject.FindGameObjectWithTag("Coroutine").GetComponent<StoryController>();
+                    autoButton.onClick.AddListener(controller.OnAutoModeCllicked);
                     break;
                 case SCENENAME.InvestigationScene:
                     audioManager.BGM_Play("BGM_dungeon", enviromentalData.m_tInstance.volumeBGM);
@@ -71,8 +73,8 @@ namespace Supadari
                     audioManager.BGM_Play("BGM_dungeon", enviromentalData.m_tInstance.volumeBGM);
                     break;
             }
-            if(currentSceneName !=SCENENAME.TitleScene) uiManager.OpenUI(UIType.Menu);
-            else uiManager.CloseUI(UIType.Menu);
+            if(currentSceneName == SCENENAME.StoryScene) uiManager.OpenUI(UIType.StoryMenu);
+            else uiManager.CloseUI(UIType.StoryMenu);
         }
         /// <summary>
         /// シーン遷移を行う関数

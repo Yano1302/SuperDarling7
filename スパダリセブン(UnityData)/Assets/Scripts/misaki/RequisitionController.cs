@@ -6,14 +6,6 @@ using UnityEngine.UI;
 
 public class RequisitionController : BaseTextController
 {
-    private Supadari.SceneManager sceneManager; // スパダリのシーンマネージャー用変数
-
-    protected override void Awake()
-    {
-        base.Awake();
-        sceneManager = GameObject.FindGameObjectWithTag("SceneManager").GetComponent<Supadari.SceneManager>();
-        playerTextSpeed = sceneManager.enviromentalData.m_tInstance.textSpeed; // テキストスピードを設定
-    }
     private void Start()
     {
         OnTalkButtonClicked();
