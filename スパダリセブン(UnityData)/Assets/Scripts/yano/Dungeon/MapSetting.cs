@@ -42,7 +42,7 @@ public class MapSetting : SingletonMonoBehaviour<MapSetting>
 
 
     //  プライベート変数  //------------------------------------------------------------------------------------------------------------------------------
-    private static List<string>[] m_mapData = null;
+    private static CSVSetting m_mapData = null;
    
     //  プライベート関数  //------------------------------------------------------------------------------------------------------------------------------
     
@@ -51,33 +51,30 @@ public class MapSetting : SingletonMonoBehaviour<MapSetting>
         base.Awake();
         //マップ情報だけ先に読み込んでおく
         if(m_mapData == null) {
-            m_mapData = new List<string>[AllMapNum];
-            for (int i = 0; i < AllMapNum; i++) {
-                string path = UsefulSystem.FindFilePath("ステージ" + (i + 1)+".txt");
-                m_mapData[i] =  UsefulSystem.Reader_TextFile(path);
-            }
+            m_mapData = new CSVSetting("ステージ1");
             KeyDebug.AddKeyAction("マップの作成", () => { Supadari.SceneManager.Instance.SceneChange(SCENENAME.Dungeon); });
         }
     }
 
     //TODO　どこかからこの関数を呼び出す
     private void _Create(int mapNumber) {
+        m_mapData.Log();
         //右上から読み込む
-        int heightCount = m_mapData[mapNumber].Count - 1;
-        for (int i = heightCount; i >= 0; i--){
-            //横一列分読み込む
-            string line = m_mapData[mapNumber][i];
-            for (int j = 0; j < line.Length; j++) {
-                //読み込んだID(Char型)をint型に変換
-                int typeNum = line[j] - '0';
-                if(typeNum >= 0) {
-                    Vector2 vec = new Vector2(Width * j, Height * (heightCount - i));
-                    Instantiate(MapObject[typeNum], vec, Quaternion.identity);
-                    if (typeNum != 1 && typeNum != 2) {
-                        Instantiate(MapObject[1], vec, Quaternion.identity);
-                    }                     
-                } 
-            }
-        }
+        //int heightCount = m_mapData[mapNumber].Count - 1;
+        //for (int i = heightCount; i >= 0; i--){
+        //    //横一列分読み込む
+        //    string line = m_mapData[mapNumber][i];
+        //    for (int j = 0; j < line.Length; j++) {
+        //        //読み込んだID(Char型)をint型に変換
+        //        int typeNum = line[j] - '0';
+        //        if(typeNum >= 0) {
+        //            Vector2 vec = new Vector2(Width * j, Height * (heightCount - i));
+        //            Instantiate(MapObject[typeNum], vec, Quaternion.identity);
+        //            if (typeNum != 1 && typeNum != 2) {
+        //                Instantiate(MapObject[1], vec, Quaternion.identity);
+        //            }                     
+        //        } 
+        //    }
+        //}
     }
 }
