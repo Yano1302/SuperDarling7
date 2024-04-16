@@ -15,8 +15,5 @@ public class ItemObject : MonoBehaviour
             Destroy(gameObject);
         }
     }
-    private void OnCollisionEnter2D(Collision2D collision) {
-        ItemManager.Instance.AddItem(m_itemID);
-        Destroy(gameObject);
-    }
+  
 }

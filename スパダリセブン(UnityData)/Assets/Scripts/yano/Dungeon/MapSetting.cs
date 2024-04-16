@@ -42,7 +42,7 @@ public class MapSetting : SingletonMonoBehaviour<MapSetting>
 
 
     //  プライベート変数  //------------------------------------------------------------------------------------------------------------------------------
-    private List<string>[] m_mapData = null;
+    private static List<string>[] m_mapData = null;
     //  プライベート関数  //------------------------------------------------------------------------------------------------------------------------------
     
     //初期化
@@ -55,7 +55,7 @@ public class MapSetting : SingletonMonoBehaviour<MapSetting>
                 string path = UsefulSystem.FindFilePath("ステージ" + (i + 1)+".txt");
                 m_mapData[i] =  UsefulSystem.Reader_TextFile(path);
             }
-            KeyDebug.AddKeyDebug("マップの作成", () => { Supadari.SceneManager.Instance.SceneChange(SCENENAME.Dungeon); });
+            KeyDebug.AddKeyAction("マップの作成", () => { Supadari.SceneManager.Instance.SceneChange(SCENENAME.Dungeon); });
         }
     }
 

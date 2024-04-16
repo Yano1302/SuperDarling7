@@ -44,7 +44,7 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
 
     public GameObject GetItemWindow(ItemID id) { return ItemWindow[(int)id]; }
 
-    // アタッチ洋館数 //
+    // アタッチ用関数 //
     [EnumAction(typeof(ItemID))]
     public void Btn_ItemClick(int id) {
         if(SolveManager.CheckScene) {
@@ -64,7 +64,7 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
         base.Awake();
         if(m_json == null) {
             //アイテム情報を読み込む
-            m_json = new JsonSettings<SettingsGetItemFlags>("Data1",Application.dataPath + "\\JsonDataFile", "ItemGetFlags");
+            m_json = new JsonSettings<SettingsGetItemFlags>("Data1","JsonSaveFile", "ItemGetFlags");
             //アイテムウィンドウを設定する
             int count = transform.childCount;
             Debug.Assert(count == UsefulSystem.GetEnumLength<ItemID>(),"設置されているアイテムウィンドウの個数とアイテムのIDの数が一致しません");

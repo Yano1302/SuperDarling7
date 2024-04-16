@@ -386,6 +386,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 344753344}
     - target: {fileID: 9069228315237934034, guid: fa4dedc1dd3eda54bb3348d897543ee0, type: 3}
+      propertyPath: audioManager
+      value: 
+      objectReference: {fileID: 1823557553}
+    - target: {fileID: 9069228315237934034, guid: fa4dedc1dd3eda54bb3348d897543ee0, type: 3}
       propertyPath: displayManager
       value: 
       objectReference: {fileID: 367544060}
@@ -1127,7 +1131,7 @@ GameObject:
   - component: {fileID: 1240978411}
   - component: {fileID: 1240978410}
   m_Layer: 5
-  m_Name: InvestigationCanvas
+  m_Name: InvCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1194,7 +1198,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 2
   m_TargetDisplay: 0
 --- !u!224 &1240978413
 RectTransform:
@@ -1299,7 +1303,7 @@ GameObject:
   - component: {fileID: 1823557553}
   m_Layer: 0
   m_Name: AudioManager
-  m_TagString: Untagged
+  m_TagString: AudioManager
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1334,7 +1338,8 @@ MonoBehaviour:
   c_FolderPath_BGM: Audio\BGM\Resources
   c_FolderPath_SE: Audio\SE\Resources
   m_maxSoundOverlap: 10
-  m_divisionScaleNum: 10
+  m_divisionScaleNum_BGM: 10
+  m_divisionScaleNum_SE: 10
   m_standardVolume: 1
   m_standardFadeTime: 1
   m_divisionScale_BGM: 5

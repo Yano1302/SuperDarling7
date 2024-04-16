@@ -15,7 +15,7 @@ public class CSVSetting {
     public CSVSetting(string fileName) {
         string path = UsefulSystem.FindFilePath(fileName+".csv");      //全体パスの取得
         int index = path.IndexOf("Resources/") + 10;                   //相対パスの始めの位置を取得
-        csvFile = Resources.Load(path.Substring(index, path.Length - (index + 4))) as TextAsset; // ResourcesにあるCSVファイルを格納
+        csvFile = Resources.Load(path.Substring(index, path.Length - (index + 4))) as TextAsset; // CSVファイルのファイル名だけを取得してResourcesにあるCSVファイルを格納
         StringReader reader = new StringReader(csvFile.text);           // TextAssetをStringReaderに変換
         csvData = new List<string[]>();                                 //メモリ確保
         ConvertEncoding(csvFile, Encoding.UTF8);                        //文字化け防止のためUTF-8に変換

@@ -8,7 +8,7 @@ using System.Threading;
 
 
 public enum InvType {
-    A, B, C,
+   A, B, C,
 }
 
 public class InvManager : MonoBehaviour
@@ -18,16 +18,17 @@ public class InvManager : MonoBehaviour
 
     public void Open(InvType type) {
         Debug.Assert(!m_isOpen,"探索パートが既に開かれています"); 
-        m_currentInvType = (int)type;  m_invObj[m_currentInvType].SetActive(true); 
+        m_currentInvType = type;  m_invObj[(int)m_currentInvType].SetActive(true); 
         m_backBtn.SetActive(true);
         m_isOpen = true; 
     }
 
     public void Close() {
-        m_invObj[m_currentInvType].SetActive(false);
+        m_invObj[(int)m_currentInvType].SetActive(false);
         m_backBtn.SetActive(false);
         m_isOpen = false; 
         Player.Instance.MoveFlag = true;
+        m_currentInvType = 0;
     }
 
 
@@ -36,12 +37,12 @@ public class InvManager : MonoBehaviour
 
     private static InvManager m_instance;
 
-    [SerializeField,Header("探索パート用ImageObjct"),EnumIndex(typeof(InvType))]
+    [SerializeField,Header("探索パート背景用ImageObjct"),EnumIndex(typeof(InvType))]
     private GameObject[] m_invObj;
     [SerializeField, Header("戻るボタン")]
     private GameObject m_backBtn;
 
-    private int m_currentInvType;
+    private InvType  m_currentInvType;
     private bool m_isOpen = false;
     private bool m_click = false;
     private PointerEventData pointData;
