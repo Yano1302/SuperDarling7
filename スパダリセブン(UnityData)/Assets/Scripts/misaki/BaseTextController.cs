@@ -226,7 +226,7 @@ public class BaseTextController : DebugSetting
             else if (i == 2 && centerCharaImage) centerCharaImage.GetComponent<Image>().color = Color.gray;
         }
         // BGMを鳴らす
-        //sceneManager.audioManager.BGM_Play(nameBGM[talkNum]);//, sceneManager.enviromentalData.m_tInstance.volumeBGM
+        sceneManager.audioManager.BGM_Play(nameBGM[talkNum]);
     }
     /// <summary>
     /// コルーチン開始関数
