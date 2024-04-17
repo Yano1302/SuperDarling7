@@ -54,10 +54,10 @@ namespace Supadari
             switch(currentSceneName)
             {
                 case SCENENAME.TitleScene:
-                    audioManager.BGM_Play("BGM_title", enviromentalData.m_tInstance.volumeBGM);
+                    audioManager.BGM_Play("BGM_title");
                     break;
                 case SCENENAME.RequisitionsScene:
-                    audioManager.BGM_Play("BGM_quest", enviromentalData.m_tInstance.volumeBGM);
+                    audioManager.BGM_Play("BGM_quest");
                     break;
                 case SCENENAME.StoryScene:
                     audioManager.BGM_Stop();
@@ -65,13 +65,21 @@ namespace Supadari
                     autoButton.onClick.AddListener(controller.OnAutoModeCllicked);
                     break;
                 case SCENENAME.InvestigationScene:
-                    audioManager.BGM_Play("BGM_dungeon", enviromentalData.m_tInstance.volumeBGM);
+                    audioManager.BGM_Play("BGM_dungeon");
                     break;
                 case SCENENAME.SolveScene:
-                    audioManager.BGM_Play("BGM_solve", enviromentalData.m_tInstance.volumeBGM);
+                    audioManager.BGM_Play("BGM_solve");
                     break;
                 case SCENENAME.Dungeon:
-                    audioManager.BGM_Play("BGM_dungeon", enviromentalData.m_tInstance.volumeBGM);
+                    audioManager.BGM_Play("BGM_dungeon");
+                    break;
+                case SCENENAME.GameOverScene:
+                    audioManager.BGM_Stop();
+                    audioManager.SE_Play("BGM_gameover");
+                    break;
+                case SCENENAME.GameClearScene:
+                    audioManager.BGM_Stop();
+                    audioManager.SE_Play("BGM_clear");
                     break;
             }
             if(currentSceneName == SCENENAME.StoryScene) uiManager.OpenUI(UIType.StoryMenu);

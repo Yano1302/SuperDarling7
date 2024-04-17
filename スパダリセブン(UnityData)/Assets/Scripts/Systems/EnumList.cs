@@ -10,7 +10,9 @@ public enum SCENENAME
     StoryScene = 2, // ストーリーシーン
     InvestigationScene = 3, // 調査シーン
     SolveScene = 4, // 解決シーン
-    Dungeon = 5 // 調査テストシーン
+    Dungeon = 5, // 調査テストシーン
+    GameOverScene = 6, // ゲームオーバーシーン
+    GameClearScene = 7 // ゲームクリアシーン
 }
 // 会話関係のステータス
 public enum TALKSTATE 

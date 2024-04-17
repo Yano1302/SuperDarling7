@@ -23,8 +23,9 @@ public class TitleManager : DebugSetting
     /// </summary>
     public void NewGame()
     {
-        audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
-        sceneManager.uiManager.OpenUI(UIType.SaveSlot);
+        audioManager.SE_Play("SE_click");
+        //sceneManager.uiManager.OpenUI(UIType.SaveSlot); // セーブスロットを開く
+        sceneManager.SceneChange(SCENENAME.GameOverScene);
         Debug.Log("ニューゲームを開始");
     }
     /// <summary>
@@ -32,10 +33,9 @@ public class TitleManager : DebugSetting
     /// </summary>
     public void Continue()
     {
-        audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
+        audioManager.SE_Play("SE_click");
         sceneManager.uiManager.OpenUI(UIType.LoadSlot); // ロードスロットを開く
         Debug.Log("コンティニューを開始");
-        
     }
     /// <summary>
     /// SettingGameボタンをクリックしたときの関数
@@ -48,7 +48,7 @@ public class TitleManager : DebugSetting
             Debug.Log("openWindowが" + openWindow + "です");
             return;
         }
-        audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
+        audioManager.SE_Play("SE_click");
         settingWindow.SetActive(true); // ウィンドウを可視化する
         openWindow = true; // trueにする
     }
@@ -64,7 +64,7 @@ public class TitleManager : DebugSetting
             return;
         }
         sceneManager.enviromentalData.Save(); // 変更した設定を保存する
-        audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
+        audioManager.SE_Play("SE_click");
         settingWindow.SetActive(false); // ウィンドウを不可視にする
         openWindow = false; // falseにする
     }
@@ -73,7 +73,7 @@ public class TitleManager : DebugSetting
     /// </summary>
     public void EndGame()
     {
-        audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
+        audioManager.SE_Play("SE_click");
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false; // Unity上でのプレイを終了
 #else

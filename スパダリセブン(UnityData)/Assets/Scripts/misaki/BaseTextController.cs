@@ -146,7 +146,7 @@ public class BaseTextController : DebugSetting
     /// <param name="storynum">読み込みたいCSV名</param>
     public virtual void OnTalkButtonClicked(string storynum = "")
     {
-        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
+        sceneManager.audioManager.SE_Play("SE_click");
         if (TalkState == TALKSTATE.NOTALK) // 会話ステータスが話していないなら
         {
             // ストーリー番号があれば

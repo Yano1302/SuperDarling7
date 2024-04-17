@@ -1,6 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
-using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 
 public class GameOverController : BaseTextController
@@ -51,7 +49,7 @@ public class GameOverController : BaseTextController
     }
     public override void OnTalkButtonClicked(string storynum = "")
     {
-        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
+        sceneManager.audioManager.SE_Play("SE_click");
         if (TalkState == TALKSTATE.NOTALK) // 会話ステータスが話していないなら
         {
             // ストーリー番号があれば
@@ -73,5 +71,21 @@ public class GameOverController : BaseTextController
         {
             TalkEnd(); //会話を終了する
         }
+    }
+    /// <summary>
+    /// タイトルへ戻るボタンをクリックしたときの関数
+    /// </summary>
+    public void BackTitle()
+    {
+        sceneManager.audioManager.SE_Play("SE_dungeon05"); // SEを鳴らす
+        sceneManager.SceneChange(0); // タイトルシーンへ遷移する
+    }
+    /// <summary>
+    /// ロードスロットを開く関数
+    /// </summary>
+    public void LoadButton()
+    {
+        sceneManager.audioManager.SE_Play("SE_click"); // SEを鳴らす
+        sceneManager.uiManager.OpenUI(UIType.LoadSlot); // ロードスロットを表示
     }
 }
