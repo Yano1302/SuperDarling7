@@ -310,7 +310,7 @@ public class BaseTextController : DebugSetting
     /// <summary>
     /// 次のダイアログに変更する関数
     /// </summary>
-    protected void NextDialogue()
+    protected virtual void NextDialogue()
     {
         // トークスキップフラグが立ったら
         if (talkSkip == true) textLabel.text = storyTalks[talkNum].talks; // 全文を表示
