@@ -31,6 +31,8 @@ namespace Supadari
             audioManager = GameObject.FindGameObjectWithTag("AudioManager").GetComponent<AudioManager>(); // audioManagerを検索して代入
             UnityEngine.SceneManagement.SceneManager.sceneLoaded += SceneLoaded;
             audioManager.BGM_Play("BGM_title", enviromentalData.m_tInstance.volumeBGM); // BGMを流す
+            //KeyDebug.AddKeyDebug("GameOver画面へ遷移", GameOver);
+            KeyDebug.AddKeyDebug("GameClear画面へ遷移", GameClear);
         }
         /// <summary>
         /// イベントハンドラー　シーン遷移時の関数
@@ -108,6 +110,14 @@ namespace Supadari
         public void SceneChange(SCENENAME LoadScene)
         {
             displayManager.FadeOut(FadeType.Entire,()=> UnityEngine.SceneManagement.SceneManager.LoadScene((int)LoadScene)); // フェードアウトする
+        }
+        void GameOver()
+        {
+            SceneChange(SCENENAME.GameOverScene);
+        }
+        void GameClear()
+        {
+            SceneChange(SCENENAME.GameClearScene);
         }
     }
 }
