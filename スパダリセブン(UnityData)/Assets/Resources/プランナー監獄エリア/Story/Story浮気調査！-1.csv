@@ -1,0 +1,21 @@
+﻿backImage,leftTalkingChara,leftHighlight,rightTalkingChara,rightHighlight,centerTalkingChara,centerHighlight,name,talks,BGM
+story_background,story_character01,,story_character02,1,,,友人,「はあ…」,BGM_story02
+story_background,story_character01,1,story_character02,,,,主人公,「どうしたの？」,0
+story_background,story_character01,,story_character02,1,,,友人,「彼氏が浮気してるかもしれない…」,0
+story_background,story_character01,1,story_character02,,,,主人公,「！！！！」,0
+story_background,story_character01,,story_character02,1,,,友人,"「なんか冷たいんだよね。
+　なに話しかけても「いいんじゃない？」って返してきてさぁ」",0
+story_background,story_character01,,story_character02,1,,,友人,"「始めて行く店なのに「この間ここに行ったから別の店にしようよ」とか言ってたし、
+　絶対浮気してるわ、アイツ」",0
+story_background,story_character01,,story_character02,,,,主人公,「でもその口ぶりだと確信的な浮気の証拠はないんでしょ」,0
+story_background,story_character01,,story_character02,1,,,友人,"「そうなんだよねぇ…
+　そうだ！！！！」",0
+story_background,story_character01,,story_character02,1,,,友人,「今からアイツの家に行って浮気の証拠見つけにいこ！！！」,0
+story_background,story_character01,1,story_character02,,,,主人公,「頑張ってー」,0
+story_background,story_character01,,story_character02,1,,,友人,"「なに他人事みたいに言ってるの！
+　主人公が来ないと話になんないじゃん！！！！」",0
+story_background,story_character01,,story_character02,1,,,友人,"「いつもの感じでパパっと証拠見つけてよ！
+　今度ゴハン奢るからさ」",0
+story_background,story_character01,1,story_character02,,,,主人公,「じゃあ〇々苑ね」,0
+story_background,story_character01,,story_character02,1,,,友人,"「オッケー！
+　じゃあ早速行こう！」",0

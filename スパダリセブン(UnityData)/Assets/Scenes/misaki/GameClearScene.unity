@@ -1204,7 +1204,7 @@ MonoBehaviour:
   textBaseSpeed: 0.05
   playerTextSpeed: 0.5
   textDelay: 1.5
-  storynum: Default
+  storynum: "\u6D6E\u6C17\u8ABF\u67FB\uFF01\u30AF\u30EA\u30A2"
   charaName: {fileID: 953089124}
   textLabel: {fileID: 8057252046524920482}
   buttonText: {fileID: 0}

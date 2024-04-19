@@ -141,7 +141,34 @@ public class BaseTextController : DebugSetting
         Debug.Log("Story" + storynum + "を読み込みました");
     }
     /// <summary>
-    /// 会話に関するボタン関数
+    /// 会話に関するボタン関数(変更不可)
+    /// </summary>
+    public virtual void OnTalkButtonClicked()
+    {
+        sceneManager.audioManager.SE_Play("SE_click");
+        if (TalkState == TALKSTATE.NOTALK) // 会話ステータスが話していないなら
+        {
+            TalkState = TALKSTATE.TALKING; // 会話ステータスを会話中に変更
+        }
+        else if (TalkState == TALKSTATE.TALKING) // 会話ステータスが話し中なら
+        {
+            talkSkip = true; // トークスキップフラグを立てる
+            TalkState = TALKSTATE.NEXTTALK; // 会話ステータスを次のセリフに変更
+            return;
+        }
+        if (TalkState != TALKSTATE.LASTTALK) // 会話ステータスが話し中,なら
+        {
+            InitializeTalkField(); // 表示されているテキスト等を初期化
+            InstantiateActors(); // 登場人物等を生成
+            StartDialogueCoroutine(); // 文章を表示するコルーチンを開始
+        }
+        else if (TalkState == TALKSTATE.LASTTALK) // 会話ステータスが最後のセリフなら
+        {
+            TalkEnd(); //会話を終了する
+        }
+    }
+    /// <summary>
+    /// 会話に関するボタン関数(読み込むCSV変更可)
     /// </summary>
     /// <param name="storynum">読み込みたいCSV名</param>
     public virtual void OnTalkButtonClicked(string storynum = "")
@@ -161,6 +188,35 @@ public class BaseTextController : DebugSetting
         }
         if (TalkState != TALKSTATE.LASTTALK) // 会話ステータスが話し中,なら
         {
+            InitializeTalkField(); // 表示されているテキスト等を初期化
+            InstantiateActors(); // 登場人物等を生成
+            StartDialogueCoroutine(); // 文章を表示するコルーチンを開始
+        }
+        else if (TalkState == TALKSTATE.LASTTALK) // 会話ステータスが最後のセリフなら
+        {
+            TalkEnd(); //会話を終了する
+        }
+    }
+    /// <summary>
+    /// 会話に関するボタン関数(talkNum変更可)
+    /// </summary>
+    /// <param name="num">読み込みたいCSVの行</param>
+    public virtual void OnTalkButtonClicked(int num = 9999)
+    {
+        sceneManager.audioManager.SE_Play("SE_click");
+        if (TalkState == TALKSTATE.NOTALK) // 会話ステータスが話していないなら
+        {
+            TalkState = TALKSTATE.TALKING; // 会話ステータスを会話中に変更
+        }
+        else if (TalkState == TALKSTATE.TALKING) // 会話ステータスが話し中なら
+        {
+            talkSkip = true; // トークスキップフラグを立てる
+            TalkState = TALKSTATE.NEXTTALK; // 会話ステータスを次のセリフに変更
+            return;
+        }
+        if (TalkState != TALKSTATE.LASTTALK) // 会話ステータスが話し中,なら
+        {
+            if (num != 9999 && num < storyTalks.Length) talkNum = num;
             InitializeTalkField(); // 表示されているテキスト等を初期化
             InstantiateActors(); // 登場人物等を生成
             StartDialogueCoroutine(); // 文章を表示するコルーチンを開始
@@ -226,7 +282,8 @@ public class BaseTextController : DebugSetting
             else if (i == 2 && centerCharaImage) centerCharaImage.GetComponent<Image>().color = Color.gray;
         }
         // BGMを鳴らす
-        sceneManager.audioManager.BGM_Play(nameBGM[talkNum]);
+        if (nameBGM[talkNum] == "Stop") sceneManager.audioManager.BGM_Stop(); // StopならBGMを止める
+        else if (nameBGM[talkNum] != "0") sceneManager.audioManager.BGM_Play(nameBGM[talkNum]); // BGM名が入っていたら切り替え　空白なら続行
     }
     /// <summary>
     /// コルーチン開始関数

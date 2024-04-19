@@ -645,6 +645,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1294113554581670652, guid: 866025499c67d4b48bc6e167654c3fe7, type: 3}
+      propertyPath: storynum
+      value: "\u6D6E\u6C17\u8ABF\u67FB\uFF01\u30B2\u30FC\u30E0\u30AA\u30FC\u30D0\u30FC"
+      objectReference: {fileID: 0}
+    - target: {fileID: 1294113554581670652, guid: 866025499c67d4b48bc6e167654c3fe7, type: 3}
       propertyPath: loadButton
       value: 
       objectReference: {fileID: 2806687492148934512}

@@ -32,7 +32,8 @@ namespace Supadari
             UnityEngine.SceneManagement.SceneManager.sceneLoaded += SceneLoaded;
             audioManager.BGM_Play("BGM_title", enviromentalData.m_tInstance.volumeBGM); // BGMを流す
             //KeyDebug.AddKeyDebug("GameOver画面へ遷移", GameOver);
-            KeyDebug.AddKeyDebug("GameClear画面へ遷移", GameClear);
+            //KeyDebug.AddKeyDebug("GameClear画面へ遷移", GameClear);
+            //KeyDebug.AddKeyDebug("調査画面へ遷移", Investigation);
         }
         /// <summary>
         /// イベントハンドラー　シーン遷移時の関数
@@ -44,6 +45,9 @@ namespace Supadari
             // 現在のシーンを代入する
             currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene(); 
             currentSceneName = (SCENENAME)currentScene.buildIndex;
+            // ストーリーシーンであればストーリーメニューを出す
+            if (currentSceneName == SCENENAME.StoryScene) uiManager.OpenUI(UIType.StoryMenu);
+            else uiManager.CloseUI(UIType.StoryMenu);
             // 現在のシーンが探索シーンであれば
             if (currentSceneName == SCENENAME.Dungeon || currentSceneName == SCENENAME.InvestigationScene)
             {
@@ -84,8 +88,6 @@ namespace Supadari
                     audioManager.SE_Play("BGM_clear");
                     break;
             }
-            if(currentSceneName == SCENENAME.StoryScene) uiManager.OpenUI(UIType.StoryMenu);
-            else uiManager.CloseUI(UIType.StoryMenu);
         }
         /// <summary>
         /// シーン遷移を行う関数
@@ -118,6 +120,10 @@ namespace Supadari
         void GameClear()
         {
             SceneChange(SCENENAME.GameClearScene);
+        }
+        void Investigation()
+        {
+            SceneChange(SCENENAME.Dungeon);
         }
     }
 }
