@@ -45,7 +45,7 @@ public class GameSettingScript : MonoBehaviour
                 if (slider[stateNomber].value == sceneManager.enviromentalData.m_tInstance.textSpeed) break; // 同じ値ならブレイクする
                 sceneManager.enviromentalData.m_tInstance.textSpeed = slider[stateNomber].value + 0.1f; // テキストスピード計算式に合わせるために0.1fしている
                 testTextController.playerTextSpeed = sceneManager.enviromentalData.m_tInstance.textSpeed; // テキストスピードを更新する
-                testTextController.OnTalkButtonClicked(); // テストテキストを流す
+                testTextController.OnTalkButtonClicked(""); // テストテキストを流す
                 break;
         }
     }

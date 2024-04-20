@@ -41,7 +41,7 @@ public class TestTextController : BaseTextController
     }
     public override void OnTalkButtonClicked(string storynum = "")
     {
-        sceneManager.audioManager.SE_Play("SE_click");
+        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
         InitializeTalkField(); // 表示されているテキスト等を初期化
         StartDialogueCoroutine(); // 文章を表示するコルーチンを開始
     }

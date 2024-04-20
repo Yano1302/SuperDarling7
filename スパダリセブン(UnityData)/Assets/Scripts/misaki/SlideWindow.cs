@@ -1,11 +1,13 @@
+using Supadari;
 using UnityEngine;
 
 public class SlideWindow : MonoBehaviour
 {
     RectTransform rectTransform; // 自身のRectTransform変数
     RectTransform[] rectTransforms; // RectTransform配列
-    [SerializeField]UIManager uiManager; // UIManager変数
+    [SerializeField] UIManager uiManager; // UIManager変数
     [SerializeField] AudioManager audioManager; // AudioManager変数
+    [SerializeField] SceneManager sceneManager; // SceneManager変数
     public float speacing = 20f; // オブジェクト間のスペースの大きさ
     float maxParentLength = 0; // 親オブジェクトの全長
     public float speed = 1000f;
@@ -171,7 +173,7 @@ public class SlideWindow : MonoBehaviour
     /// </summary>
     public void SaveButton()
     {
-        audioManager.SE_Play("SE_click"); // SEを鳴らす
+        audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE); // SEを鳴らす
         uiManager.OpenUI(UIType.SaveSlot); // セーブスロットを表示
     }
     /// <summary>
@@ -179,7 +181,7 @@ public class SlideWindow : MonoBehaviour
     /// </summary>
     public void LoadButton()
     {
-        audioManager.SE_Play("SE_click"); // SEを鳴らす
+        audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE); // SEを鳴らす
         uiManager.OpenUI(UIType.LoadSlot); // ロードスロットを表示
     }
 }

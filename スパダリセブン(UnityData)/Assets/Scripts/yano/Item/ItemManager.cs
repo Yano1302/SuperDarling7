@@ -49,6 +49,10 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     public void Btn_ItemClick(int id) {
         if(SolveManager.CheckScene) {
             SolveManager.Instance.choice((ItemID)id);
+            /// 岬追記　idと同じ行を表示 ///
+            SolveTextController itemText = GameObject.FindGameObjectWithTag("ItemText").GetComponent<SolveTextController>();
+            itemText.OnTalkButtonClicked(id);
+            /// ここまで ///
         }
     }
 

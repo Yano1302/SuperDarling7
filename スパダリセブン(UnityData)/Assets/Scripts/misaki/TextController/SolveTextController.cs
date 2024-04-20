@@ -1,11 +1,16 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SolveTextController : BaseTextController
 {
+    [SerializeField] bool firstWrite = true; // ゲームスタート時にCSV1行目を表示するか
+    [SerializeField] bool addOnClick = false; // ボタンチェック
+    private Button[] itemButtons = new Button[10]; // ボタン配列
     private void Start()
     {
-        OnTalkButtonClicked(0);
+        if (firstWrite) OnTalkButtonClicked(0); // ゲームスタート時に表示する
+        if (addOnClick) itemButtons[0].onClick.AddListener(() => OnTalkButtonClicked(0)); // ラムダ式でonclick関数を設定
     }
     protected override void StorySetUp(string storynum)
     {
@@ -35,7 +40,7 @@ public class SolveTextController : BaseTextController
         // numがstoryTalks.length以上または現talkNumと同じかつnum==0ではないならリターン
         if (num >= storyTalks.Length || num == talkNum && num != 0) return;
         talkNum = num; // 指定された値を代入
-        sceneManager.audioManager.SE_Play("SE_click");
+        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
         InitializeTalkField(); // 表示されているテキスト等を初期化
         StartDialogueCoroutine(); // 文章を表示するコルーチンを開始
     }

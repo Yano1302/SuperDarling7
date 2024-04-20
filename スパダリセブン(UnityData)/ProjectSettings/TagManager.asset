@@ -11,6 +11,7 @@ TagManager:
   - AudioManager
   - Load
   - BackTitle
+  - ItemText
   layers:
   - Default
   - TransparentFX

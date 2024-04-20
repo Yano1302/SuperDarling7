@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using Supadari;
 
 /// <summary>
 /// マネージャー用オブジェクトにアタッチして使用する
@@ -10,10 +11,10 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class SolveManager : MonoBehaviour
 {
-//public variables
+    //public variables
     public static SolveManager Instance { get { return m_instance; }}
 
-    public static bool CheckScene { get { return SceneManager.GetActiveScene().name == "SolveScene"; } }
+    public static bool CheckScene { get { return UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "SolveScene"; } }
 
     //public functions
     public void choice(ItemID id) {
@@ -38,7 +39,9 @@ public class SolveManager : MonoBehaviour
         m_obj[(int)m_playerAnswer].SetActive(false);
         bool check = m_Answer == m_playerAnswer;
         UIType type = check ? UIType.Clear : UIType.miss;
-        UIManager.Instance.OpenUI(type);
+        //UIManager.Instance.OpenUI(type); 岬追記　クリアまたはゲームオーバーシーンに遷移させるためコメント化
+        if (type == UIType.Clear) sceneManager.SceneChange(SCENENAME.GameClearScene); // クリアならクリアシーンに遷移
+        else sceneManager.SceneChange(SCENENAME.GameOverScene); // ゲームオーバーシーンに遷移
     }
 
     public void Btn__RetrunTitle() { Supadari.SceneManager.Instance.SceneChange(0); }
@@ -46,12 +49,13 @@ public class SolveManager : MonoBehaviour
     //private
     private static SolveManager m_instance;
     private ItemID? m_playerAnswer = null;
-    
+    private Supadari.SceneManager sceneManager; // 岬追記　シーンマネージャー変数
 
 
     private void Awake() {
         m_instance = GetComponent<SolveManager>();
         m_answerDecisionBtn.SetActive (false);
+        sceneManager = GameObject.FindGameObjectWithTag("SceneManager").GetComponent<Supadari.SceneManager>();
     }
 
 

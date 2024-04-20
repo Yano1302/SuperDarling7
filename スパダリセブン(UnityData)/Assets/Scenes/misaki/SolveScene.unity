@@ -1634,6 +1634,8 @@ MonoBehaviour:
   sceneManager: {fileID: 0}
   testText: 0
   talkState: 0
+  firstWrite: 1
+  addOnClick: 0
 --- !u!1 &1093800575
 GameObject:
   m_ObjectHideFlags: 0
@@ -1926,7 +1928,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_Font: {fileID: 12800000, guid: fdf23e70512b1c940ba2471d3f7785df, type: 3}
     m_FontSize: 50
     m_FontStyle: 0
     m_BestFit: 1
@@ -1938,7 +1940,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u6C7A\u5B9A"
+  m_Text: "\u7167\u5408"
 --- !u!222 &1252378194
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2915,7 +2917,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -1
   m_TargetDisplay: 0
 --- !u!1 &1806322351669313820
 GameObject:
@@ -2989,9 +2991,10 @@ GameObject:
   - component: {fileID: 7764898534999245242}
   - component: {fileID: 5916370989292545100}
   - component: {fileID: 1238538183808658761}
+  - component: {fileID: 7764898534999245243}
   m_Layer: 5
   m_Name: ItemTextBack
-  m_TagString: Untagged
+  m_TagString: ItemText
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3398,6 +3401,40 @@ RectTransform:
   m_AnchoredPosition: {x: 480, y: -375}
   m_SizeDelta: {x: 800, y: 300}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &7764898534999245243
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2966388699427924120}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc436d9e48b715048b1a5d3f34fc1cc7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  debugSettings: {fileID: 11400000, guid: e0bebd3eb006f154498ddc536a46f38f, type: 2}
+  displayCharaAnchors: 0
+  textBaseSpeed: 0.05
+  playerTextSpeed: 0.5
+  textDelay: 1.5
+  storynum: "Item\u4EEE"
+  charaName: {fileID: 0}
+  textLabel: {fileID: 443512548382172204}
+  buttonText: {fileID: 0}
+  backImageAnchor: {fileID: 0}
+  charaAnchors:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  talkButton: {fileID: 0}
+  autoButton: {fileID: 0}
+  runtimeCoroutine: 0
+  sceneManager: {fileID: 0}
+  testText: 0
+  talkState: 0
+  firstWrite: 0
+  addOnClick: 0
 --- !u!222 &7793851759761678931
 CanvasRenderer:
   m_ObjectHideFlags: 0

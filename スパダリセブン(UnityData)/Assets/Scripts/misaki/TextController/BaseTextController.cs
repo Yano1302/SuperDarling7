@@ -145,7 +145,7 @@ public class BaseTextController : DebugSetting
     /// </summary>
     public virtual void OnTalkButtonClicked()
     {
-        sceneManager.audioManager.SE_Play("SE_click");
+        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
         if (TalkState == TALKSTATE.NOTALK) // 会話ステータスが話していないなら
         {
             TalkState = TALKSTATE.TALKING; // 会話ステータスを会話中に変更
@@ -173,7 +173,7 @@ public class BaseTextController : DebugSetting
     /// <param name="storynum">読み込みたいCSV名</param>
     public virtual void OnTalkButtonClicked(string storynum = "")
     {
-        sceneManager.audioManager.SE_Play("SE_click");
+        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
         if (TalkState == TALKSTATE.NOTALK) // 会話ステータスが話していないなら
         {
             // ストーリー番号があれば
@@ -203,7 +203,7 @@ public class BaseTextController : DebugSetting
     /// <param name="num">読み込みたいCSVの行</param>
     public virtual void OnTalkButtonClicked(int num = 9999)
     {
-        sceneManager.audioManager.SE_Play("SE_click");
+        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
         if (TalkState == TALKSTATE.NOTALK) // 会話ステータスが話していないなら
         {
             TalkState = TALKSTATE.TALKING; // 会話ステータスを会話中に変更
@@ -283,7 +283,7 @@ public class BaseTextController : DebugSetting
         }
         // BGMを鳴らす
         if (nameBGM[talkNum] == "Stop") sceneManager.audioManager.BGM_Stop(); // StopならBGMを止める
-        else if (nameBGM[talkNum] != "0") sceneManager.audioManager.BGM_Play(nameBGM[talkNum]); // BGM名が入っていたら切り替え　空白なら続行
+        else if (nameBGM[talkNum] != "0") sceneManager.audioManager.BGM_Play(nameBGM[talkNum], sceneManager.enviromentalData.m_tInstance.volumeBGM); // BGM名が入っていたら切り替え　空白なら続行
     }
     /// <summary>
     /// コルーチン開始関数

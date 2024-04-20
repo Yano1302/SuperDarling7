@@ -56,14 +56,15 @@ namespace Supadari
                 uiManager.OpenUI(UIType.Timer); // タイマーを表示
                 uiManager.OpenUI(UIType.ItemWindow); // アイテムウィンドウを表示
             }
+            else if (currentSceneName != SCENENAME.SolveScene) uiManager.CloseUI(UIType.ItemWindow); // アイテムウィンドウを閉じる
             // 各シーンでのBGMを流す ストーリーシーンはCSVデータを参照して流すのでここでは流さない
             switch(currentSceneName)
             {
                 case SCENENAME.TitleScene:
-                    audioManager.BGM_Play("BGM_title");
+                    audioManager.BGM_Play("BGM_title", enviromentalData.m_tInstance.volumeBGM);
                     break;
                 case SCENENAME.RequisitionsScene:
-                    audioManager.BGM_Play("BGM_quest");
+                    audioManager.BGM_Play("BGM_quest", enviromentalData.m_tInstance.volumeBGM);
                     break;
                 case SCENENAME.StoryScene:
                     audioManager.BGM_Stop();
@@ -71,21 +72,21 @@ namespace Supadari
                     autoButton.onClick.AddListener(controller.OnAutoModeCllicked);
                     break;
                 case SCENENAME.InvestigationScene:
-                    audioManager.BGM_Play("BGM_dungeon");
+                    audioManager.BGM_Play("BGM_dungeon", enviromentalData.m_tInstance.volumeBGM);
                     break;
                 case SCENENAME.SolveScene:
-                    audioManager.BGM_Play("BGM_solve");
+                    audioManager.BGM_Play("BGM_solve", enviromentalData.m_tInstance.volumeBGM);
                     break;
                 case SCENENAME.Dungeon:
-                    audioManager.BGM_Play("BGM_dungeon");
+                    audioManager.BGM_Play("BGM_dungeon", enviromentalData.m_tInstance.volumeBGM);
                     break;
                 case SCENENAME.GameOverScene:
                     audioManager.BGM_Stop();
-                    audioManager.SE_Play("BGM_gameover");
+                    audioManager.SE_Play("BGM_gameover", enviromentalData.m_tInstance.volumeSE);
                     break;
                 case SCENENAME.GameClearScene:
                     audioManager.BGM_Stop();
-                    audioManager.SE_Play("BGM_clear");
+                    audioManager.SE_Play("BGM_clear", enviromentalData.m_tInstance.volumeSE);
                     break;
             }
         }

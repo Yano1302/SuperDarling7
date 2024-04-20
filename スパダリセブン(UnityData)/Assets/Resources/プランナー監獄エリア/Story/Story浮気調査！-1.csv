@@ -1,11 +1,12 @@
 ﻿backImage,leftTalkingChara,leftHighlight,rightTalkingChara,rightHighlight,centerTalkingChara,centerHighlight,name,talks,BGM
-story_background,story_character01,,story_character02,1,,,友人,「はあ…」,BGM_story02
+story_background,story_character01,,story_character02,,,,,──某所──,BGM_story02
+story_background,story_character01,,story_character02,1,,,友人,「はあ……」,0
 story_background,story_character01,1,story_character02,,,,主人公,「どうしたの？」,0
-story_background,story_character01,,story_character02,1,,,友人,「彼氏が浮気してるかもしれない…」,0
+story_background,story_character01,,story_character02,1,,,友人,「彼氏が浮気してるかもしれない……」,0
 story_background,story_character01,1,story_character02,,,,主人公,「！！！！」,0
 story_background,story_character01,,story_character02,1,,,友人,"「なんか冷たいんだよね。
-　なに話しかけても「いいんじゃない？」って返してきてさぁ」",0
-story_background,story_character01,,story_character02,1,,,友人,"「始めて行く店なのに「この間ここに行ったから別の店にしようよ」とか言ってたし、
+　なに話しかけても『いいんじゃない？』って言うし」",0
+story_background,story_character01,,story_character02,1,,,友人,"「始めて行く店なのに『この間ここに行ったから別の店にしようよ』とか言うし、
 　絶対浮気してるわ、アイツ」",0
 story_background,story_character01,,story_character02,,,,主人公,「でもその口ぶりだと確信的な浮気の証拠はないんでしょ」,0
 story_background,story_character01,,story_character02,1,,,友人,"「そうなんだよねぇ…
