@@ -50,6 +50,7 @@ public class Player : MonoBehaviour
     /// <summary>移動処理を行います</summary>
     void Move() {
         if (MoveFlag) {
+            
             //キーの入力を取得する
             m_direction.x = Input.GetAxis("Horizontal");
             m_direction.y = Input.GetAxis("Vertical");
@@ -58,6 +59,7 @@ public class Player : MonoBehaviour
             if (m_direction.magnitude > 0) {
                 float z = Vector2.Angle(Vector2.up, m_direction);
                 z = m_direction.x < 0 ? z : -z;
+                //TODO:視点の切り替えを緩やかにする
                 transform.eulerAngles = new Vector3(0, 0, z);  
                 m_visRect.eulerAngles = new Vector3(0,0, z);
             }           

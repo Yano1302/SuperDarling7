@@ -262,8 +262,12 @@ PrefabInstance:
       value: Canvas
       objectReference: {fileID: 0}
     - target: {fileID: 9171292972236699999, guid: 114fb54d35ae32a48807ab382aac13cf, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 3000
+      objectReference: {fileID: 0}
+    - target: {fileID: 9171292972236699999, guid: 114fb54d35ae32a48807ab382aac13cf, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 1080
+      value: 3000
       objectReference: {fileID: 0}
     - target: {fileID: 9171292972236699999, guid: 114fb54d35ae32a48807ab382aac13cf, type: 3}
       propertyPath: m_LocalRotation.w

@@ -6,6 +6,7 @@ Shader "Unlit/Triangle"
         _PointX("OriginPointX", Range(-0.5, 0.5)) = 0       //視界の始点のUV座標(U)
         _PointY("OriginPointY", Range(-0.5,0.5)) = 0        //視界の始点のUV座標(V)
         _Width("Width", Range(0.0, 3.0)) = 0                //視点の幅
+        _Radius("Radius",Range(0.0,0.5)) = 0                 //円の半径
         _InvAlpha("InvisibleAlpha",Range(0.0, 1.0)) = 1.0  //暗い部分のα値(低くするほど薄くなる)
         _vAlpha("VisibleAlpha", Range(0.0, 1.0)) = 0        //見えている部分のα値
     }
@@ -48,6 +49,7 @@ Shader "Unlit/Triangle"
             fixed _PointY;
             fixed  _InvAlpha;
             fixed  _vAlpha;
+            fixed  _Radius;
 
          
             v2f vert (appdata v)
@@ -69,15 +71,14 @@ Shader "Unlit/Triangle"
                 fixed halfwidth = (i.uv.y - _PointY) * delta / 2;
                 //中心から左右に半分の幅を足し引きして幅を作る
                 float2 pos = { _PointX - halfwidth,_PointX + halfwidth };
-
                 //視点の高さがまだ満たしていない場合はくり抜かない
                  fixed alpha = step(i.uv.y,_PointY);
                 //高さを満たした幅の中だけくり抜く
                 alpha += step(i.uv.x, pos.x);
                 alpha += step(pos.y,i.uv.x);
-
-                fixed4 col = tex2D(_MainTex, i.uv) * i.color;            
-                col.a = (alpha >= 1) ? _InvAlpha : _vAlpha;
+                fixed4 col = tex2D(_MainTex, i.uv) * i.color;
+                alpha *= smoothstep(_Radius, _Radius, length(i.uv));
+                col.a = (alpha >= 1)? _InvAlpha : _vAlpha;
                 return col;
             }           
             ENDCG
