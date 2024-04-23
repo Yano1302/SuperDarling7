@@ -4,6 +4,8 @@ using UnityEngine.UI;
 
 public class RequisitionController : BaseTextController
 {
+    [SerializeField] GameObject questUI; // 受注画面UI
+    [SerializeField] GameObject selectUI; // 依頼を選択するUI
     private void Start()
     {
         OnTalkButtonClicked();
@@ -81,5 +83,11 @@ public class RequisitionController : BaseTextController
             return;
         }
         TalkState = TALKSTATE.NOTALK; // 会話ステータスを話していないに変更
+    }
+    public override void OnTalkButtonClicked(string storynum = "")
+    {
+        base.OnTalkButtonClicked(storynum);
+        questUI.SetActive(false); // 受注画面を非表示
+        selectUI.SetActive(true); // 依頼選択画面を表維持
     }
 }
