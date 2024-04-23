@@ -9,8 +9,10 @@ namespace Supadari
         [SerializeField] DisplayManager displayManager; // ディスプレイマネージャー用変数
         [SerializeField] SCENENAME currentSceneName; // 現在のシーン名
         [SerializeField] Scene currentScene; // 現在のシーン
+        [SerializeField] MenuScript menuScript; // MenuScript変数
         [SerializeField] Button autoButton; // オートボタン変数
         StoryController controller; // ストーリーコントローラー変数
+        public int saveSlot; // 現在使用している
         public UIManager uiManager; // UIマネージャー用変数
         public AudioManager audioManager; // オーディオマネージャー変数
         public SCENENAME CheckSceneName { get { return currentSceneName; } } // 現在のシーン名を取得
@@ -58,6 +60,7 @@ namespace Supadari
             }
             else if (currentSceneName != SCENENAME.SolveScene) uiManager.CloseUI(UIType.ItemWindow); // アイテムウィンドウを閉じる
             // 各シーンでのBGMを流す ストーリーシーンはCSVデータを参照して流すのでここでは流さない
+            // 依頼シーンに遷移したときのみ自動セーブ
             switch(currentSceneName)
             {
                 case SCENENAME.TitleScene:
@@ -65,6 +68,7 @@ namespace Supadari
                     break;
                 case SCENENAME.RequisitionsScene:
                     audioManager.BGM_Play("BGM_quest", enviromentalData.m_tInstance.volumeBGM);
+                    menuScript.Save(saveSlot); // 現在使用しているスロットにセーブ
                     break;
                 case SCENENAME.StoryScene:
                     audioManager.BGM_Stop();

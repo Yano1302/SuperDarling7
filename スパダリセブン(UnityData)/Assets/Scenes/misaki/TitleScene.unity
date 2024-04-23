@@ -4751,6 +4751,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 181818664}
     - target: {fileID: 9069228315237934034, guid: fa4dedc1dd3eda54bb3348d897543ee0, type: 3}
+      propertyPath: menuScript
+      value: 
+      objectReference: {fileID: 9068793991925390252}
+    - target: {fileID: 9069228315237934034, guid: fa4dedc1dd3eda54bb3348d897543ee0, type: 3}
       propertyPath: audioManager
       value: 
       objectReference: {fileID: 1480421019}

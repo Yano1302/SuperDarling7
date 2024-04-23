@@ -55,11 +55,14 @@ public class MenuScript : SingletonMonoBehaviour <MenuScript>
         saveData.m_tInstance.scenename = sceneManager.CheckSceneName;
         // セーブしたことがあるをtrueにする
         if (saveData.m_tInstance.scenename != SCENENAME.TitleScene) saveData.m_tInstance.haveSaved = true;
-        saveData.Save();
+        saveData.Save(); // セーブする
+        Debug.Log("セーブします");
+        // タイトルシーンの場合
         if (saveData.m_tInstance.scenename == SCENENAME.TitleScene)
         {
-            sceneManager.SceneChange(SCENENAME.StoryScene);
-            sceneManager.uiManager.CloseUI(UIType.SaveSlot);
+            sceneManager.saveSlot = saveSlotIndex; // 現在使用しているスロットを代入
+            sceneManager.SceneChange(SCENENAME.StoryScene); // シーン遷移
+            sceneManager.uiManager.CloseUI(UIType.SaveSlot); // UIを閉じる
         }
     }
     /// <summary>
@@ -75,9 +78,10 @@ public class MenuScript : SingletonMonoBehaviour <MenuScript>
             Debug.Log("セーブされていません");
             return; // 一度もセーブされたことがないのならリターン
         }
-        sceneManager.audioManager.SE_Play("SE_click");
+        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
         // ロードしてシーン遷移
         sceneManager.SceneChange(saveData.m_tInstance.scenename);
+        sceneManager.uiManager.CloseUI(UIType.LoadSlot);
     }
     /// <summary>
     /// タイトルへ戻るボタンをクリックしたときの関数

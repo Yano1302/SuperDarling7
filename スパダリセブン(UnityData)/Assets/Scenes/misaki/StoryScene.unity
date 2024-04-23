@@ -537,6 +537,10 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 519420031}
+    - target: {fileID: 4954410046863973549, guid: b6da155c055dc624c8cf3a3fd3b587f5, type: 3}
+      propertyPath: m_text
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 5749960558590850381, guid: b6da155c055dc624c8cf3a3fd3b587f5, type: 3}
       propertyPath: m_Name
       value: StoryPrefab
