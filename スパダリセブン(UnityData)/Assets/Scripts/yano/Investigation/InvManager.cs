@@ -53,8 +53,16 @@ public class InvManager : MonoBehaviour
     }
 
     private void Update() {
+        CheckClick();
+    }
+
+
+    private void CheckClick() {
+        //画面が開かれていて、かつクリック処理を行っていない場合、クリックされた判定を行う
         if (m_isOpen && !m_click && Input.GetKeyDown(KeyCode.Mouse0)) {
-            m_click = true;
+            //クリック処理中
+            m_click = true; 
+            //別スレッドからメインスレッドを参照できるようにする
             SynchronizationContext MainThread = SynchronizationContext.Current;
             Task.Run(() =>
             {
@@ -69,15 +77,14 @@ public class InvManager : MonoBehaviour
                     EventSystem.current.RaycastAll(pointData, RayResult);
 
                     foreach (RaycastResult result in RayResult) {
-                        result.gameObject.TryGetComponent<ItemObject>(out var item);
                         //アイテムの取得処理
-                        if (item != null) {
+                        if (result.gameObject.TryGetComponent<ItemObject>(out var item)) {
                             ItemManager.Instance.AddItem(item.ID);
                             Destroy(item.gameObject);
                         }
-                        m_click = false;
                     }
-                }, null); 
+                    m_click = false;    //処理終了
+                }, null);
             });
         }
     }

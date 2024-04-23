@@ -13,7 +13,7 @@ public class OpenTimer : MonoBehaviour
 
 
     private void OnEnable() {
-        _Timer = Timer.SetTimer(gameObject, MapSetting.Instance.GetTimer,TimeUp);
+        _Timer = Timer.SetTimer(gameObject, MapSetting.Instance.Time,TimeUp);
         _Timer.SecondAction = SetTimerUI;
         SetTimerUI();
     }

@@ -46,7 +46,7 @@ public class KeyDebug:MonoBehaviour {
                     var code = m_keyCods[i];
                     if (Input.GetKeyDown(code)){
                         if (m_codeList.TryGetValue(code, out var action)) {
-                            Debug.Log(action.ToString() + " Ç™é¿çsÇ≥ÇÍÇ‹Ç∑");
+                            Debug.Log(m_actioString[i] + " Ç™é¿çsÇ≥ÇÍÇ‹Ç∑");
                             action();
                         }                        
                         break;
