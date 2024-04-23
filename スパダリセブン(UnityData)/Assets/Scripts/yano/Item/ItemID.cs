@@ -7,17 +7,18 @@ using System;
 
 //IDを設定　(Jsonファイルと同じ名前にする)
 public enum ItemID {
-    ID0　=  0,
-    ID1  =  1,
-    ID2  =  2,
-    ID3  =  3,
-    ID4  =  4,
-    ID5  =  5,
-    ID6  =  6,
-    ID7  =  7,
-    ID8  =  8,
-    ID9  =  9,
-    ID10 =  10,
+    Dummy = 0,
+    ID0　=  1,
+    ID1  =  2,
+    ID2  =  3,
+    ID3  =  4,
+    ID4  =  5,
+    ID5  =  6,
+    ID6  =  7,
+    ID7  =  8,
+    ID8  =  9,
+    ID9  =  10,
+    ID10 =  11,
 }
 
 //ID名とbool変数名を一致させる
@@ -49,7 +50,7 @@ public class SettingsGetItemFlags {
             case ItemID.ID9: return ID9;
             case ItemID.ID10: return ID10;
         }
-        UsefulSystem.LogError("アイテムIDに対応する所持フラグがありませんでした。");
+        UsefulSystem.LogError("アイテムIDに対応する所持フラグがありませんでした。 ID : " + id);
         return false;
     }
 
@@ -68,7 +69,7 @@ public class SettingsGetItemFlags {
             case ItemID.ID10: ID10 = value; break;
 
 
-            default: UsefulSystem.LogError("アイテムIDに対応する所持フラグがありませんでした。");break;
+            default: UsefulSystem.LogError("アイテムIDに対応する所持フラグがありませんでした。 ID : " + id);break;
         }
     }
 }

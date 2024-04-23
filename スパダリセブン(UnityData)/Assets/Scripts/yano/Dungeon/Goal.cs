@@ -7,10 +7,15 @@ using SceneManager = Supadari.SceneManager;
 
 public class Goal : MonoBehaviour
 {
-    public void OnCollisionEnter2D(Collision2D collision) {
-        // TODO 仮置き
-        Player.Instance.MoveFlag = false;
-        UIManager.Instance.CloseUI(UIType.Timer);
-        SceneManager.Instance.SceneChange(4);
+    [SerializeField] private InvBackGroundType m_invType;
+
+    private void OnCollisionEnter2D(Collision2D collision) {
+        // ウィンドウを開く処理
+        if (collision.gameObject.CompareTag("Player")) {
+            var ins = Player.Instance;
+            ins.MoveFlag = false;
+            ins.VisibilityImage = false;
+            InvManager.Instance.Open(m_invType);
+        }
     }
 }

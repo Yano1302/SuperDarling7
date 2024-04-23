@@ -32,10 +32,10 @@ Material:
     - _InvAlpha: 1
     - _Point: 0
     - _PointX: 0
-    - _PointY: -0.01
+    - _PointY: -0.5
     - _Range: 1
     - _Rotate: 0
-    - _Width: 0.5
+    - _Width: 1
     - _vAlpha: 0
     m_Colors: []
   m_BuildTextureStacks: []

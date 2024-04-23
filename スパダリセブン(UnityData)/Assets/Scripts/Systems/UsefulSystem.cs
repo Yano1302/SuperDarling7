@@ -65,8 +65,6 @@ public class UsefulSystem : SingletonMonoBehaviour<UsefulSystem>
     }
 
 
-   
-
 
 
     /// <summary>Vector3の要素数同士を掛け合わせます</summary>
@@ -97,8 +95,8 @@ public class UsefulSystem : SingletonMonoBehaviour<UsefulSystem>
     [Conditional("UNITY_EDITOR")] public static void LogError(object o) { Debug.LogError(o); }
     /// <summary>エディタ上でのみ有効な関数を実行します</summary>
     [Conditional("UNITY_EDITOR")] public static void DebugAction(UnityAction action) { action(); }
-
-
+    /// <summary>デバッグ時のみ渡されたオブジェクトをヒエラルキーの一番上に動かします</summary>
+    [Conditional("UNITY_EDITOR")] public static void DebugShowTopObj(GameObject obj) { obj.transform.SetAsFirstSibling(); }
     //  Public関数    //--------------------------------------------------------------------------------------------------------------------------------
 
     /// <summary> 一定時間待機したあと、渡された関数を実行します。

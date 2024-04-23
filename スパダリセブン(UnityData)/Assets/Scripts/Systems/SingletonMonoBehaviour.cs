@@ -32,7 +32,10 @@ public abstract class SingletonMonoBehaviour<T> : MonoBehaviour where T : MonoBe
         if (this != Instance)
         {
             // アタッチされている場合は破棄する
-           Destroy(this);
+#if UNITY_EDITOR
+            Debug.LogWarning("既に"+ typeof(T)+"があるのでオブジェクトが破棄されます");
+#endif
+            Destroy(this.gameObject);
             return;
         }
         DontDestroyOnLoad(this.gameObject);
