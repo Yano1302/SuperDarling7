@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Threading;
 
 
-public enum InvType {
+public enum InvBackGroundType {
    A, B, C,
 }
 
@@ -16,7 +16,7 @@ public class InvManager : MonoBehaviour
     public static InvManager Instance { get { Debug.Assert(m_instance, "シーンが違うのでインスタンスを取得できません。"); return m_instance; } }
 
 
-    public void Open(InvType type) {
+    public void Open(InvBackGroundType type) {
         Debug.Assert(!m_isOpen,"探索パートが既に開かれています"); 
         m_currentInvType = type;  m_invObj[(int)m_currentInvType].SetActive(true); 
         m_backBtn.SetActive(true);
@@ -31,18 +31,14 @@ public class InvManager : MonoBehaviour
         m_currentInvType = 0;
     }
 
-
-  
-
-
     private static InvManager m_instance;
 
-    [SerializeField,Header("探索パート背景用ImageObjct"),EnumIndex(typeof(InvType))]
+    [SerializeField,Header("探索パート背景用ImageObjct"),EnumIndex(typeof(InvBackGroundType))]
     private GameObject[] m_invObj;
     [SerializeField, Header("戻るボタン")]
     private GameObject m_backBtn;
 
-    private InvType  m_currentInvType;
+    private InvBackGroundType  m_currentInvType;
     private bool m_isOpen = false;
     private bool m_click = false;
     private PointerEventData pointData;
@@ -55,8 +51,6 @@ public class InvManager : MonoBehaviour
     private void Update() {
         CheckClick();
     }
-
-
     private void CheckClick() {
         //画面が開かれていて、かつクリック処理を行っていない場合、クリックされた判定を行う
         if (m_isOpen && !m_click && Input.GetKeyDown(KeyCode.Mouse0)) {
@@ -88,4 +82,7 @@ public class InvManager : MonoBehaviour
             });
         }
     }
+
+
+
 }

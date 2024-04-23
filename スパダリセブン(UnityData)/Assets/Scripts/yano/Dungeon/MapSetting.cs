@@ -30,24 +30,23 @@ public class MapSetting : SingletonMonoBehaviour<MapSetting> {
     /// <summary>マップの総数を取得します</summary>
     public int TotalMapNumber { get { return m_mapData.Length; } }
 
-    /// <summary>
-    /// </summary>
-
     // アタッチ変数  //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
     [SerializeField, Header("マップオブジェクト"), EnumIndex(typeof(MapType))]
     private GameObject[] MapObject;
     //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
-
+   
+    /// <summary>ステージのCSVを読み込むためのインデックスを管理します</summary>
+    public enum StageCsvIndex {
+        number = 0,
+        name = 1,
+        time = 2,
+        size = 3,
+        itemStart = 4,
+    }
 
     //  プライベート変数  //------------------------------------------------------------------------------------------------------------------------------
 
-    public enum StageCsvIndex {
-        number = 0,
-        name   = 1,
-        time   = 2,
-        size   = 3,
-        itemStart = 4,
-    }
+
 
     //マップデータを読み込むクラス配列
     private static CSVSetting[] m_mapData = null;

@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Threading.Tasks;
 
-
-
-
 /// <summary>
 /// アイテムの所持などを管理するクラスです
 /// </summary>
@@ -14,8 +11,8 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     //アイテムメッセージの選択を管理する列挙型
     public enum ItemMessageType {
         Investigation = ItemDataCsvIndex.Investigation,             //探索パートメッセージ
-        Requisitions = ItemDataCsvIndex.Requisitions,               //推理パートメッセージ
-        RequisitionsHint = ItemDataCsvIndex.RequisitionsHint,       //推理パートのヒントメッセージ
+        Solve = ItemDataCsvIndex.Solve,               //推理パートメッセージ
+        SolveHint = ItemDataCsvIndex.SolveHint,       //推理パートのヒントメッセージ
     }
 
     // 関数一覧 //
@@ -38,7 +35,6 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     /// <param name="id">所持フラグを調べたいアイテムのID</param>
     /// <returns>指定されたアイテムの所持フラグ</returns>
     public bool GetFlag(ItemID id) { return m_itemFlag.TInstance.GetFlag(id); }
-
 
     /// <summary>名前からアイテムのIDを取得します</summary>
     /// <param name="name">アイテム名</param>
@@ -155,8 +151,8 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
         ID = 0,                     //ID
         Name = 1,                   //名前
         Investigation = 2,          //探索パートメッセージ
-        Requisitions = 3,           //推理パートメッセージ
-        RequisitionsHint = 4,       //推理パートのヒントメッセージ
+        Solve = 3,                  //推理パートメッセージ
+        SolveHint = 4,              //推理パートのヒントメッセージ
     }
 
     private static JsonSettings<SettingsGetItemFlags> m_itemFlag;  //アイテム所持情報
