@@ -4,14 +4,18 @@ using UnityEngine;
 using UnityEngine.UI;
 
 
-public class OpenTimer : MonoBehaviour
+public class TimerManager : SingletonMonoBehaviour<TimerManager>
 {
+    /// <summary>タイマーのフラグを設定します</summary>
+    public bool TimerFlag { get { return _Timer.TimeFlag; } set { _Timer.TimeFlag = value; } }
+
+
+
     [SerializeField, Header("時間を表示するUIテキスト")]
     private Text m_text;
     
     private Timer _Timer;
-
-
+    
     private void OnEnable() {
         _Timer = Timer.SetTimer(gameObject, MapSetting.Instance.Time,TimeUp);
         _Timer.SecondAction = SetTimerUI;
