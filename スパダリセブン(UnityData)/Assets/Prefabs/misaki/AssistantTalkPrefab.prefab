@@ -226,6 +226,8 @@ MonoBehaviour:
   eventCheck: 1
   requisitionController: {fileID: 355467974455498801}
   storyname: Stage1
+  barImage: {fileID: 0}
+  barFluctuationValue: 0.3
 --- !u!1 &1806322351115521888
 GameObject:
   m_ObjectHideFlags: 0
@@ -296,7 +298,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: cecf9cd8408356e47b1c8c1558012ad5, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 77d521f461cefe7499318f2f7c4c0585, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -622,7 +624,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: f470e0f0034a5bc4e9d5c284eb1f5545, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f8dfb71b1a3b8eb40b05b59a910c516d, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -767,6 +769,7 @@ MonoBehaviour:
   autoButton: {fileID: 0}
   runtimeCoroutine: 0
   sceneManager: {fileID: 0}
+  testText: 0
   talkState: 0
 --- !u!1 &4218095282875413789
 GameObject:
@@ -803,7 +806,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 200, y: 50}
+  m_SizeDelta: {x: 242.4, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6142040009206341055
 CanvasRenderer:
@@ -1052,6 +1055,8 @@ MonoBehaviour:
   eventCheck: 0
   requisitionController: {fileID: 355467974455498801}
   storyname: Stage2
+  barImage: {fileID: 0}
+  barFluctuationValue: 0.3
 --- !u!1 &5496982977328032114
 GameObject:
   m_ObjectHideFlags: 0
@@ -1086,7 +1091,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -32.8}
+  m_AnchoredPosition: {x: 0, y: -12.32}
   m_SizeDelta: {x: 595, y: 212.66}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7793851759241866287
@@ -1336,6 +1341,8 @@ MonoBehaviour:
   eventCheck: 0
   requisitionController: {fileID: 355467974455498801}
   storyname: Stage1
+  barImage: {fileID: 0}
+  barFluctuationValue: 0.3
 --- !u!1 &6148374661573463690
 GameObject:
   m_ObjectHideFlags: 0

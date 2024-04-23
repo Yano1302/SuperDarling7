@@ -23,6 +23,7 @@ namespace Supadari
         protected override void Awake()
         {
             base.Awake();
+            Application.targetFrameRate = 60;
         }
         // Start is called before the first frame update
         void Start()
@@ -30,6 +31,9 @@ namespace Supadari
             audioManager = GameObject.FindGameObjectWithTag("AudioManager").GetComponent<AudioManager>(); // audioManagerを検索して代入
             UnityEngine.SceneManagement.SceneManager.sceneLoaded += SceneLoaded;
             audioManager.BGM_Play("BGM_title", enviromentalData.m_tInstance.volumeBGM); // BGMを流す
+            //KeyDebug.AddKeyDebug("GameOver画面へ遷移", GameOver);
+            //KeyDebug.AddKeyDebug("GameClear画面へ遷移", GameClear);
+            //KeyDebug.AddKeyDebug("調査画面へ遷移", Investigation);
         }
         /// <summary>
         /// イベントハンドラー　シーン遷移時の関数
@@ -41,12 +45,16 @@ namespace Supadari
             // 現在のシーンを代入する
             currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene(); 
             currentSceneName = (SCENENAME)currentScene.buildIndex;
+            // ストーリーシーンであればストーリーメニューを出す
+            if (currentSceneName == SCENENAME.StoryScene) uiManager.OpenUI(UIType.StoryMenu);
+            else uiManager.CloseUI(UIType.StoryMenu);
             // 現在のシーンが探索シーンであれば
             if (currentSceneName == SCENENAME.Dungeon || currentSceneName == SCENENAME.InvestigationScene)
             {
                 MapSetting setting = GameObject.FindGameObjectWithTag("MapSetting").GetComponent<MapSetting>(); // MapSettingを検索
                 setting.CreateMap(1); // マップを生成
             }
+            else if (currentSceneName != SCENENAME.SolveScene) uiManager.CloseUI(UIType.ItemWindow); // アイテムウィンドウを閉じる
             // 各シーンでのBGMを流す ストーリーシーンはCSVデータを参照して流すのでここでは流さない
             switch(currentSceneName)
             {
@@ -70,9 +78,15 @@ namespace Supadari
                 case SCENENAME.Dungeon:
                     audioManager.BGM_Play("BGM_dungeon", enviromentalData.m_tInstance.volumeBGM);
                     break;
+                case SCENENAME.GameOverScene:
+                    audioManager.BGM_Stop();
+                    audioManager.SE_Play("BGM_gameover", enviromentalData.m_tInstance.volumeSE);
+                    break;
+                case SCENENAME.GameClearScene:
+                    audioManager.BGM_Stop();
+                    audioManager.SE_Play("BGM_clear", enviromentalData.m_tInstance.volumeSE);
+                    break;
             }
-            if(currentSceneName == SCENENAME.StoryScene) uiManager.OpenUI(UIType.StoryMenu);
-            else uiManager.CloseUI(UIType.StoryMenu);
         }
         /// <summary>
         /// シーン遷移を行う関数
@@ -97,6 +111,18 @@ namespace Supadari
         public void SceneChange(SCENENAME LoadScene)
         {
             displayManager.FadeOut(FadeType.Entire,()=> UnityEngine.SceneManagement.SceneManager.LoadScene((int)LoadScene)); // フェードアウトする
+        }
+        void GameOver()
+        {
+            SceneChange(SCENENAME.GameOverScene);
+        }
+        void GameClear()
+        {
+            SceneChange(SCENENAME.GameClearScene);
+        }
+        void Investigation()
+        {
+            SceneChange(SCENENAME.Dungeon);
         }
     }
 }

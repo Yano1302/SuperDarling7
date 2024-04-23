@@ -1,5 +1,0 @@
-﻿backImage,leftTalkingChara,leftHighlight,rightTalkingChara,rightHighlight,centerTalkingChara,centerHighlight,name,talks,BGM
-quest_background,story_character01,1,story_character02,,,,主人公,"左のきゃらが
-しゃべるよ",BGM_story01
-story_background,story_character01,,story_character02,1,story_character03,,友人,右のきゃらがしゃべるよ,BGM_story02
-over_background,,,,,story_character03,1,犯人,この会話が終わったら探索シーンに行くよ,BGM_story03

@@ -1,11 +1,13 @@
+using Supadari;
 using UnityEngine;
 
 public class SlideWindow : MonoBehaviour
 {
     RectTransform rectTransform; // 自身のRectTransform変数
     RectTransform[] rectTransforms; // RectTransform配列
-    [SerializeField]UIManager uiManager; // UIManager変数
+    [SerializeField] UIManager uiManager; // UIManager変数
     [SerializeField] AudioManager audioManager; // AudioManager変数
+    [SerializeField] SceneManager sceneManager; // SceneManager変数
     public float speacing = 20f; // オブジェクト間のスペースの大きさ
     float maxParentLength = 0; // 親オブジェクトの全長
     public float speed = 1000f;
@@ -25,11 +27,11 @@ public class SlideWindow : MonoBehaviour
             maxParentLength += rectTransforms[i].rect.width + speacing;
         }
         phase = new float[transform.childCount]; // フェーズの要素数を子オブジェクト数にする
-        for(int i=0;i<phase.Length;i++)
+        for (int i = 0; i < phase.Length; i++)
         {
             // 基準となるフェーズ目標値を算出する　親オブジェクトの全長/子オブジェクト数
             if (i == 0)
-            { 
+            {
                 phase[0] = maxParentLength / transform.childCount;
                 continue;
             }
@@ -39,10 +41,7 @@ public class SlideWindow : MonoBehaviour
         slideState = SLIDESTATE.DEFAULT; // slideStateをデフォルトにする
         audioManager = GameObject.FindGameObjectWithTag("AudioManager").GetComponent<AudioManager>(); // AudioManagerを代入
     }
-    private void Start()
-    {
-        
-    }
+
     private void FixedUpdate()
     {
         if (!openMenu) SlideIn(); // メニューをしまう場合
@@ -57,6 +56,13 @@ public class SlideWindow : MonoBehaviour
         if (phasePoint >= maxParentLength || slideState == SLIDESTATE.DEFAULT)
         {
             if (slideState == SLIDESTATE.DEFAULT) return; // デフォルトの場合はリターンして関数を動かさない
+            Debug.Log(rectTransform.offsetMin.x + maxParentLength);
+            // 親オブジェクトの全長を最小に変更
+            rectTransform.offsetMin = new Vector2(rectTransform.offsetMax.x  , rectTransform.offsetMin.y);
+            for (int i = 0; i < rectTransforms.Length; i++)
+            {
+                rectTransforms[i].position = new Vector2(rectTransform.position.x, rectTransforms[i].position.y);
+            }
             phasePoint = default; // フェーズポイントをリセット
             slideState = SLIDESTATE.DEFAULT; // デフォルトにする
             return;
@@ -79,6 +85,27 @@ public class SlideWindow : MonoBehaviour
         if (phasePoint >= maxParentLength || slideState == SLIDESTATE.DEFAULT)
         {
             if (slideState == SLIDESTATE.DEFAULT) return; // デフォルトの場合はリターンして関数を動かさない
+            // 親オブジェクトの全長を最大(全子オブジェクトの幅合計値)に変更
+            rectTransform.offsetMin = new Vector2(-(maxParentLength - rectTransform.offsetMax.x), rectTransform.offsetMin.y);
+            for (int i = 0; i < rectTransforms.Length; i++)
+            {
+                if (i == 0)
+                {
+                    rectTransforms[i].position = new Vector2(rectTransform.position.x + phase[2], rectTransforms[i].position.y);
+                }
+                else if(i == 1)
+                {
+                    rectTransforms[i].position = new Vector2(rectTransform.position.x + phase[1], rectTransforms[i].position.y);
+                }
+                else if (i == 2)
+                {
+                    rectTransforms[i].position = new Vector2(rectTransform.position.x + phase[0], rectTransforms[i].position.y);
+                }
+                else if (i == 3)
+                {
+                    rectTransforms[i].position = new Vector2(rectTransform.position.x, rectTransforms[i].position.y);
+                }
+            }
             phasePoint = default; // フェーズポイントをリセット
             slideState = SLIDESTATE.DEFAULT; // デフォルトにする
             return; 
@@ -97,7 +124,6 @@ public class SlideWindow : MonoBehaviour
     /// </summary>
     /// <param name="value">動かしたい子オブジェクトの要素数</param>
     /// <param name="move">移動値</param>
-    /// <param name="revise">移動値に掛ける補正率 移動値が物足りないときに入力</param>
     void SlideChildren(int value, float move)
     {
         // value以下の子オブジェクトをスライドさせる
@@ -112,7 +138,6 @@ public class SlideWindow : MonoBehaviour
                 rectTransforms[i + 1].position = new Vector2(rectTransforms[i + 1].position.x + move, rectTransforms[i + 1].position.y);
             }
         }
-
     }
     /// <summary>
     /// 子オブジェクトをスライドインさせるかのチェック関数
@@ -123,7 +148,7 @@ public class SlideWindow : MonoBehaviour
         // フェーズポイントがどのフェーズまで到達しているかのチェック
         for (int i = phase.Length - 1; i >= 0; i--)
         {
-            if (phasePoint >= phase[i])
+            if (phasePoint > phase[i])
             {
                 // チェックが通ったらフェーズ配列の要素数分の子オブジェクトを動かす
                 SlideChildren(i, move);
@@ -148,7 +173,7 @@ public class SlideWindow : MonoBehaviour
     /// </summary>
     public void SaveButton()
     {
-        audioManager.SE_Play("SE_click"); // SEを鳴らす
+        audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE); // SEを鳴らす
         uiManager.OpenUI(UIType.SaveSlot); // セーブスロットを表示
     }
     /// <summary>
@@ -156,7 +181,7 @@ public class SlideWindow : MonoBehaviour
     /// </summary>
     public void LoadButton()
     {
-        audioManager.SE_Play("SE_click"); // SEを鳴らす
+        audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE); // SEを鳴らす
         uiManager.OpenUI(UIType.LoadSlot); // ロードスロットを表示
     }
 }

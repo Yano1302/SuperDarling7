@@ -1,14 +1,13 @@
 using System.Collections;
-using System.Collections.Generic;
-using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 
-public class GameOverController : BaseTextController
+public class GameClearController : BaseTextController
 {
+    [SerializeField] Animator animator; // スタンプのアニメーター
     // Start is called before the first frame update
     void Start()
     {
-        OnTalkButtonClicked();
+        charaName.text = storyTalks[talkNum].name; // 話しているキャラクター名を表示
     }
     protected override void StorySetUp(string storynum)
     {
@@ -18,36 +17,12 @@ public class GameOverController : BaseTextController
         //　先ほど用意したcsvファイルを読み込ませる。
         //　ファイルは「Resources」フォルダを作り、そこに入れておくこと。
         //　Resources.Load 内はcsvファイルの名前。
-        textasset = Resources.Load("プランナー監獄エリア/Json/GameOver/" + storynum, typeof(TextAsset)) as TextAsset;
+        textasset = Resources.Load("プランナー監獄エリア/Json/GameClear/" + storynum, typeof(TextAsset)) as TextAsset;
 
         /// CSVSerializerを用いてcsvファイルを配列に流し込む。///
         storyTalks = CSVSerializer.Deserialize<StoryTalkData>(textasset.text); // CSVのテキストデータを配列に格納する
         /// ここまで ///
         Debug.Log(storynum + "を読み込みました");
-    }
-    protected override IEnumerator Dialogue()
-    {
-        talkNum = Random.Range(0, storyTalks.Length); // 表示する文章をランダムで設定
-        Debug.Log(storynum + "の" + (talkNum + 1) + "列目を再生");
-        TalkState = TALKSTATE.TALKING; // 会話ステータスを話し中にする
-        // charaName.text = storyTalks[talkNum].name; // 話しているキャラクター名を表示
-        words = storyTalks[talkNum].talks; // 文章を取得
-        // 各文字に対して繰り返し処理を行います C#のIEnumerable機能により一文字ずつ取り出せる
-        foreach (char c in words)
-        {
-            // 文字を textLabel に追加します
-            textLabel.text += c;
-            // ボタンがクリックされたらフラグを立ててループを抜ける
-            if (talkSkip) break;
-            // 次の文字を表示する前に少し待ちます
-            yield return new WaitForSeconds(CalculataTextSpeed());
-        }
-        NextDialogue(); // 次のダイアログに変更する
-        if (talkAuto) // オートモードであれば
-        {
-            yield return new WaitForSeconds(textDelay); // textDelay秒待つ
-            OnTalkButtonClicked(); // 次の会話を自動でスタートする
-        }
     }
     public override void OnTalkButtonClicked(string storynum = "")
     {
@@ -71,7 +46,20 @@ public class GameOverController : BaseTextController
         }
         else if (TalkState == TALKSTATE.LASTTALK) // 会話ステータスが最後のセリフなら
         {
-            TalkEnd(); //会話を終了する
+            BackTitle(); //タイトルへ戻る
         }
+    }
+    protected override void NextDialogue()
+    {
+        base.NextDialogue();
+        if (TalkState == TALKSTATE.LASTTALK) animator.SetTrigger("Stamp");
+    }
+    /// <summary>
+    /// タイトルへ戻るボタンをクリックしたときの関数
+    /// </summary>
+    public void BackTitle()
+    {
+        sceneManager.audioManager.SE_Play("SE_dungeon05", sceneManager.enviromentalData.m_tInstance.volumeSE); // SEを鳴らす
+        sceneManager.SceneChange(0); // タイトルシーンへ遷移する
     }
 }

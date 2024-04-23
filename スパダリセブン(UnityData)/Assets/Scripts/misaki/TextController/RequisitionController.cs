@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -79,7 +77,7 @@ public class RequisitionController : BaseTextController
         talkNum = default; // リセットする
         if (TalkState == TALKSTATE.LASTTALK)
         {
-            sceneManager.SceneChange(SCENENAME.Dungeon);
+            sceneManager.SceneChange(SCENENAME.InvestigationScene);
             return;
         }
         TalkState = TALKSTATE.NOTALK; // 会話ステータスを話していないに変更

@@ -543,7 +543,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6134271887941804298, guid: b6da155c055dc624c8cf3a3fd3b587f5, type: 3}
       propertyPath: storynum
-      value: 1-1
+      value: "\u6D6E\u6C17\u8ABF\u67FB\uFF01-1"
       objectReference: {fileID: 0}
     - target: {fileID: 6134271887941804298, guid: b6da155c055dc624c8cf3a3fd3b587f5, type: 3}
       propertyPath: testText

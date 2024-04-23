@@ -9,6 +9,9 @@ TagManager:
   - Coroutine
   - MapSetting
   - AudioManager
+  - Load
+  - BackTitle
+  - ItemText
   layers:
   - Default
   - TransparentFX
