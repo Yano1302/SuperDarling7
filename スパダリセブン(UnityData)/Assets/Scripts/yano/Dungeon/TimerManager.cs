@@ -4,19 +4,20 @@ using UnityEngine;
 using UnityEngine.UI;
 
 
-public class OpenTimer : MonoBehaviour
+public class TimerManager : SingletonMonoBehaviour<TimerManager>
 {
-    [SerializeField, Header("時間設定(秒)")]
-    private float DefaultTimer = 60f;
+    /// <summary>タイマーのフラグを設定します</summary>
+    public bool TimerFlag { get { return _Timer.TimeFlag; } set { _Timer.TimeFlag = value; } }
+
+
+
     [SerializeField, Header("時間を表示するUIテキスト")]
     private Text m_text;
     
     private Timer _Timer;
-
-
-    //TODO　timerをどこかから設定する？/一旦CreateMapから呼び出します
+    
     private void OnEnable() {
-        _Timer = Timer.SetTimer(gameObject, DefaultTimer,TimeUp);
+        _Timer = Timer.SetTimer(gameObject, MapSetting.Instance.Time,TimeUp);
         _Timer.SecondAction = SetTimerUI;
         SetTimerUI();
     }
@@ -33,8 +34,7 @@ public class OpenTimer : MonoBehaviour
         DisplayManager.Instance.FadeOut(
             FadeType.Entire, 
             () => {
-                //TODO　仕様が決まり次第追記する
-                UsefulSystem.Instance.EndGame();
+                Supadari.SceneManager.Instance.SceneChange(SCENENAME.SolveScene);
             });
     }
 

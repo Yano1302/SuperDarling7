@@ -29,13 +29,16 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _InvAlpha: 1
+    - _InvAlpha: 0.96
     - _Point: 0
     - _PointX: 0
-    - _PointY: -0.01
+    - _PointY: 0
+    - _Radius: 0.05
     - _Range: 1
     - _Rotate: 0
-    - _Width: 0.5
+    - _Width: 0.52
+    - _rCenterPointY: 0.5
+    - _radius: 0
     - _vAlpha: 0
     m_Colors: []
   m_BuildTextureStacks: []

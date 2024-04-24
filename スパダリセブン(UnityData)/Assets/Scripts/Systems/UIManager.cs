@@ -109,7 +109,7 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
             }
 #if UNITY_EDITOR
             else {
-                Debug.LogError("指定されたUIが開かれていません");
+                Debug.LogError("指定されたUIが開かれていません : "+ type.ToString());
                 return;
             }
 #endif

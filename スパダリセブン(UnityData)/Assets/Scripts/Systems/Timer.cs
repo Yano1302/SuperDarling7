@@ -10,7 +10,6 @@ using Debug = UnityEngine.Debug;
 /// </summary>
 public class Timer:MonoBehaviour
 {
-// public  static //
     /// <summary>タイマーを設定します。</summary>
     /// <param name="manager">タイマーを管理するオブジェクト</param>
     /// <param name="timer">設定する秒数</param>
@@ -40,7 +39,6 @@ public class Timer:MonoBehaviour
         return instance;
     }
 
-    //  Public //
     /// <summary> 総残り時間(秒)</summary>
     public float RemainingTime { get; set; } = 999;
     /// <summary>残り時間を分数で返します</summary>
@@ -58,6 +56,7 @@ public class Timer:MonoBehaviour
     public UnityAction SecondAction { get; set; } = null;   
     /// <summary>タイマーの進む速度を指定できます(倍率)。速度をマイナスにした場合は残り時間が増えていきます。 </summary>
     public float TimeSpeed { get { return m_timeSpeed; } set { m_timeSpeed = value; UsefulSystem.DebugAction(() => { if (value < 0) Debug.LogWarning("徐々に残り時間が増えていきます。"); }); } }
+
 
 
 
