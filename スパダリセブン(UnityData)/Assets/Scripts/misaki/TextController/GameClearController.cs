@@ -26,7 +26,7 @@ public class GameClearController : BaseTextController
     }
     public override void OnTalkButtonClicked(string storynum = "")
     {
-        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
+        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.TInstance.volumeSE);
         if (TalkState == TALKSTATE.NOTALK) // 会話ステータスが話していないなら
         {
             // ストーリー番号があれば
@@ -59,7 +59,7 @@ public class GameClearController : BaseTextController
     /// </summary>
     public void BackTitle()
     {
-        sceneManager.audioManager.SE_Play("SE_dungeon05", sceneManager.enviromentalData.m_tInstance.volumeSE); // SEを鳴らす
+        sceneManager.audioManager.SE_Play("SE_dungeon05", sceneManager.enviromentalData.TInstance.volumeSE); // SEを鳴らす
         sceneManager.SceneChange(0); // タイトルシーンへ遷移する
     }
 }
