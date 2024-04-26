@@ -173,7 +173,7 @@ public class SlideWindow : MonoBehaviour
     /// </summary>
     public void SaveButton()
     {
-        audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE); // SEを鳴らす
+        audioManager.SE_Play("SE_click", sceneManager.enviromentalData.TInstance.volumeSE); // SEを鳴らす
         uiManager.OpenUI(UIType.SaveSlot); // セーブスロットを表示
     }
     /// <summary>
@@ -181,7 +181,7 @@ public class SlideWindow : MonoBehaviour
     /// </summary>
     public void LoadButton()
     {
-        audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE); // SEを鳴らす
+        audioManager.SE_Play("SE_click", sceneManager.enviromentalData.TInstance.volumeSE); // SEを鳴らす
         uiManager.OpenUI(UIType.LoadSlot); // ロードスロットを表示
     }
 }

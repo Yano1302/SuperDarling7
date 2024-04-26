@@ -40,7 +40,7 @@ public class SolveTextController : BaseTextController
         // numがstoryTalks.length以上または現talkNumと同じかつnum==0ではないならリターン
         if (num >= storyTalks.Length || num == talkNum && num != 0) return;
         talkNum = num; // 指定された値を代入
-        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
+        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.TInstance.volumeSE);
         InitializeTalkField(); // 表示されているテキスト等を初期化
         StartDialogueCoroutine(); // 文章を表示するコルーチンを開始
     }
