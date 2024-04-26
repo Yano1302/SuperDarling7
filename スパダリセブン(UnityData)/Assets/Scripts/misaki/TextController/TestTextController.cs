@@ -11,7 +11,7 @@ public class TestTextController : BaseTextController
         //　先ほど用意したcsvファイルを読み込ませる。
         //　ファイルは「Resources」フォルダを作り、そこに入れておくこと。
         //　Resources.Load 内はcsvファイルの名前。
-        textasset = Resources.Load("プランナー監獄エリア/Json/TestText/" + storynum, typeof(TextAsset)) as TextAsset;
+        textasset = Resources.Load("プランナー監獄エリア/TestText/" + storynum, typeof(TextAsset)) as TextAsset;
 
         /// CSVSerializerを用いてcsvファイルを配列に流し込む。///
         storyTalks = CSVSerializer.Deserialize<StoryTalkData>(textasset.text); // CSVのテキストデータを配列に格納する

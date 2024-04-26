@@ -1,11 +1,12 @@
 using UnityEngine;
 using UnityEngine.UI;
-
+using System.Threading.Tasks;
 
 public class RequisitionController : BaseTextController
 {
     [SerializeField] GameObject questUI; // 受注画面UI
     [SerializeField] GameObject selectUI; // 依頼を選択するUI
+    [SerializeField] Button[] questButtons; // 受注画面のボタン配列
     private void Start()
     {
         OnTalkButtonClicked();
@@ -87,7 +88,24 @@ public class RequisitionController : BaseTextController
     public override void OnTalkButtonClicked(string storynum = "")
     {
         base.OnTalkButtonClicked(storynum);
-        questUI.SetActive(false); // 受注画面を非表示
-        selectUI.SetActive(true); // 依頼選択画面を表維持
+        if (questUI.activeSelf == true)
+        {
+            questUI.SetActive(false); // 受注画面を非表示
+            selectUI.SetActive(true); // 依頼選択画面を表維持
+        }
+    }
+    protected override async void NextDialogue()
+    {
+        base.NextDialogue();
+        if (TalkState == TALKSTATE.LASTTALK) // 会話ステータスが最後なら
+        {
+            // 受注画面のボタンを無効にする
+            for (int i = 0; i < questButtons.Length; i++)
+            {
+                questButtons[i].interactable = false;
+            }
+            await Task.Delay(1000); // 一秒止める
+            TalkEnd(); // 次のシーンへ遷移する
+        }
     }
 }

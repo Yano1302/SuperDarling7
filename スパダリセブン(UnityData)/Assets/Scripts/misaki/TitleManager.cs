@@ -25,7 +25,7 @@ public class TitleManager : DebugSetting
     {
         audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
         sceneManager.uiManager.OpenUI(UIType.SaveSlot); // セーブスロットを開く
-        //sceneManager.SceneChange(SCENENAME.InvestigationScene);
+        //sceneManager.SceneChange(SCENENAME.RequisitionsScene);
         Debug.Log("ニューゲームを開始");
     }
     /// <summary>

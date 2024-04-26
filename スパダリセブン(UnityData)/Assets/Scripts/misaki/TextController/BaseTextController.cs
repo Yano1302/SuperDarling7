@@ -37,7 +37,6 @@ public class BaseTextController : DebugSetting
     string[] nameBGM; // 鳴らすBGM格納配列
 
     public GameObject talkButton; // 会話を進めるボタン
-    public GameObject autoButton; // オートモードに切り替えるボタン
     protected StoryTalkData[] storyTalks; //csvファイルにある文章を格納する配列
 
     public bool runtimeCoroutine = false; // コルーチンが実行中かどうか
@@ -45,6 +44,7 @@ public class BaseTextController : DebugSetting
 
     [SerializeField]protected SceneManager sceneManager; // シーンマネージャー変数
     [SerializeField]bool testText = false; // ボタンのテキストを表示するかどうか
+    [SerializeField] GameObject autoImage; // オートモードの画像
 
     public TALKSTATE talkState; // 会話ステータス変数
     public TALKSTATE TalkState
@@ -73,7 +73,7 @@ public class BaseTextController : DebugSetting
     protected override void Awake()
     {
         base .Awake(); // デバッグログを表示するか否かスクリプタブルオブジェクトのGameSettingsを参照
-        StorySetUp(storynum); // 対応する会話文をセットする
+        if(storynum!="") StorySetUp(storynum); // 対応する会話文をセットする
         TalkState = TALKSTATE.NOTALK; // 会話ステータスを話していないに変更
         sceneManager = GameObject.FindGameObjectWithTag("SceneManager").GetComponent<SceneManager>(); // オーディオマネージャーを取得
         playerTextSpeed = sceneManager.enviromentalData.m_tInstance.textSpeed; // テキストスピードを設定
@@ -173,11 +173,15 @@ public class BaseTextController : DebugSetting
     /// <param name="storynum">読み込みたいCSV名</param>
     public virtual void OnTalkButtonClicked(string storynum = "")
     {
+        // ストーリー番号があれば
+        if (storynum != "")
+        {
+            StorySetUp(storynum); // 対応する会話文をセット
+            talkNum = default; // 初期に戻す
+        }
         sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
         if (TalkState == TALKSTATE.NOTALK) // 会話ステータスが話していないなら
         {
-            // ストーリー番号があれば
-            if (storynum != "") StorySetUp(storynum); // 対応する会話文をセット
             TalkState = TALKSTATE.TALKING; // 会話ステータスを会話中に変更
         }
         else if (TalkState == TALKSTATE.TALKING) // 会話ステータスが話し中なら
@@ -395,6 +399,10 @@ public class BaseTextController : DebugSetting
     {
         // talkAutoがtrueならfalseに、falseならtrueに変換
         talkAuto = !talkAuto;
+        // オートモードならオートモード画像を出す　オートモードではないなら画像を出さない
+        if (!autoImage) return;
+        if(talkAuto) autoImage.SetActive(true);
+        else autoImage.SetActive(false);
     }
 }
 [System.Serializable] // サブプロパティを埋め込む

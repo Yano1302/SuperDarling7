@@ -70,8 +70,8 @@ namespace Supadari
                     break;
                 case SCENENAME.StoryScene:
                     audioManager.BGM_Stop();
-                    controller = GameObject.FindGameObjectWithTag("Coroutine").GetComponent<StoryController>();
-                    autoButton.onClick.AddListener(controller.OnAutoModeCllicked);
+                    controller = GameObject.FindGameObjectWithTag("Coroutine").GetComponent<StoryController>(); // ストーリーコントローラーを代入
+                    autoButton.onClick.AddListener(controller.OnAutoModeCllicked); // OnClick関数にアタッチ
                     break;
                 case SCENENAME.InvestigationScene:
                     audioManager.BGM_Play("BGM_dungeon", enviromentalData.m_tInstance.volumeBGM);

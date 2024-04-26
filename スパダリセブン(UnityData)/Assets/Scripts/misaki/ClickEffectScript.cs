@@ -1,7 +1,7 @@
 using Supadari;
 using UnityEngine;
 
-public class ClickEffectScript : MonoBehaviour
+public class ClickEffectScript : SingletonMonoBehaviour<ClickEffectScript>
 {
     public GameObject clickEffect; // エフェクト変数
     public float destroyDeleteTime = 1.0f; // エフェクトを消すまでの時間変数
