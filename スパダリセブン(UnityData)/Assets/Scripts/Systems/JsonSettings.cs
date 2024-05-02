@@ -14,51 +14,38 @@ public class JsonSettings<T> where T : class, new() {
     /// <summary>T型のクラスのインスタンスを取得します。</summary>
     public T TInstance { get { return m_tInstance; } }
 
-    //コンストラクタ
+    //　コンストラクタ　//
     /// <summary>Jsonを管理するクラスを作成します</summary>
-    /// <param name="dataFileName">この名前でファイルを生成しデータを保存します</param>
+    /// <param name="createFileName">この名前でファイルを生成しデータを保存します</param>
     /// <param name="saveFolderPath">データを保存するフォルダのパス(Asset/以下)</param>
-    /// <param name="defaultJsonFileName">Jsonファイル名(拡張子抜き)</param>
-    public JsonSettings(string dataFileName,string saveFolderPath, string defaultJsonFileName) {
-        
-        m_jsonFileName = dataFileName + ".json";
-        m_jsonDefaultPath = UsefulSystem.FindFilePath(defaultJsonFileName + ".json");
-        m_jsonPath = Application.dataPath + "\\" + saveFolderPath + "\\" + m_jsonFileName;
-        if (!File.Exists(m_jsonPath)) {
+    /// <param name="dataFileName">Jsonファイル名(拡張子抜き)</param>
+    public JsonSettings(in string createFileName, in string saveFolderPath, in string dataFileName) {
+        JsonSetUp(createFileName, saveFolderPath, dataFileName);
+    }
+
+    /// <summary>マスターデータも自動で作成します。マスターデータは"Origin_createFileName.json"として作成されます</summary>
+    /// <param name="createFileName">この名前でファイルを生成しデータを保存します</param>
+    /// <param name="saveFolderPath">データを保存するフォルダのパス(Asset/以下)</param>
+    public JsonSettings(in string createFileName, in string saveFolderPath) {
+        var path = Application.dataPath + "\\" + saveFolderPath + "\\" + createFileName + ".json";
+        m_jsonDefaultPath = Application.dataPath + "\\" + saveFolderPath + "\\" + "Origin_" + createFileName + ".json";
+        if (!File.Exists(path)) {
+            //マスターデータ用のパスでマスターデータを作成する
+            m_jsonPath = m_jsonDefaultPath;
+            m_tInstance = new T();
+            _Save(true);
+            //正しいパスをJsonパスに格納し、改めてデータを作成する
+            m_jsonPath = path;
             SettingData();
         }
-        Load(); 
+        else { m_jsonPath = path; }
+        Load();
     }
 
-    /// <summary>マスターデータも自動で作成します</summary>
-    /// <param name="dataFileName">この名前でファイルを生成しデータを保存します</param>
-    /// <param name="saveFolderPath">データを保存するフォルダのパス(Asset/以下)</param>
-    public JsonSettings(string dataFileName,string saveFolderPath) {
-        m_jsonFileName = dataFileName + ".json";
-        m_jsonPath = Application.dataPath +"\\"+ saveFolderPath + "\\" + m_jsonFileName;
-        m_tInstance = new T();
-        m_create = true;
-        Save();
-    }
 
-    public JsonSettings(string dataFileName, string saveFolderPath, string defaultJsonFileName,GameObject obj) {
-    
-    }
-
-   //  関数  //
+    //  関数  //
     /// <summary> Jsonデータにインスタンスの情報を書き込みます。</summary>
-    public void Save() {
-        //stringに変換する
-        string jsonStr = JsonUtility.ToJson(TInstance);
-        //ファイル書き込み用のライターを開く 上書きにしないとjsonデータが崩れるのでfalseにしています
-        StreamWriter writer = new StreamWriter(m_jsonPath,m_create);
-        //書き込み
-        writer.Write(jsonStr);
-        //ライターを閉じる処理
-        writer.Flush();
-        writer.Close();
-        m_create = false;
-    }
+    public void Save() { _Save(false); }
 
     /// <summary>Jsonデータをインスタンスに読み込みます</summary>
     public void Load() {
@@ -70,7 +57,9 @@ public class JsonSettings<T> where T : class, new() {
 
     /// <summary>データを初期値に戻します。</summary>
     public void Reset() {
-        SettingData();
+        var json = File.ReadAllText(m_jsonDefaultPath);
+        m_tInstance = JsonUtility.FromJson<T>(json);
+        _Save(false);
     }
 
     /// <summary>データを削除します。インスタンスも破棄されます。</summary>
@@ -90,17 +79,30 @@ public class JsonSettings<T> where T : class, new() {
         return JsonUtility.ToJson(ins, true);
     }
 
+    /// <summary>Jsonファイル内のデータをログに表示します </summary>
+    [System.Diagnostics.Conditional("UNITY_EDITOR")]
+    public void Log() { Debug.Log(JsonToString()); }
+
 
 
 
     //　プライベート変数・関数　// 
-    private string m_jsonFileName;
     private string m_jsonPath;
     private string m_jsonDefaultPath = null;
-    private bool m_create = false;
-    public T m_tInstance; // 他スクリプトから変更するためにpublicにしています
+    private T m_tInstance;
     private JsonSettings() { }
-    
+
+    //Jsonファイルの作成、読み込みを行います
+    private void JsonSetUp(in string createFileName, in string saveFolderPath, in string dataFileName) {
+
+        m_jsonDefaultPath = UsefulSystem.FindFilePath(dataFileName + ".json");
+        m_jsonPath = Application.dataPath + "\\" + saveFolderPath + "\\" + createFileName + ".json";
+        if (!File.Exists(m_jsonPath)) {
+            SettingData();
+        }
+        Load();
+    }
+
     //データを設定します
     private void SettingData() {
         //デフォルトのJSONファイルを読み込む
@@ -108,10 +110,22 @@ public class JsonSettings<T> where T : class, new() {
         //オブジェクト化する
         m_tInstance = JsonUtility.FromJson<T>(json);
         //初期値をセーブする
-        m_create = true;
-        Save();
+        _Save(true);
+    }
+
+    //セーブの実際の処理
+    private void _Save(bool initialization) {
+        //stringに変換する
+        string jsonStr = JsonUtility.ToJson(TInstance);
+        //ファイル書き込み用のライターを開く
+        StreamWriter writer = new StreamWriter(m_jsonPath, initialization);
+        //書き込み
+        writer.Write(jsonStr);
+        //ライターを閉じる処理
+        writer.Flush();
+        writer.Close();
     }
 
     //MonoBehaviourが継承されているか調べます
-    private bool CheckMono() {return typeof(T).GetType().IsSubclassOf(typeof(MonoBehaviour)); }
+    private bool CheckMono() { return typeof(T).GetType().IsSubclassOf(typeof(MonoBehaviour)); }
 }
