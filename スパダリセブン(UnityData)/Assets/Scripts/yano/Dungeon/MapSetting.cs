@@ -21,7 +21,7 @@ public class MapSetting : SingletonMonoBehaviour<MapSetting> {
     /// <summary>マップを生成します</summary>
     /// <param name="stageNumber">マップ番号</param>
     public void CreateMap(int stageNumber) {
-        stageNumber -= 1;
+        //stageNumber -= 1;
         _Create(stageNumber);
     }
 

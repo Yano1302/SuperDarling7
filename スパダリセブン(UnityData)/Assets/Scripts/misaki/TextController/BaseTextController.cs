@@ -418,4 +418,5 @@ public class StoryTalkData
     public string name; // キャラクター名
     public string talks; // 文章
     public string BGM; // BGM名
+    public string stage; // ステージ番号
 }

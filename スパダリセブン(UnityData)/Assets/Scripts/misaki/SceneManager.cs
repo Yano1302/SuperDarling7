@@ -12,7 +12,8 @@ namespace Supadari
         [SerializeField] MenuScript menuScript; // MenuScript変数
         [SerializeField] Button autoButton; // オートボタン変数
         StoryController controller; // ストーリーコントローラー変数
-        public int saveSlot; // 現在使用している
+        public int saveSlot; // 現在使用しているセーブスロット
+        public int stageNum; // ステージナンバー
         public UIManager uiManager; // UIマネージャー用変数
         public AudioManager audioManager; // オーディオマネージャー変数
         public SCENENAME CheckSceneName { get { return currentSceneName; } } // 現在のシーン名を取得
@@ -54,7 +55,7 @@ namespace Supadari
             if (currentSceneName == SCENENAME.Dungeon || currentSceneName == SCENENAME.InvestigationScene)
             {
                 MapSetting setting = GameObject.FindGameObjectWithTag("MapSetting").GetComponent<MapSetting>(); // MapSettingを検索
-                setting.CreateMap(1); // マップを生成
+                setting.CreateMap(stageNum); // マップを生成
             }
             else if (currentSceneName != SCENENAME.SolveScene) uiManager.CloseUI(UIType.ItemWindow); // アイテムウィンドウを閉じる
             // 各シーンでのBGMを流す ストーリーシーンはCSVデータを参照して流すのでここでは流さない

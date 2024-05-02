@@ -169,12 +169,28 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
             m_itemFlag = new JsonSettings<SettingsGetItemFlags>("Data1","JsonSaveFile", "ItemGetFlags");    //アイテム所持データ
             m_itemData = new CSVSetting("アイテム情報");   //アイテム情報(メッセージ等)       
             m_stageData = new CSVSetting("ステージ情報");
+            /* awakeだとアイテムウィンドウを取得できないためStart関数に移動
+            // アイテムウィンドウを取得
+            ItemWindowContent = GameObject.FindGameObjectWithTag("ItemWindow");
+            Debug.Log(ItemWindowContent);
 
             //所持アイテム情報とオブジェクトのアクティブ情報を一致させる　TODO:後で変える
             int length = ItemWindowContent.transform.childCount;
             for (int i = 0; i < length; i++) {
                 ItemWindowContent.transform.GetChild(i).gameObject.SetActive(m_itemFlag.TInstance.GetFlag((ItemID)i + 1));
-            }
+            }*/
+        }
+    }
+    private void Start()
+    {
+        // アイテムウィンドウを取得
+        ItemWindowContent = GameObject.FindGameObjectWithTag("ItemWindow");
+
+        //所持アイテム情報とオブジェクトのアクティブ情報を一致させる　TODO:後で変える
+        int length = ItemWindowContent.transform.childCount;
+        for (int i = 0; i < length; i++)
+        {
+            ItemWindowContent.transform.GetChild(i).gameObject.SetActive(m_itemFlag.TInstance.GetFlag((ItemID)i + 1));
         }
     }
 }

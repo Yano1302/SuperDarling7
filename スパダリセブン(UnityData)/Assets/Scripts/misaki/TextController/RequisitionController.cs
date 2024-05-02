@@ -80,7 +80,8 @@ public class RequisitionController : BaseTextController
         talkNum = default; // リセットする
         if (TalkState == TALKSTATE.LASTTALK)
         {
-            sceneManager.SceneChange(SCENENAME.InvestigationScene);
+            sceneManager.stageNum = int.Parse(storyTalks[talkNum].stage); // ステージ番号をCSVから取得
+            sceneManager.SceneChange(SCENENAME.InvestigationScene); // 探索シーンに遷移
             return;
         }
         TalkState = TALKSTATE.NOTALK; // 会話ステータスを話していないに変更
