@@ -10,6 +10,8 @@ namespace Supadari
         [SerializeField] SCENENAME currentSceneName; // 現在のシーン名
         [SerializeField] Scene currentScene; // 現在のシーン
         [SerializeField] Button autoButton; // オートボタン変数
+        public int saveSlot; // セーブスロット変数
+        public int stageNum = 0; // ステージ番号
         StoryController controller; // ストーリーコントローラー変数
         public UIManager uiManager; // UIマネージャー用変数
         public AudioManager audioManager; // オーディオマネージャー変数
@@ -51,7 +53,7 @@ namespace Supadari
             // 現在のシーンが探索シーンであれば
             if (currentSceneName == SCENENAME.Dungeon || currentSceneName == SCENENAME.InvestigationScene) {
                 MapSetting setting = MapSetting.Instance; // MapSettingのインスタンス取得　※矢野変更
-                setting.CreateMap(1); // マップを生成
+                setting.CreateMap(stageNum); // マップを生成
             }
             else if (currentSceneName != SCENENAME.SolveScene) 
             {

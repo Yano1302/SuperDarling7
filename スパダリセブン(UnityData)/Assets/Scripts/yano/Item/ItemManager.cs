@@ -169,14 +169,14 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     private void Start()
     {
         //所持アイテム情報とオブジェクトのアクティブ情報を一致させる　TODO:後で変える
-        int length = ItemWindowContent.transform.childCount;
+        int length = m_itemWindow.transform.childCount;
         for (int i = 0; i < length; i++)
         {
             string itemName;
             m_itemData.GetData(1, i + 1, out itemName); // アイテム情報よりアイテム名を取得 岬追記
-            ItemWindowContent.transform.GetChild(i).GetChild(0).GetComponent<TextMeshProUGUI>().text = itemName; // アイテム名を子オブジェクトに代入 岬追記
-            ItemWindowContent.transform.GetChild(i).GetComponent<Button>().onClick.AddListener(() => ItemDetails(itemName)); // ボタンにItemDetails関数を設定
-            ItemWindowContent.transform.GetChild(i).gameObject.SetActive(m_itemFlag.TInstance.GetFlag((ItemID)i + 1 ));
+            m_itemWindow.transform.GetChild(i).GetChild(0).GetComponent<TextMeshProUGUI>().text = itemName; // アイテム名を子オブジェクトに代入 岬追記
+            m_itemWindow.transform.GetChild(i).GetComponent<Button>().onClick.AddListener(() => ItemDetails(itemName)); // ボタンにItemDetails関数を設定
+            m_itemWindow.transform.GetChild(i).gameObject.SetActive(m_itemFlag.TInstance.GetFlag((ItemID)i + 1 ));
         }
     }
 
