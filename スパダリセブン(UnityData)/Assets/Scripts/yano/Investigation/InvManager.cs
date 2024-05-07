@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 using UnityEngine.EventSystems;
 using System.Threading.Tasks;
 using System.Threading;
@@ -13,8 +14,10 @@ public enum InvBackGroundType {
 
 public class InvManager : MonoBehaviour
 {
+    /// <summary>探索パート～調査パート間のみ取得できるインスタンス</summary>
     public static InvManager Instance { get { Debug.Assert(m_instance, "シーンが違うのでインスタンスを取得できません。"); return m_instance; } }
-
+    /// <summary>この調査パートに配置されたアイテムの中で取得しているアイテム数</summary>
+    public static int GetItemNum { get; set; } = 0;
 
     public void Open(InvBackGroundType type) {
         Debug.Assert(!m_isOpen,"探索パートが既に開かれています"); 
@@ -24,27 +27,33 @@ public class InvManager : MonoBehaviour
     }
 
     public void Close() {
-        m_invObj[(int)m_currentInvType].SetActive(false);
-        m_backBtn.SetActive(false);
-        m_isOpen = false; 
-        Player.Instance.MoveFlag = true;
-        m_currentInvType = 0;
+        if (!m_click) {
+            m_invObj[(int)m_currentInvType].SetActive(false);
+            m_backBtn.SetActive(false);
+            m_isOpen = false;
+            Player.Instance.MoveFlag = true;
+            m_currentInvType = 0;
+        }
     }
 
     private static InvManager m_instance;
+    private InvManager() { }
 
-    [SerializeField,Header("探索パート背景用ImageObjct"),EnumIndex(typeof(InvBackGroundType))]
-    private GameObject[] m_invObj;
     [SerializeField, Header("戻るボタン")]
     private GameObject m_backBtn;
 
+    [SerializeField,Header("探索パート背景用ImageObjct"),EnumIndex(typeof(InvBackGroundType))]
+    private GameObject[] m_invObj;
+   
+
     private InvBackGroundType  m_currentInvType;
-    private bool m_isOpen = false;
-    private bool m_click = false;
-    private PointerEventData pointData;
+    private bool m_isOpen = false;              //開いているかのフラグ
+    private bool m_click = false;               //クリック抑制
+    private PointerEventData pointData;         //クリック検知用
 
     private void Awake() {
-        m_instance = GetComponent<InvManager>();
+        GetItemNum = 0;
+        m_instance = GetComponent<InvManager>(); 
         pointData = new PointerEventData(EventSystem.current);      
     }
 
@@ -73,12 +82,20 @@ public class InvManager : MonoBehaviour
                     foreach (RaycastResult result in RayResult) {
                         //アイテムの取得処理
                         if (result.gameObject.TryGetComponent<ItemObject>(out var item)) {
-                            ItemManager.Instance.AddItem(item.ID);
-                            Destroy(item.gameObject);
+                            //取得するアイテムのメッセージを取得する
+                            var ins = ItemManager.Instance;
+                            ins.GetItemMessage(item.ID,ItemManager.ItemMessageType.Investigation,out string message);
+                            item.GetItem();
+
+                            if (GetItemNum == ins.GetTotalItemNum(MapSetting.Instance.StageNumber)) {
+                                Close();
+                                Supadari.SceneManager.Instance.SceneChange(SCENENAME.SolveScene);
+                            }
+                            break;
                         }
                     }
-                    m_click = false;    //処理終了
-                }, null);
+                    //処理終了
+                }, new Action(() => m_click = false));
             });
         }
     }

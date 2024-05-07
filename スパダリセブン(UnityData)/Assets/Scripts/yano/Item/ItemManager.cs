@@ -10,8 +10,8 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     //アイテムメッセージの選択を管理する列挙型
     public enum ItemMessageType {
         Investigation = ItemDataCsvIndex.Investigation,             //探索パートメッセージ
-        Solve = ItemDataCsvIndex.Solve,               //推理パートメッセージ
-        SolveHint = ItemDataCsvIndex.SolveHint,       //推理パートのヒントメッセージ
+        Solve = ItemDataCsvIndex.Solve,                             //推理パートメッセージ
+        SolveHint = ItemDataCsvIndex.SolveHint,                     //推理パートのヒントメッセージ
     }
 
     // 関数一覧 //
@@ -19,21 +19,25 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     /// <summary>アイテムを所持します。</summary>
     /// <param name="id">所持するアイテムのID</param>
     public void AddItem(ItemID id) {
-        UsefulSystem.DebugAction(() => { if (m_itemFlag.TInstance.GetFlag(id)) { Debug.LogWarning("そのアイテムは既に取得しています。"); } });  
-        m_itemFlag.TInstance.SetFlag(id,true); GetItemWindow(id).SetActive(true);
+        UsefulSystem.DebugAction(() => { if (m_itemFlag.TInstance.GetFlag(id)) { Debug.LogWarning("そのアイテムは既に取得しています。"); } });
+        m_itemWindow ??= ItemWindow.Instance;
+        m_itemWindow.SetWindow(id,true);
     }
 
     /// <summary>アイテムの所持フラグを消します。</summary>
     /// <param name="id">消すアイテムのID</param>
     public void RemoveItem(ItemID id) {
         UsefulSystem.DebugAction(() => { if (!m_itemFlag.TInstance.GetFlag(id)) { Debug.LogWarning("指定されたアイテムの所持フラグは既にfalseです"); } });
-        m_itemFlag.TInstance.SetFlag(id, false); GetItemWindow(id).SetActive(false);
+        m_itemWindow ??= ItemWindow.Instance;
+        m_itemWindow.SetWindow(id,false);
     }
 
     /// <summary>指定されたアイテムの所持フラグを取得します。</summary>
     /// <param name="id">所持フラグを調べたいアイテムのID</param>
     /// <returns>指定されたアイテムの所持フラグ</returns>
     public bool GetFlag(ItemID id) { return m_itemFlag.TInstance.GetFlag(id); }
+
+    public string GetItemName(ItemID id) { m_itemData.GetData((int)ItemDataCsvIndex.Name, (int)id, out string data); return data; }
 
     /// <summary>名前からアイテムのIDを取得します</summary>
     /// <param name="name">アイテム名</param>
@@ -74,7 +78,7 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     }
 
     /// <summary>ステージクリアに必要なアイテムの情報を１つ取得します</summary>
-    /// <param name="stageNumber">ステージ番号</param>
+    /// <param name="stageNumber">ステージ番号(1~)</param>
     /// <param name="itemNumber">何番目のアイテムか</param>
     /// <returns></returns>
     public bool GetNeedItem(int stageNumber,int itemNumber,out ItemID data) {
@@ -104,14 +108,13 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     /// <returns></returns>
     public int GetTotalItemNum(int stageNumber) {
         int total = 0;
-        int length = m_stageData.GetLength(0);  
-        for(int i = (int)MapSetting.StageCsvIndex.itemStart; i < length; i++) {
-            if (m_itemData.CheckData(i, stageNumber))total++;
+        int length = m_stageData.GetLength(0) - 1; //右端を取得
+        for (int i = (int)MapSetting.StageCsvIndex.itemStart; i < length; i++) {
+            if (m_stageData.CheckData(i, stageNumber))total++;
             else  break;      
         }
-        length = m_stageData.GetLength(0);  //右端を取得
-        m_stageData.GetData(length, stageNumber,out string str);
-        total += str.Split(',').Length;
+        m_stageData.GetData(length - 1, stageNumber,out string str);
+        total += str != "" ? str.Split(',').Length : 0;
         return total;
     }
 
@@ -129,19 +132,7 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     [System.Diagnostics.Conditional("UNITY_EDITOR")]
     public void Log() { Debug.Log(m_itemFlag.JsonToString()); }
 
-    /// <summary>アイテムウィンドウオブジェクトを取得します</summary>
-    public GameObject GetItemWindow(ItemID id) { return ItemWindowContent.transform.GetChild((int)id - 1).gameObject; }
-
-    // アタッチ用関数 //
-    [EnumAction(typeof(ItemID))]
-    public void Btn_ItemClick(int id) {
-        if(SolveManager.CheckScene) {
-            SolveManager.Instance.choice((ItemID)id);
-        }
-    }
-
-
-
+  
 
     // private //
 
@@ -157,24 +148,17 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     private static JsonSettings<SettingsGetItemFlags> m_itemFlag;  //アイテム所持情報
     private CSVSetting m_itemData;                                 //総アイテムデータ 
     private CSVSetting m_stageData;                                //ステージデータ
-    [SerializeField,Header("アイテムウィンドウを管理している親オブジェクト")]
-    private GameObject ItemWindowContent;                          //アイテムウィンドウ
+    private ItemWindow m_itemWindow;                               //アイテムウィンドウ管理インスタンス
    
 
     //初期化とJsonからのデータの読み込み
     protected override void Awake() {
         base.Awake();
         if(m_itemFlag == null) {
-            //アイテム情報を読み込む
+            //アイテム情報を読み込む   TODO : セーブファイル情報を他で管理する
             m_itemFlag = new JsonSettings<SettingsGetItemFlags>("Data1","JsonSaveFile", "ItemGetFlags");    //アイテム所持データ
             m_itemData = new CSVSetting("アイテム情報");   //アイテム情報(メッセージ等)       
             m_stageData = new CSVSetting("ステージ情報");
-
-            //所持アイテム情報とオブジェクトのアクティブ情報を一致させる　TODO:後で変える
-            int length = ItemWindowContent.transform.childCount;
-            for (int i = 0; i < length; i++) {
-                ItemWindowContent.transform.GetChild(i).gameObject.SetActive(m_itemFlag.TInstance.GetFlag((ItemID)i + 1));
-            }
         }
     }
 }

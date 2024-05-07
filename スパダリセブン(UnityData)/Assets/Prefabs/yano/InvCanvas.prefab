@@ -610,9 +610,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81070ed4c2ce55249b68e0909de5b483, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_backBtn: {fileID: 661445093059865140}
   m_invObj:
   - {fileID: 7784875632944991269}
-  m_backBtn: {fileID: 661445093059865140}
 --- !u!223 &3582938333436914522
 Canvas:
   m_ObjectHideFlags: 0
@@ -634,7 +634,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 1
   m_TargetDisplay: 0
 --- !u!114 &9080139757466914558
 MonoBehaviour:
