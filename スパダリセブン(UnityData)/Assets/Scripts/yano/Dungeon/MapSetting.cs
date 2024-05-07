@@ -24,6 +24,9 @@ public class MapSetting : SingletonMonoBehaviour<MapSetting> {
         _Create(stageNumber);
     }
 
+    /// <summary>現在のステージ番号を取得します</summary>
+    public int StageNumber { get { return m_stageData.number; } }
+
     /// <summary>ステージの制限時間を取得します</summary>
     public float Time { get { return m_stageData.time; } }
     /// <summary>マップの総数を取得します</summary>
@@ -40,7 +43,8 @@ public class MapSetting : SingletonMonoBehaviour<MapSetting> {
         name = 1,
         time = 2,
         size = 3,
-        itemStart = 4,
+        danger = 4,
+        itemStart = 5,
     }
 
     //  プライベート変数  //------------------------------------------------------------------------------------------------------------------------------
@@ -54,7 +58,7 @@ public class MapSetting : SingletonMonoBehaviour<MapSetting> {
     //ステージのデータを管理する構造体
     private struct StageData {
         public static CSVSetting Data;     //マップデータを全て格納したデータCSV
-        public int number;          //マップ番号(これを元にデータを返します)
+        public int number;                 //マップ番号(これを元にデータを返します)
         public string name { get { Data.GetData((int)StageCsvIndex.name,number, out string data); return data; } } //ステージ名
         public float time  { get { Data.GetData((int)StageCsvIndex.time, number, out int data); return data; } }    //制限時間
         public float size  { get { Data.GetData((int)StageCsvIndex.size,number, out int data); return data; } }    //一マスのサイズ
@@ -68,14 +72,15 @@ public class MapSetting : SingletonMonoBehaviour<MapSetting> {
         //マップ情報だけ先に読み込んでおく
         if (StageData.Data == null) {
             //ステージ作成に必要なデータが入ったCSVを読み込む
-            StageData.Data = new CSVSetting("ステージ情報");
-            //デバッグ用
-            KeyDebug.AddKeyAction("マップの作成", () => { _Create(1); });
-            KeyDebug.AddKeyAction("マップ名をログに表示する", () => {Debug.Log(m_stageData.name); });
-            KeyDebug.AddKeyAction("制限時間をログに表示する", () => {Debug.Log(m_stageData.time); });
-            KeyDebug.AddKeyAction("マップのサイズをログに表示する", () => {Debug.Log(m_stageData.size); });
-            
+            StageData.Data = new CSVSetting("ステージ情報");         
         }
+    }
+    private void Start() {
+        //デバッグ用
+        KeyDebug.AddKeyAction("マップの作成", () => { _Create(1); });
+        KeyDebug.AddKeyAction("マップ名をログに表示する", () => { Debug.Log(m_stageData.name); });
+        KeyDebug.AddKeyAction("制限時間をログに表示する", () => { Debug.Log(m_stageData.time); });
+        KeyDebug.AddKeyAction("マップのサイズをログに表示する", () => { Debug.Log(m_stageData.size); });
     }
 
     /// <summary>マップを作成します Note:岬さんのシーンマネージャーから呼び出します</summary>
@@ -118,8 +123,8 @@ public class MapSetting : SingletonMonoBehaviour<MapSetting> {
             }        
         }
         //マップ生成後にタイマーを開く
-        m_uiManager.OpenUI(UIType.Timer);
+        TimerManager.Instance.SetTimer(m_stageData.time);
         // アイテムウィンドウを表示
-        m_uiManager.OpenUI(UIType.ItemWindow);
+        ItemWindow.Instance.ActiveWindows();
     }
 }

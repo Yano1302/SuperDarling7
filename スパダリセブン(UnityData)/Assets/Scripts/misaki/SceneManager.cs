@@ -49,12 +49,15 @@ namespace Supadari
             if (currentSceneName == SCENENAME.StoryScene) uiManager.OpenUI(UIType.StoryMenu);
             else uiManager.CloseUI(UIType.StoryMenu);
             // 現在のシーンが探索シーンであれば
-            if (currentSceneName == SCENENAME.Dungeon || currentSceneName == SCENENAME.InvestigationScene)
-            {
-                MapSetting setting = GameObject.FindGameObjectWithTag("MapSetting").GetComponent<MapSetting>(); // MapSettingを検索
+            if (currentSceneName == SCENENAME.Dungeon || currentSceneName == SCENENAME.InvestigationScene) {
+                MapSetting setting = MapSetting.Instance; // MapSettingのインスタンス取得　※矢野変更
                 setting.CreateMap(1); // マップを生成
             }
-            else if (currentSceneName != SCENENAME.SolveScene) uiManager.CloseUI(UIType.ItemWindow); // アイテムウィンドウを閉じる
+            else if (currentSceneName != SCENENAME.SolveScene) 
+            {
+                TimerManager.Instance.CloseTimer(true);   // タイマーを閉じる　※矢野追記
+                uiManager.CloseUI(UIType.ItemWindow); // アイテムウィンドウを閉じる
+            } 
             // 各シーンでのBGMを流す ストーリーシーンはCSVデータを参照して流すのでここでは流さない
             switch(currentSceneName)
             {
