@@ -12,7 +12,7 @@ TagManager:
   - Load
   - BackTitle
   - ItemText
-  - ItemWindow
+  - Content
   layers:
   - Default
   - TransparentFX

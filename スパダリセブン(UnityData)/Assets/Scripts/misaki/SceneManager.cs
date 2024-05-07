@@ -9,11 +9,8 @@ namespace Supadari
         [SerializeField] DisplayManager displayManager; // ディスプレイマネージャー用変数
         [SerializeField] SCENENAME currentSceneName; // 現在のシーン名
         [SerializeField] Scene currentScene; // 現在のシーン
-        [SerializeField] MenuScript menuScript; // MenuScript変数
         [SerializeField] Button autoButton; // オートボタン変数
         StoryController controller; // ストーリーコントローラー変数
-        public int saveSlot; // 現在使用しているセーブスロット
-        public int stageNum; // ステージナンバー
         public UIManager uiManager; // UIマネージャー用変数
         public AudioManager audioManager; // オーディオマネージャー変数
         public SCENENAME CheckSceneName { get { return currentSceneName; } } // 現在のシーン名を取得
@@ -52,14 +49,16 @@ namespace Supadari
             if (currentSceneName == SCENENAME.StoryScene) uiManager.OpenUI(UIType.StoryMenu);
             else uiManager.CloseUI(UIType.StoryMenu);
             // 現在のシーンが探索シーンであれば
-            if (currentSceneName == SCENENAME.Dungeon || currentSceneName == SCENENAME.InvestigationScene)
-            {
-                MapSetting setting = GameObject.FindGameObjectWithTag("MapSetting").GetComponent<MapSetting>(); // MapSettingを検索
-                setting.CreateMap(stageNum); // マップを生成
+            if (currentSceneName == SCENENAME.Dungeon || currentSceneName == SCENENAME.InvestigationScene) {
+                MapSetting setting = MapSetting.Instance; // MapSettingのインスタンス取得　※矢野変更
+                setting.CreateMap(1); // マップを生成
             }
-            else if (currentSceneName != SCENENAME.SolveScene) uiManager.CloseUI(UIType.ItemWindow); // アイテムウィンドウを閉じる
+            else if (currentSceneName != SCENENAME.SolveScene) 
+            {
+                TimerManager.Instance.CloseTimer(true);   // タイマーを閉じる　※矢野追記
+                uiManager.CloseUI(UIType.ItemWindow); // アイテムウィンドウを閉じる
+            } 
             // 各シーンでのBGMを流す ストーリーシーンはCSVデータを参照して流すのでここでは流さない
-            // 依頼シーンに遷移したときのみ自動セーブ
             switch(currentSceneName)
             {
                 case SCENENAME.TitleScene:
@@ -67,12 +66,11 @@ namespace Supadari
                     break;
                 case SCENENAME.RequisitionsScene:
                     audioManager.BGM_Play("BGM_quest", enviromentalData.TInstance.volumeBGM);
-                    menuScript.Save(saveSlot); // 現在使用しているスロットにセーブ
                     break;
                 case SCENENAME.StoryScene:
                     audioManager.BGM_Stop();
-                    controller = GameObject.FindGameObjectWithTag("Coroutine").GetComponent<StoryController>(); // ストーリーコントローラーを代入
-                    autoButton.onClick.AddListener(controller.OnAutoModeCllicked); // OnClick関数にアタッチ
+                    controller = GameObject.FindGameObjectWithTag("Coroutine").GetComponent<StoryController>();
+                    autoButton.onClick.AddListener(controller.OnAutoModeCllicked);
                     break;
                 case SCENENAME.InvestigationScene:
                     audioManager.BGM_Play("BGM_dungeon", enviromentalData.TInstance.volumeBGM);
