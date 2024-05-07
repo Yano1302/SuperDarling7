@@ -76,7 +76,7 @@ public class BaseTextController : DebugSetting
         if(storynum!="") StorySetUp(storynum); // 対応する会話文をセットする
         TalkState = TALKSTATE.NOTALK; // 会話ステータスを話していないに変更
         sceneManager = GameObject.FindGameObjectWithTag("SceneManager").GetComponent<SceneManager>(); // オーディオマネージャーを取得
-        playerTextSpeed = sceneManager.enviromentalData.m_tInstance.textSpeed; // テキストスピードを設定
+        playerTextSpeed = sceneManager.enviromentalData.TInstance.textSpeed; // テキストスピードを設定
     }
     /// <summary>
     /// 対応する会話文をセットする関数
@@ -145,7 +145,7 @@ public class BaseTextController : DebugSetting
     /// </summary>
     public virtual void OnTalkButtonClicked()
     {
-        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
+        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.TInstance.volumeSE);
         if (TalkState == TALKSTATE.NOTALK) // 会話ステータスが話していないなら
         {
             TalkState = TALKSTATE.TALKING; // 会話ステータスを会話中に変更
@@ -179,7 +179,7 @@ public class BaseTextController : DebugSetting
             StorySetUp(storynum); // 対応する会話文をセット
             talkNum = default; // 初期に戻す
         }
-        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
+        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.TInstance.volumeSE);
         if (TalkState == TALKSTATE.NOTALK) // 会話ステータスが話していないなら
         {
             TalkState = TALKSTATE.TALKING; // 会話ステータスを会話中に変更
@@ -207,7 +207,7 @@ public class BaseTextController : DebugSetting
     /// <param name="num">読み込みたいCSVの行</param>
     public virtual void OnTalkButtonClicked(int num = 9999)
     {
-        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.m_tInstance.volumeSE);
+        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.TInstance.volumeSE);
         if (TalkState == TALKSTATE.NOTALK) // 会話ステータスが話していないなら
         {
             TalkState = TALKSTATE.TALKING; // 会話ステータスを会話中に変更
@@ -287,7 +287,7 @@ public class BaseTextController : DebugSetting
         }
         // BGMを鳴らす
         if (nameBGM[talkNum] == "Stop") sceneManager.audioManager.BGM_Stop(); // StopならBGMを止める
-        else if (nameBGM[talkNum] != "0") sceneManager.audioManager.BGM_Play(nameBGM[talkNum], sceneManager.enviromentalData.m_tInstance.volumeBGM); // BGM名が入っていたら切り替え　空白なら続行
+        else if (nameBGM[talkNum] != "0") sceneManager.audioManager.BGM_Play(nameBGM[talkNum], sceneManager.enviromentalData.TInstance.volumeBGM); // BGM名が入っていたら切り替え　空白なら続行
     }
     /// <summary>
     /// コルーチン開始関数

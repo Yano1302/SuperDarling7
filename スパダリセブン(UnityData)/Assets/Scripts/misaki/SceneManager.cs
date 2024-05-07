@@ -33,7 +33,7 @@ namespace Supadari
         {
             audioManager = GameObject.FindGameObjectWithTag("AudioManager").GetComponent<AudioManager>(); // audioManagerを検索して代入
             UnityEngine.SceneManagement.SceneManager.sceneLoaded += SceneLoaded;
-            audioManager.BGM_Play("BGM_title", enviromentalData.m_tInstance.volumeBGM); // BGMを流す
+            audioManager.BGM_Play("BGM_title", enviromentalData.TInstance.volumeBGM); // BGMを流す
             //KeyDebug.AddKeyDebug("GameOver画面へ遷移", GameOver);
             //KeyDebug.AddKeyDebug("GameClear画面へ遷移", GameClear);
             //KeyDebug.AddKeyDebug("調査画面へ遷移", Investigation);
@@ -63,10 +63,10 @@ namespace Supadari
             switch(currentSceneName)
             {
                 case SCENENAME.TitleScene:
-                    audioManager.BGM_Play("BGM_title", enviromentalData.m_tInstance.volumeBGM);
+                    audioManager.BGM_Play("BGM_title", enviromentalData.TInstance.volumeBGM);
                     break;
                 case SCENENAME.RequisitionsScene:
-                    audioManager.BGM_Play("BGM_quest", enviromentalData.m_tInstance.volumeBGM);
+                    audioManager.BGM_Play("BGM_quest", enviromentalData.TInstance.volumeBGM);
                     menuScript.Save(saveSlot); // 現在使用しているスロットにセーブ
                     break;
                 case SCENENAME.StoryScene:
@@ -75,21 +75,21 @@ namespace Supadari
                     autoButton.onClick.AddListener(controller.OnAutoModeCllicked); // OnClick関数にアタッチ
                     break;
                 case SCENENAME.InvestigationScene:
-                    audioManager.BGM_Play("BGM_dungeon", enviromentalData.m_tInstance.volumeBGM);
+                    audioManager.BGM_Play("BGM_dungeon", enviromentalData.TInstance.volumeBGM);
                     break;
                 case SCENENAME.SolveScene:
-                    audioManager.BGM_Play("BGM_solve", enviromentalData.m_tInstance.volumeBGM);
+                    audioManager.BGM_Play("BGM_solve", enviromentalData.TInstance.volumeBGM);
                     break;
                 case SCENENAME.Dungeon:
-                    audioManager.BGM_Play("BGM_dungeon", enviromentalData.m_tInstance.volumeBGM);
+                    audioManager.BGM_Play("BGM_dungeon", enviromentalData.TInstance.volumeBGM);
                     break;
                 case SCENENAME.GameOverScene:
                     audioManager.BGM_Stop();
-                    audioManager.SE_Play("BGM_gameover", enviromentalData.m_tInstance.volumeSE);
+                    audioManager.SE_Play("BGM_gameover", enviromentalData.TInstance.volumeSE);
                     break;
                 case SCENENAME.GameClearScene:
                     audioManager.BGM_Stop();
-                    audioManager.SE_Play("BGM_clear", enviromentalData.m_tInstance.volumeSE);
+                    audioManager.SE_Play("BGM_clear", enviromentalData.TInstance.volumeSE);
                     break;
             }
         }

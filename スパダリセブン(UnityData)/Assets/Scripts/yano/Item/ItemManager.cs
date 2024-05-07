@@ -1,12 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
+using UnityEngine.UI;
 
 /// <summary>
 /// アイテムの所持などを管理するクラスです
 /// </summary>
 public class ItemManager : SingletonMonoBehaviour<ItemManager>
 {
+    public TextMeshProUGUI itemText; // アイテムの詳細を表示するテキスト　岬追記
+    public Image itemImage; // アイテム画像　岬追記
+
     //アイテムメッセージの選択を管理する列挙型
     public enum ItemMessageType {
         Investigation = ItemDataCsvIndex.Investigation,             //探索パートメッセージ
@@ -169,28 +174,30 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
             m_itemFlag = new JsonSettings<SettingsGetItemFlags>("Data1","JsonSaveFile", "ItemGetFlags");    //アイテム所持データ
             m_itemData = new CSVSetting("アイテム情報");   //アイテム情報(メッセージ等)       
             m_stageData = new CSVSetting("ステージ情報");
-            /* awakeだとアイテムウィンドウを取得できないためStart関数に移動
-            // アイテムウィンドウを取得
-            ItemWindowContent = GameObject.FindGameObjectWithTag("ItemWindow");
-            Debug.Log(ItemWindowContent);
-
-            //所持アイテム情報とオブジェクトのアクティブ情報を一致させる　TODO:後で変える
-            int length = ItemWindowContent.transform.childCount;
-            for (int i = 0; i < length; i++) {
-                ItemWindowContent.transform.GetChild(i).gameObject.SetActive(m_itemFlag.TInstance.GetFlag((ItemID)i + 1));
-            }*/
         }
     }
     private void Start()
     {
-        // アイテムウィンドウを取得
-        ItemWindowContent = GameObject.FindGameObjectWithTag("ItemWindow");
-
         //所持アイテム情報とオブジェクトのアクティブ情報を一致させる　TODO:後で変える
         int length = ItemWindowContent.transform.childCount;
         for (int i = 0; i < length; i++)
         {
-            ItemWindowContent.transform.GetChild(i).gameObject.SetActive(m_itemFlag.TInstance.GetFlag((ItemID)i + 1));
+            string itemName;
+            m_itemData.GetData(1, i + 1, out itemName); // アイテム情報よりアイテム名を取得 岬追記
+            ItemWindowContent.transform.GetChild(i).GetChild(0).GetComponent<TextMeshProUGUI>().text = itemName; // アイテム名を子オブジェクトに代入 岬追記
+            ItemWindowContent.transform.GetChild(i).GetComponent<Button>().onClick.AddListener(() => ItemDetails(itemName)); // ボタンにItemDetails関数を設定
+            ItemWindowContent.transform.GetChild(i).gameObject.SetActive(m_itemFlag.TInstance.GetFlag((ItemID)i + 1 ));
         }
+    }
+
+    public void ItemDetails(string itemName)
+    {
+        ItemID id = GetItemID(itemName);
+        string details;
+        GetItemMessage(id,ItemMessageType.Investigation, out details);
+        itemText.text = details;
+        string imageName;
+        m_itemData.GetData((int)id, 5, out imageName);
+        itemImage.sprite =Resources.Load<Sprite>("小物イラスト/"+imageName+".png");
     }
 }
