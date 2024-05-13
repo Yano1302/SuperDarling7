@@ -41,6 +41,8 @@ public class BaseTextController : DebugSetting
 
     public bool runtimeCoroutine = false; // コルーチンが実行中かどうか
     private Coroutine dialogueCoroutine; // コルーチンを格納する変数
+    protected string richTextTag = string.Empty; // リッチテキストタグ用変数
+    protected bool isTag = false; // リッチテキストタグを格納しているかどうか
 
     [SerializeField]protected SceneManager sceneManager; // シーンマネージャー変数
     [SerializeField]bool testText = false; // ボタンのテキストを表示するかどうか
@@ -333,6 +335,19 @@ public class BaseTextController : DebugSetting
         // 各文字に対して繰り返し処理を行います C#のIEnumerable機能により一文字ずつ取り出せる
         foreach (char c in words)
         {
+            // リッチテキストタグを検出してtextに代入
+            if (c == '<' || isTag)
+            {
+                isTag = true; // タグを全文格納するためにtrueにする
+                richTextTag += c; // タグを1文字ずつ代入
+                if (c == '>') // タグの終わりを検出した場合
+                {
+                    isTag = !isTag; // タグを全文格納できたためfalseにする
+                    textLabel.text += richTextTag; // テキストにタグを代入
+                    richTextTag = string.Empty; // タグをリセット
+                }
+                continue;
+            }
             // 文字を textLabel に追加します
             textLabel.text += c;
             // ボタンがクリックされたらフラグを立ててループを抜ける
@@ -356,6 +371,19 @@ public class BaseTextController : DebugSetting
         // 文章の残りを再表示
         for (int i = currentCharIndex; i < words.Length; i++)
         {
+            // リッチテキストタグを検出してtextに代入
+            if (words[i] == '<' || isTag)
+            {
+                isTag = true; // タグを全文格納するためにtrueにする
+                richTextTag += words[i]; // タグを1文字ずつ代入
+                if (words[i] == '>') // タグの終わりを検出した場合
+                {
+                    isTag = !isTag; // タグを全文格納できたためfalseにする
+                    textLabel.text += richTextTag; // テキストにタグを代入
+                    richTextTag = string.Empty; // タグをリセット
+                }
+                continue;
+            }
             // 文字を textLabel に追加します
             textLabel.text += words[i];
             // 次の文字を表示する前に少し待ちます

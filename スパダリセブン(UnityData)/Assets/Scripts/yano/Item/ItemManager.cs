@@ -26,6 +26,11 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     public void AddItem(ItemID id) {
         UsefulSystem.DebugAction(() => { if (m_itemFlag.TInstance.GetFlag(id)) { Debug.LogWarning("そのアイテムは既に取得しています。"); } });
         m_itemWindow ??= ItemWindow.Instance;
+        string itemName;
+        m_itemData.GetData(1, (int)id, out itemName); // アイテム情報よりアイテム名を取得 岬追記
+        GameObject item = m_itemWindow.GetWinObj(id); // アイテムのオブジェクトを取得
+        item.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = itemName; // アイテム名を子オブジェクトに代入 岬追記
+        item.GetComponent<Button>().onClick.AddListener(() => ItemDetails(itemName)); // ボタンにItemDetails関数を設定
         m_itemWindow.SetWindow(id,true);
     }
 
@@ -166,10 +171,10 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
             m_stageData = new CSVSetting("ステージ情報");
         }
     }
-    private void Start()
+    /*private void Start()
     {
         //所持アイテム情報とオブジェクトのアクティブ情報を一致させる　TODO:後で変える
-        int length = m_itemWindow.transform.childCount;
+        int length = m_itemWindow.gameObject.transform.childCount;
         for (int i = 0; i < length; i++)
         {
             string itemName;
@@ -178,7 +183,7 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
             m_itemWindow.transform.GetChild(i).GetComponent<Button>().onClick.AddListener(() => ItemDetails(itemName)); // ボタンにItemDetails関数を設定
             m_itemWindow.transform.GetChild(i).gameObject.SetActive(m_itemFlag.TInstance.GetFlag((ItemID)i + 1 ));
         }
-    }
+    }*/
 
     public void ItemDetails(string itemName)
     {

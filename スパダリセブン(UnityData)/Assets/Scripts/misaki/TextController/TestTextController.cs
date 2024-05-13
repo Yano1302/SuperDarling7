@@ -27,6 +27,19 @@ public class TestTextController : BaseTextController
         // 各文字に対して繰り返し処理を行います C#のIEnumerable機能により一文字ずつ取り出せる
         foreach (char c in words)
         {
+            // リッチテキストタグを検出してtextに代入
+            if (c == '<' || isTag)
+            {
+                isTag = true; // タグを全文格納するためにtrueにする
+                richTextTag += c; // タグを1文字ずつ代入
+                if (c == '>') // タグの終わりを検出した場合
+                {
+                    isTag = !isTag; // タグを全文格納できたためfalseにする
+                    textLabel.text += richTextTag; // テキストにタグを代入
+                    richTextTag = string.Empty; // タグをリセット
+                }
+                continue;
+            }
             // 文字を textLabel に追加します
             textLabel.text += c;
             // 次の文字を表示する前に少し待ちます

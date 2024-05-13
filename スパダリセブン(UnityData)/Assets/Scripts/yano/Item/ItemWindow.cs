@@ -13,6 +13,8 @@ public class ItemWindow :SingletonMonoBehaviour<ItemWindow>
     /// <summary>ウィンドウを非アクティブ化します</summary>
     public void InactiveWindows() { m_managerUI ??= UIManager.Instance; m_managerUI.CloseUI(UIType.ItemWindow); }
 
+    public GameObject GetWinObj(ItemID itemID) { return m_windows[(int)itemID]; } // ゲッター関数　岬追記
+
 
     /// <summary>指定したアイテムウィンドウを開きます</summary>
     /// <param name="id">開くウィンドウのID</param>
