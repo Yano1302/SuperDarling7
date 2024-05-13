@@ -158,7 +158,7 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     private static JsonSettings<SettingsGetItemFlags> m_itemFlag;  //アイテム所持情報
     private CSVSetting m_itemData;                                 //総アイテムデータ 
     private CSVSetting m_stageData;                                //ステージデータ
-    private ItemWindow m_itemWindow;                               //アイテムウィンドウ管理インスタンス
+    public ItemWindow m_itemWindow;                               //アイテムウィンドウ管理インスタンス
    
 
     //初期化とJsonからのデータの読み込み
@@ -171,28 +171,34 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
             m_stageData = new CSVSetting("ステージ情報");
         }
     }
-    /*private void Start()
+    private void Start()
     {
         //所持アイテム情報とオブジェクトのアクティブ情報を一致させる　TODO:後で変える
-        int length = m_itemWindow.gameObject.transform.childCount;
-        for (int i = 0; i < length; i++)
+        int length = 6;
+        for (int i = 1; i < length; i++)
         {
             string itemName;
-            m_itemData.GetData(1, i + 1, out itemName); // アイテム情報よりアイテム名を取得 岬追記
-            m_itemWindow.transform.GetChild(i).GetChild(0).GetComponent<TextMeshProUGUI>().text = itemName; // アイテム名を子オブジェクトに代入 岬追記
-            m_itemWindow.transform.GetChild(i).GetComponent<Button>().onClick.AddListener(() => ItemDetails(itemName)); // ボタンにItemDetails関数を設定
-            m_itemWindow.transform.GetChild(i).gameObject.SetActive(m_itemFlag.TInstance.GetFlag((ItemID)i + 1 ));
+            m_itemData.GetData(1, i, out itemName); // アイテム情報よりアイテム名を取得 岬追記
+            GameObject g = m_itemWindow.GetWinObj((ItemID)i); // アイテム名を子オブジェクトに代入 岬追記
+            g.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = itemName; // ボタンにItemDetails関数を設定
+            g.GetComponent<Button>().onClick.AddListener(() => ItemDetails(itemName)); // ボタンにItemDetails関数を設定
+            g.SetActive(m_itemFlag.TInstance.GetFlag((ItemID)i + 1)); // 表示
         }
-    }*/
+    }
 
+    /// <summary>
+    /// アイテムの詳細を表示する関数
+    /// </summary>
+    /// <param name="itemName">アイテム名</param>
     public void ItemDetails(string itemName)
     {
-        ItemID id = GetItemID(itemName);
         string details;
-        GetItemMessage(id,ItemMessageType.Investigation, out details);
-        itemText.text = details;
         string imageName;
-        m_itemData.GetData((int)id, 5, out imageName);
-        itemImage.sprite =Resources.Load<Sprite>("小物イラスト/"+imageName+".png");
+        ItemID id = GetItemID(itemName); // アイテムIDを取得
+        GetItemMessage(id,ItemMessageType.Investigation, out details); // アイテム詳細文をdetailsに代入
+        itemText.text = details; // アイテムテキストにアイテム詳細文を代入
+        m_itemData.GetData(5, (int)id, out imageName); // アイテム画像名を取得
+        itemImage.gameObject.SetActive(true); // アイテム画像を表示
+        itemImage.sprite = Resources.Load<Sprite>("小物イラスト/" + imageName); // アイテム画像を代入
     }
 }

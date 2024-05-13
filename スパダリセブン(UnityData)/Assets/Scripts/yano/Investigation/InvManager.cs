@@ -82,6 +82,8 @@ public class InvManager : MonoBehaviour
                     foreach (RaycastResult result in RayResult) {
                         //アイテムの取得処理
                         if (result.gameObject.TryGetComponent<ItemObject>(out var item)) {
+                            //クリック処理中
+                            m_click = true;
                             //取得するアイテムのメッセージを取得する
                             var ins = ItemManager.Instance;
                             ins.GetItemMessage(item.ID,ItemManager.ItemMessageType.Investigation,out string message);
