@@ -1211,10 +1211,10 @@ MonoBehaviour:
   backImageAnchor: {fileID: 0}
   charaAnchors: []
   talkButton: {fileID: 1513601819}
-  autoButton: {fileID: 0}
   runtimeCoroutine: 0
   sceneManager: {fileID: 0}
   testText: 0
+  autoImage: {fileID: 0}
   talkState: 0
   animator: {fileID: 5790974200170439797}
 --- !u!114 &8057252046524920482
@@ -1271,7 +1271,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 2
+  m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0

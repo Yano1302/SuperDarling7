@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -53,7 +54,7 @@ namespace Supadari
             else uiManager.CloseUI(UIType.StoryMenu);
             // 現在のシーンが探索シーンであれば
             if (currentSceneName == SCENENAME.Dungeon || currentSceneName == SCENENAME.InvestigationScene) {
-                MapSetting setting = MapSetting.Instance; // MapSettingのインスタンス取得　※矢野変更
+                MapManager setting = MapManager.Instance; // MapManagerのインスタンス取得　※矢野変更
                 setting.CreateMap(stageNum); // マップを生成
             }
             else if (currentSceneName != SCENENAME.SolveScene) 
@@ -119,6 +120,15 @@ namespace Supadari
         public void SceneChange(SCENENAME LoadScene)
         {
             displayManager.FadeOut(FadeType.Entire,()=> UnityEngine.SceneManagement.SceneManager.LoadScene((int)LoadScene)); // フェードアウトする
+        }
+        /// <summary>
+        /// シーン遷移を行う関数
+        /// </summary>
+        /// <param name="LoadScene">シーン名</param>
+        /// <param name="action">この関数はシーン遷移直前に呼ばれます</param>
+        public void SceneChange(SCENENAME LoadScene, UnityAction action)
+        {
+            displayManager.FadeOut(FadeType.Entire, () => { action?.Invoke(); UnityEngine.SceneManagement.SceneManager.LoadScene((int)LoadScene); }); // フェードアウトする
         }
         void GameOver()
         {

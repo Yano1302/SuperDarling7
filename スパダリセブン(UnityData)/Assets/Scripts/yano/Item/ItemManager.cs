@@ -86,13 +86,29 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
         m_itemData.GetLineIndex((int)messageType, name, out int index_y);
         return m_itemData.GetData((int)messageType, index_y, out message);
     }
-
+    /// <summary>ステージクリアに必要なアイテムの情報を全て取得します</summary>
+    /// <param name="stageNumber">ステージ番号(1~)</param>
+    /// <param name="itemNumber">何番目のアイテムか</param>
+    /// <returns>アイテムが一つでも見つかった場合はtrueを返します</returns>
+    public bool GetAllNeedItem(int stageNumber, out List<ItemID> data)
+    {
+        data = new List<ItemID>();
+        int end = (int)MapManager.StageCsvIndex.otherItem;
+        for (int i = (int)MapManager.StageCsvIndex.itemStart; i < end; i++)
+        {
+            if (m_stageData.GetData(i, stageNumber, out int dataInt))
+            {
+                data.Add((ItemID)dataInt);
+            }
+        }
+        return data.Count > 0;
+    }
     /// <summary>ステージクリアに必要なアイテムの情報を１つ取得します</summary>
     /// <param name="stageNumber">ステージ番号(1~)</param>
     /// <param name="itemNumber">何番目のアイテムか</param>
     /// <returns></returns>
     public bool GetNeedItem(int stageNumber,int itemNumber,out ItemID data) {
-        int index = (int)MapSetting.StageCsvIndex.itemStart + itemNumber - 1;
+        int index = (int)MapManager.StageCsvIndex.itemStart + itemNumber - 1;
         bool check = m_itemData.GetData(index,stageNumber, out int dataInt);
         data = check ? (ItemID)dataInt : ItemID.Dummy;
         return check; 
@@ -102,7 +118,7 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     /// <param name="stageNumber">ステージの番号</param>
     /// <param name="dataID">その他アイテムのデータ配列</param>
     /// <returns>その他のアイテムが無かった場合はfalseを返します</returns>
-    public bool GetOtherItem(int stageNumber,out ItemID[] dataID) {
+    public bool GetOtherItems(int stageNumber,out ItemID[] dataID) {
         int index =  m_stageData.GetLength(0) - 1;  //右端を取得
         bool check = m_stageData.GetData(index,stageNumber,out string str);  //読み込む
         var data = str.Split(',');                                          　//分離する
@@ -119,7 +135,7 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     public int GetTotalItemNum(int stageNumber) {
         int total = 0;
         int length = m_stageData.GetLength(0) - 1; //右端を取得
-        for (int i = (int)MapSetting.StageCsvIndex.itemStart; i < length; i++) {
+        for (int i = (int)MapManager.StageCsvIndex.itemStart; i < length; i++) {
             if (m_stageData.CheckData(i, stageNumber))total++;
             else  break;      
         }

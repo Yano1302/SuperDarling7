@@ -108,6 +108,8 @@ public class InvManager : MonoBehaviour
         m_isOpen = false;
         m_getItemNum = 0;
         m_instance = GetComponent<InvManager>();
+        m_gauge.enabled = false;
+        m_gaugefill.enabled = false;
     }
 
     private void Update() {
