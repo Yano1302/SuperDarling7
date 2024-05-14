@@ -80,6 +80,7 @@ public class MenuScript : SingletonMonoBehaviour <MenuScript>
         }
         sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.TInstance.volumeSE);
         // ロードしてシーン遷移
+        sceneManager.saveSlot = saveSlotIndex;
         sceneManager.SceneChange(saveData.TInstance.scenename);
         sceneManager.uiManager.CloseUI(UIType.LoadSlot);
     }

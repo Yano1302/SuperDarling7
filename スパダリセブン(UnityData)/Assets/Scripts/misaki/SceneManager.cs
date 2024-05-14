@@ -20,7 +20,7 @@ namespace Supadari
         // セーブデータを読み込み
         public JsonSettings<EnvironmentalData> enviromentalData = new JsonSettings<EnvironmentalData>("EnvironmentalData(0)", "/Resources/プランナー監獄エリア/Json", "EnvironmentalData");
         //public JsonSettings<EnvironmentalData> environmentalData = new JsonSettings<EnvironmentalData>("EnvironmentalData", "/Resources/プランナー監獄エリア/Json");
-        public JsonSettings<MasterData> saveData = new JsonSettings<MasterData>("MasterData", "/Resources/プランナー監獄エリア/Json");
+        //public JsonSettings<MasterData> saveData = new JsonSettings<MasterData>("MasterData", "/Resources/プランナー監獄エリア/Json");
 
         protected override void Awake()
         {
@@ -44,6 +44,7 @@ namespace Supadari
         /// <param name="mode"></param>
         void SceneLoaded(Scene nextScene, LoadSceneMode mode)
         {
+            JsonSettings<MasterData> saveData = new JsonSettings<MasterData>(string.Format("SaveData{0}", saveSlot), "/Resources/プランナー監獄エリア/Json", "MasterData");
             // 現在のシーンを代入する
             currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene(); 
             currentSceneName = (SCENENAME)currentScene.buildIndex;
@@ -68,6 +69,8 @@ namespace Supadari
                     break;
                 case SCENENAME.RequisitionsScene:
                     audioManager.BGM_Play("BGM_quest", enviromentalData.TInstance.volumeBGM);
+                    saveData.TInstance.scenename = currentSceneName; // 現在のシーンを代入
+                    saveData.Save(); // セーブする
                     break;
                 case SCENENAME.StoryScene:
                     audioManager.BGM_Stop();

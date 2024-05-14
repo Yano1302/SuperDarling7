@@ -171,7 +171,8 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
             m_stageData = new CSVSetting("ステージ情報");
         }
     }
-    private void Start()
+    ///テスト用
+    /*private void Start()
     {
         //所持アイテム情報とオブジェクトのアクティブ情報を一致させる　TODO:後で変える
         int length = 6;
@@ -184,7 +185,7 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
             g.GetComponent<Button>().onClick.AddListener(() => ItemDetails(itemName)); // ボタンにItemDetails関数を設定
             g.SetActive(m_itemFlag.TInstance.GetFlag((ItemID)i + 1)); // 表示
         }
-    }
+    }*/
 
     /// <summary>
     /// アイテムの詳細を表示する関数
