@@ -18,7 +18,7 @@ EditorBuildSettings:
     path: Assets/Scenes/misaki/InvestigationScene.unity
     guid: 469ca243e2ac94443ac1d24bbb8c759c
   - enabled: 1
-    path: Assets/Scenes/misaki/SolveScene.unity
+    path: Assets/Scenes/misaki/SolveScene(backup).unity
     guid: bb16faa5795a8ec49ad698b8559c246d
   - enabled: 1
     path: Assets/Scenes/yano/Dungeon.unity
