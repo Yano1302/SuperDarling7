@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Supadari;
@@ -78,6 +80,12 @@ public class InvManager : MonoBehaviour
     private Image m_gauge;
     [SerializeField]
     private Image m_gaugefill;
+    [SerializeField]
+    private Image m_waves;
+    [SerializeField]
+    private float m_waveDirectionTime;
+    [SerializeField]
+    private float m_waveInterval;
 
     [SerializeField, Header("マウスカーソル画像1")]
     Texture2D m_cursor; 
@@ -91,7 +99,7 @@ public class InvManager : MonoBehaviour
     private InvBackGroundType  m_currentInvType;
     private bool m_isOpen;                       //開いているかのフラグ
     private Vigilance m_vigilance;               //警戒度用構造体
-    private int m_getItemNum;                    //現在取得しているアイテム数          
+    private int m_getItemNum;                    //現在取得しているアイテム数
 
     private struct Vigilance {
         public float MaxVigilance;               //最大警戒度
@@ -100,14 +108,19 @@ public class InvManager : MonoBehaviour
         public bool IsOver { get { return m_VigilanceLevel >= MaxVigilance; } }
         public Vector2 mouseVec;               //マウス座標
         public bool VigilanceFlag;              //このフラグがOnの時のみ警戒度を設定できます
+        public float WaveInterval;           //鼓動の間隔
         private float m_VigilanceLevel;         //警戒度
+
     }
     
 
     private void Awake() {
         m_isOpen = false;
         m_getItemNum = 0;
+        m_vigilance.WaveInterval = m_waveInterval;
         m_instance = GetComponent<InvManager>();
+        m_gauge.enabled = false;
+        m_gaugefill.enabled = false;
     }
 
     private void Update() {
@@ -129,6 +142,11 @@ public class InvManager : MonoBehaviour
     private bool AddVigilance(float addValue) {
         m_vigilance.Level += addValue;
         m_gaugefill.fillAmount = m_vigilance.Rate;
+        if (m_vigilance.Rate > m_vigilance.WaveInterval) {
+            StartCoroutine("Waves");
+            m_vigilance.WaveInterval += m_waveInterval;
+        }
+        
         return m_vigilance.IsOver;
     }
 
@@ -151,6 +169,7 @@ public class InvManager : MonoBehaviour
     /// <summary>全てのアイテムを取得した際の処理を記述します</summary>
     private void ClearInv() {
         m_vigilance.VigilanceFlag = false;
+        StopCoroutine("Waves");
         SceneManager.Instance.SceneChange(SCENENAME.SolveScene, () => { UIManager.Instance.CloseUI(UIType.Timer); SetCursor(null); });
     }
 
@@ -166,6 +185,31 @@ public class InvManager : MonoBehaviour
     /// 警戒度がマックスの際にマウスを動かしてしまった場合の処理
     /// </summary>
     private void OverVigilance() {
+        StopCoroutine("Waves");
         SceneManager.Instance.SceneChange(SCENENAME.GameOverScene, () => { UIManager.Instance.CloseUI(UIType.Timer); SetCursor(null); });
+    }
+
+    private IEnumerator Waves() {
+        float time = 0; 
+        WaitForSeconds wait = new WaitForSeconds(Time.deltaTime);
+        while (time < 0.5) {
+            float t = Time.deltaTime / m_waveDirectionTime;
+            Color c = m_waves.color;
+            c.a += t * 2;
+            m_waves.color = c;
+            time += t;
+            yield return wait;
+        }
+        while(time < 1) {
+            float t = Time.deltaTime / m_waveDirectionTime;
+            Color c = m_waves.color;
+            c.a -= t * 2;
+            m_waves.color = c;
+            time += t;
+            yield return wait;
+        }
+        Color col = m_waves.color;
+        col.a = 0;
+        m_waves.color = col;
     }
 }
