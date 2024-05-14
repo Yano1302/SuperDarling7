@@ -1,7 +1,7 @@
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using UnityEngine.Events;
 
 namespace Supadari
 {
@@ -11,6 +11,8 @@ namespace Supadari
         [SerializeField] SCENENAME currentSceneName; // 現在のシーン名
         [SerializeField] Scene currentScene; // 現在のシーン
         [SerializeField] Button autoButton; // オートボタン変数
+        public int saveSlot; // セーブスロット変数
+        public int stageNum = 0; // ステージ番号
         StoryController controller; // ストーリーコントローラー変数
         public UIManager uiManager; // UIマネージャー用変数
         public AudioManager audioManager; // オーディオマネージャー変数
@@ -19,7 +21,7 @@ namespace Supadari
         // セーブデータを読み込み
         public JsonSettings<EnvironmentalData> enviromentalData = new JsonSettings<EnvironmentalData>("EnvironmentalData(0)", "/Resources/プランナー監獄エリア/Json", "EnvironmentalData");
         //public JsonSettings<EnvironmentalData> environmentalData = new JsonSettings<EnvironmentalData>("EnvironmentalData", "/Resources/プランナー監獄エリア/Json");
-        public JsonSettings<MasterData> saveData = new JsonSettings<MasterData>("MasterData", "/Resources/プランナー監獄エリア/Json");
+        //public JsonSettings<MasterData> saveData = new JsonSettings<MasterData>("MasterData", "/Resources/プランナー監獄エリア/Json");
 
         protected override void Awake()
         {
@@ -43,6 +45,7 @@ namespace Supadari
         /// <param name="mode"></param>
         void SceneLoaded(Scene nextScene, LoadSceneMode mode)
         {
+            JsonSettings<MasterData> saveData = new JsonSettings<MasterData>(string.Format("SaveData{0}", saveSlot), "/Resources/プランナー監獄エリア/Json", "MasterData");
             // 現在のシーンを代入する
             currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene(); 
             currentSceneName = (SCENENAME)currentScene.buildIndex;
@@ -51,8 +54,8 @@ namespace Supadari
             else uiManager.CloseUI(UIType.StoryMenu);
             // 現在のシーンが探索シーンであれば
             if (currentSceneName == SCENENAME.Dungeon || currentSceneName == SCENENAME.InvestigationScene) {
-                MapManager setting = MapManager.Instance; // MapSettingのインスタンス取得　※矢野変更
-                setting.CreateMap(1); // マップを生成
+                MapManager setting = MapManager.Instance; // MapManagerのインスタンス取得　※矢野変更
+                setting.CreateMap(stageNum); // マップを生成
             }
             else if (currentSceneName != SCENENAME.SolveScene) 
             {
@@ -67,6 +70,8 @@ namespace Supadari
                     break;
                 case SCENENAME.RequisitionsScene:
                     audioManager.BGM_Play("BGM_quest", enviromentalData.TInstance.volumeBGM);
+                    saveData.TInstance.scenename = currentSceneName; // 現在のシーンを代入
+                    saveData.Save(); // セーブする
                     break;
                 case SCENENAME.StoryScene:
                     audioManager.BGM_Stop();
@@ -116,17 +121,15 @@ namespace Supadari
         {
             displayManager.FadeOut(FadeType.Entire,()=> UnityEngine.SceneManagement.SceneManager.LoadScene((int)LoadScene)); // フェードアウトする
         }
-
         /// <summary>
         /// シーン遷移を行う関数
         /// </summary>
         /// <param name="LoadScene">シーン名</param>
         /// <param name="action">この関数はシーン遷移直前に呼ばれます</param>
-        public void SceneChange(SCENENAME LoadScene,UnityAction action) {
-            displayManager.FadeOut(FadeType.Entire, () => { action?.Invoke();UnityEngine.SceneManagement.SceneManager.LoadScene((int)LoadScene); }); // フェードアウトする
+        public void SceneChange(SCENENAME LoadScene, UnityAction action)
+        {
+            displayManager.FadeOut(FadeType.Entire, () => { action?.Invoke(); UnityEngine.SceneManagement.SceneManager.LoadScene((int)LoadScene); }); // フェードアウトする
         }
-
-
         void GameOver()
         {
             SceneChange(SCENENAME.GameOverScene);

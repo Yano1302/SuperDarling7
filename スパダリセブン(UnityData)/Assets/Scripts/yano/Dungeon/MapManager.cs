@@ -101,9 +101,7 @@ public class MapManager : SingletonMonoBehaviour<MapManager> {
         m_stageData.number = mapNumber;
         //現在のステージのアイテム数を取得する
         var im = ItemManager.Instance;
-        im.GetAllNeedItem(mapNumber, out List<ItemID> ni);
-        im.GetOtherItems(mapNumber, out ItemID[] oi);
-        m_stageData.totalitem = ni.Count + oi.Length;
+        m_stageData.totalitem = im.GetTotalItemNum(mapNumber);
         //マップの高さと１マスのサイズを取得
         int maxY = mapData.TotalLine;//高さ
          Vector2 scale = new Vector2(m_stageData.size, m_stageData.size); //サイズ

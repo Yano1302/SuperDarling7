@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class OnMouseScript : DebugSetting, IPointerEnterHandler, IPointerExitHandler
 {
-    [SerializeField] bool eventCheck = true;
+    [SerializeField] bool eventCheck = true; // OnMouseScriptを動かすかどうかのチェック
     [SerializeField] RequisitionController requisitionController; // RequisitionController用変数
     [SerializeField] string storyname = null; // 表示したいテキスト名
     private Supadari.SceneManager sceneManager; // SceneManager変数
@@ -16,7 +16,7 @@ public class OnMouseScript : DebugSetting, IPointerEnterHandler, IPointerExitHan
     private void Start()
     {
         // シーンマネージャーを取得
-        sceneManager=GameObject.FindGameObjectWithTag("SceneManager").GetComponent<Supadari.SceneManager>();
+        sceneManager = GameObject.FindGameObjectWithTag("SceneManager").GetComponent<Supadari.SceneManager>();
     }
     private void FixedUpdate()
     {

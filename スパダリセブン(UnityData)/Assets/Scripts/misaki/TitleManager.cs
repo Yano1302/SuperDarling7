@@ -25,7 +25,7 @@ public class TitleManager : DebugSetting
     {
         audioManager.SE_Play("SE_click", sceneManager.enviromentalData.TInstance.volumeSE);
         sceneManager.uiManager.OpenUI(UIType.SaveSlot); // セーブスロットを開く
-        //sceneManager.SceneChange(SCENENAME.InvestigationScene);
+        //sceneManager.SceneChange(SCENENAME.GameClearScene);
         Debug.Log("ニューゲームを開始");
     }
     /// <summary>
@@ -35,6 +35,7 @@ public class TitleManager : DebugSetting
     {
         audioManager.SE_Play("SE_click", sceneManager.enviromentalData.TInstance.volumeSE);
         sceneManager.uiManager.OpenUI(UIType.LoadSlot); // ロードスロットを開く
+        //sceneManager.SceneChange(SCENENAME.GameOverScene);
         Debug.Log("コンティニューを開始");
     }
     /// <summary>

@@ -37,14 +37,16 @@ public class BaseTextController : DebugSetting
     string[] nameBGM; // 鳴らすBGM格納配列
 
     public GameObject talkButton; // 会話を進めるボタン
-    public GameObject autoButton; // オートモードに切り替えるボタン
     protected StoryTalkData[] storyTalks; //csvファイルにある文章を格納する配列
 
     public bool runtimeCoroutine = false; // コルーチンが実行中かどうか
     private Coroutine dialogueCoroutine; // コルーチンを格納する変数
+    protected string richTextTag = string.Empty; // リッチテキストタグ用変数
+    protected bool isTag = false; // リッチテキストタグを格納しているかどうか
 
     [SerializeField]protected SceneManager sceneManager; // シーンマネージャー変数
     [SerializeField]bool testText = false; // ボタンのテキストを表示するかどうか
+    [SerializeField] GameObject autoImage; // オートモードの画像
 
     public TALKSTATE talkState; // 会話ステータス変数
     public TALKSTATE TalkState
@@ -73,7 +75,7 @@ public class BaseTextController : DebugSetting
     protected override void Awake()
     {
         base .Awake(); // デバッグログを表示するか否かスクリプタブルオブジェクトのGameSettingsを参照
-        StorySetUp(storynum); // 対応する会話文をセットする
+        if(storynum!="") StorySetUp(storynum); // 対応する会話文をセットする
         TalkState = TALKSTATE.NOTALK; // 会話ステータスを話していないに変更
         sceneManager = GameObject.FindGameObjectWithTag("SceneManager").GetComponent<SceneManager>(); // オーディオマネージャーを取得
         playerTextSpeed = sceneManager.enviromentalData.TInstance.textSpeed; // テキストスピードを設定
@@ -173,11 +175,15 @@ public class BaseTextController : DebugSetting
     /// <param name="storynum">読み込みたいCSV名</param>
     public virtual void OnTalkButtonClicked(string storynum = "")
     {
+        // ストーリー番号があれば
+        if (storynum != "")
+        {
+            StorySetUp(storynum); // 対応する会話文をセット
+            talkNum = default; // 初期に戻す
+        }
         sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.TInstance.volumeSE);
         if (TalkState == TALKSTATE.NOTALK) // 会話ステータスが話していないなら
         {
-            // ストーリー番号があれば
-            if (storynum != "") StorySetUp(storynum); // 対応する会話文をセット
             TalkState = TALKSTATE.TALKING; // 会話ステータスを会話中に変更
         }
         else if (TalkState == TALKSTATE.TALKING) // 会話ステータスが話し中なら
@@ -329,6 +335,19 @@ public class BaseTextController : DebugSetting
         // 各文字に対して繰り返し処理を行います C#のIEnumerable機能により一文字ずつ取り出せる
         foreach (char c in words)
         {
+            // リッチテキストタグを検出してtextに代入
+            if (c == '<' || isTag)
+            {
+                isTag = true; // タグを全文格納するためにtrueにする
+                richTextTag += c; // タグを1文字ずつ代入
+                if (c == '>') // タグの終わりを検出した場合
+                {
+                    isTag = !isTag; // タグを全文格納できたためfalseにする
+                    textLabel.text += richTextTag; // テキストにタグを代入
+                    richTextTag = string.Empty; // タグをリセット
+                }
+                continue;
+            }
             // 文字を textLabel に追加します
             textLabel.text += c;
             // ボタンがクリックされたらフラグを立ててループを抜ける
@@ -352,6 +371,19 @@ public class BaseTextController : DebugSetting
         // 文章の残りを再表示
         for (int i = currentCharIndex; i < words.Length; i++)
         {
+            // リッチテキストタグを検出してtextに代入
+            if (words[i] == '<' || isTag)
+            {
+                isTag = true; // タグを全文格納するためにtrueにする
+                richTextTag += words[i]; // タグを1文字ずつ代入
+                if (words[i] == '>') // タグの終わりを検出した場合
+                {
+                    isTag = !isTag; // タグを全文格納できたためfalseにする
+                    textLabel.text += richTextTag; // テキストにタグを代入
+                    richTextTag = string.Empty; // タグをリセット
+                }
+                continue;
+            }
             // 文字を textLabel に追加します
             textLabel.text += words[i];
             // 次の文字を表示する前に少し待ちます
@@ -395,6 +427,10 @@ public class BaseTextController : DebugSetting
     {
         // talkAutoがtrueならfalseに、falseならtrueに変換
         talkAuto = !talkAuto;
+        // オートモードならオートモード画像を出す　オートモードではないなら画像を出さない
+        if (!autoImage) return;
+        if(talkAuto) autoImage.SetActive(true);
+        else autoImage.SetActive(false);
     }
 }
 [System.Serializable] // サブプロパティを埋め込む
@@ -410,4 +446,5 @@ public class StoryTalkData
     public string name; // キャラクター名
     public string talks; // 文章
     public string BGM; // BGM名
+    public string stage; // ステージ番号
 }
