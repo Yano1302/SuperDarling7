@@ -1,11 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using System;
-using UnityEngine.EventSystems;
-using System.Threading.Tasks;
-using System.Threading;
+using Supadari;
+using SceneManager = Supadari.SceneManager;
 
 
 public enum InvBackGroundType {
@@ -17,23 +13,60 @@ public class InvManager : MonoBehaviour
     /// <summary>探索パート～調査パート間のみ取得できるインスタンス</summary>
     public static InvManager Instance { get { Debug.Assert(m_instance, "シーンが違うのでインスタンスを取得できません。"); return m_instance; } }
     /// <summary>この調査パートに配置されたアイテムの中で取得しているアイテム数</summary>
-    public static int GetItemNum { get; set; } = 0;
+    public int GetItemNum { get { return m_getItemNum; } set { m_getItemNum = value; if (m_getItemNum >= MapManager.Instance.TotalItem){ ClearInv();} } }
+
+    /// <summary>警戒度が上がるフラグを設定します。</summary>
+    public bool VigilanceFlag { get { return m_vigilance.VigilanceFlag; } set { m_vigilance.VigilanceFlag = value; } }
 
     public void Open(InvBackGroundType type) {
-        Debug.Assert(!m_isOpen,"探索パートが既に開かれています"); 
-        m_currentInvType = type;  m_invObj[(int)m_currentInvType].SetActive(true); 
+        Debug.Assert(!m_isOpen,"探索パートが既に開かれています");
+        //シーンを開く
+        m_currentInvType = type;  m_invObj[(int)m_currentInvType].SetActive(true);
+        //ボタンをアクティブにする
         m_backBtn.SetActive(true);
+        //最大値を設定する
+        m_vigilance.MaxVigilance = 10;
+        //警戒度を初期化する
+        SetVigilance(0);
+        //座標を初期化する
+        m_vigilance.mouseVec = Input.mousePosition;
+        //フラグ設定
+        m_gauge.enabled = true;
+        m_gaugefill.enabled = true;
         m_isOpen = true; 
+        m_vigilance.VigilanceFlag = true;
+        Player.Instance.MoveFlag = false;
+        //カーソルを変更
+        SetCursor(false);
+       
     }
 
+    /// <summary>
+    /// 戻るボタンにアタッチします
+    /// </summary>
     public void Close() {
-        if (!m_click) {
+        if (m_vigilance.VigilanceFlag) {
+            //シーンを閉じる
             m_invObj[(int)m_currentInvType].SetActive(false);
+            //ボタンを非表示に
             m_backBtn.SetActive(false);
+            //フラグ設定
+            m_gaugefill.enabled = false;
             m_isOpen = false;
             Player.Instance.MoveFlag = true;
             m_currentInvType = 0;
+            //カーソルを元に戻す
+            SetCursor(null);
         }
+    }
+
+    /// <summary>マウスアイコンを設定します</summary>
+    /// <param name="target">targetがnullの場合;デフォルトのマウスカーソルになります<br />
+    /// targetがtrueの場合:カーソルがターゲットカーソルになります
+    /// targetがfalseの場合:カーソルが非ターゲットカーソルになります
+    /// </param>
+    public void SetMouseIcon(bool? target) {
+       SetCursor(target);
     }
 
     private static InvManager m_instance;
@@ -41,65 +74,98 @@ public class InvManager : MonoBehaviour
 
     [SerializeField, Header("戻るボタン")]
     private GameObject m_backBtn;
+    [SerializeField, Header("警戒度ゲージ")]
+    private Image m_gauge;
+    [SerializeField]
+    private Image m_gaugefill;
+
+    [SerializeField, Header("マウスカーソル画像1")]
+    Texture2D m_cursor; 
+    [SerializeField, Header("マウスカーソル画像1")]
+    Texture2D m_cursorTaget;
 
     [SerializeField,Header("探索パート背景用ImageObjct"),EnumIndex(typeof(InvBackGroundType))]
     private GameObject[] m_invObj;
    
 
     private InvBackGroundType  m_currentInvType;
-    private bool m_isOpen = false;              //開いているかのフラグ
-    private bool m_click = false;               //クリック抑制
-    private PointerEventData pointData;         //クリック検知用
+    private bool m_isOpen;                       //開いているかのフラグ
+    private Vigilance m_vigilance;               //警戒度用構造体
+    private int m_getItemNum;                    //現在取得しているアイテム数          
+
+    private struct Vigilance {
+        public float MaxVigilance;               //最大警戒度
+        public float Level { get { return m_VigilanceLevel; } set { if (VigilanceFlag) { m_VigilanceLevel = value;  }  } }
+        public float Rate { get { return m_VigilanceLevel / MaxVigilance; } }
+        public bool IsOver { get { return m_VigilanceLevel >= MaxVigilance; } }
+        public Vector2 mouseVec;               //マウス座標
+        public bool VigilanceFlag;              //このフラグがOnの時のみ警戒度を設定できます
+        private float m_VigilanceLevel;         //警戒度
+    }
+    
 
     private void Awake() {
-        GetItemNum = 0;
-        m_instance = GetComponent<InvManager>(); 
-        pointData = new PointerEventData(EventSystem.current);      
+        m_isOpen = false;
+        m_getItemNum = 0;
+        m_instance = GetComponent<InvManager>();
     }
 
     private void Update() {
-        CheckClick();
-    }
-    private void CheckClick() {
-        //画面が開かれていて、かつクリック処理を行っていない場合、クリックされた判定を行う
-        if (m_isOpen && !m_click && Input.GetKeyDown(KeyCode.Mouse0)) {
-            //クリック処理中
-            m_click = true; 
-            //別スレッドからメインスレッドを参照できるようにする
-            SynchronizationContext MainThread = SynchronizationContext.Current;
-            Task.Run(() =>
-            {
-                MainThread.Post(__ =>
-                {
-                    //RaycastAllの結果格納用のリスト作成
-                    List<RaycastResult> RayResult = new List<RaycastResult>();
-
-                    //PointerEvenDataに、マウスの位置をセット
-                    pointData.position = Input.mousePosition;
-                    //RayCast（スクリーン座標）
-                    EventSystem.current.RaycastAll(pointData, RayResult);
-
-                    foreach (RaycastResult result in RayResult) {
-                        //アイテムの取得処理
-                        if (result.gameObject.TryGetComponent<ItemObject>(out var item)) {
-                            //取得するアイテムのメッセージを取得する
-                            var ins = ItemManager.Instance;
-                            ins.GetItemMessage(item.ID,ItemManager.ItemMessageType.Investigation,out string message);
-                            item.GetItem();
-
-                            if (GetItemNum == ins.GetTotalItemNum(MapSetting.Instance.StageNumber)) {
-                                Close();
-                                Supadari.SceneManager.Instance.SceneChange(SCENENAME.SolveScene);
-                            }
-                            break;
-                        }
-                    }
-                    //処理終了
-                }, new Action(() => m_click = false));
-            });
+        if (m_vigilance.VigilanceFlag) {
+            CheckLevel();
         }
     }
 
+    /// <summary>警戒度を設定します</summary>
+    /// <returns>警戒度が最大値以上の場合にtrueを返します</returns>
+    private bool SetVigilance(float value) {
+        m_vigilance.Level = value;
+        m_gaugefill.fillAmount = m_vigilance.Rate;
+        return m_vigilance.IsOver;
+    }
 
+    /// <summary>警戒度を追加します</summary>
+    /// <returns>警戒度が最大値以上の場合にtrueを返します</returns>
+    private bool AddVigilance(float addValue) {
+        m_vigilance.Level += addValue;
+        m_gaugefill.fillAmount = m_vigilance.Rate;
+        return m_vigilance.IsOver;
+    }
 
+    /// <summary>マウスが動いたかどうかを調べます</summary>
+    /// <returns>ゲームオーバーの場合にはfalseを返します</returns>
+    private void CheckLevel() {
+            Vector2 pos = Input.mousePosition;
+            //マウスが動かされている場合
+            if (m_vigilance.mouseVec != pos) {
+                if (m_vigilance.IsOver) {
+                    OverVigilance();
+                }
+                else {
+                    m_vigilance.mouseVec = pos;
+                    AddVigilance(Time.deltaTime);
+                }
+            }
+    }
+
+    /// <summary>全てのアイテムを取得した際の処理を記述します</summary>
+    private void ClearInv() {
+        m_vigilance.VigilanceFlag = false;
+        SceneManager.Instance.SceneChange(SCENENAME.SolveScene, () => { UIManager.Instance.CloseUI(UIType.Timer); SetCursor(null); });
+    }
+
+    /// <summary>カーソルを設定します</summary>
+    /// <param name="target"></param>
+    private void SetCursor(bool? target) {
+        Texture2D tex = target == null ? null : (bool)target ? m_cursorTaget : m_cursor;
+        Vector2 vec = tex  == null ? Vector2.zero : new Vector2(tex.width/2,tex.height/2);
+        Cursor.SetCursor(tex, vec, CursorMode.Auto);
+    }
+  
+    /// <summary>
+    /// 警戒度がマックスの際にマウスを動かしてしまった場合の処理
+    /// </summary>
+    private void OverVigilance() {
+        SceneManager.Instance.SceneChange(SCENENAME.GameOverScene, () => { UIManager.Instance.CloseUI(UIType.Timer); SetCursor(null); });
+    }
 }

@@ -5,8 +5,7 @@ using UnityEngine;
 /// <summary>
 /// アイテムの所持などを管理するクラスです
 /// </summary>
-public class ItemManager : SingletonMonoBehaviour<ItemManager>
-{
+public class ItemManager : SingletonMonoBehaviour<ItemManager> {
     //アイテムメッセージの選択を管理する列挙型
     public enum ItemMessageType {
         Investigation = ItemDataCsvIndex.Investigation,             //探索パートメッセージ
@@ -21,7 +20,7 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     public void AddItem(ItemID id) {
         UsefulSystem.DebugAction(() => { if (m_itemFlag.TInstance.GetFlag(id)) { Debug.LogWarning("そのアイテムは既に取得しています。"); } });
         m_itemWindow ??= ItemWindow.Instance;
-        m_itemWindow.SetWindow(id,true);
+        m_itemWindow.SetWindow(id, true);
     }
 
     /// <summary>アイテムの所持フラグを消します。</summary>
@@ -29,7 +28,7 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     public void RemoveItem(ItemID id) {
         UsefulSystem.DebugAction(() => { if (!m_itemFlag.TInstance.GetFlag(id)) { Debug.LogWarning("指定されたアイテムの所持フラグは既にfalseです"); } });
         m_itemWindow ??= ItemWindow.Instance;
-        m_itemWindow.SetWindow(id,false);
+        m_itemWindow.SetWindow(id, false);
     }
 
     /// <summary>指定されたアイテムの所持フラグを取得します。</summary>
@@ -46,14 +45,14 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
         m_itemData.GetLineIndex((int)ItemDataCsvIndex.Name, name, out int index_y);
         m_itemData.GetData((int)ItemDataCsvIndex.ID, index_y, out int data);
         return (ItemID)data;
-    }  
+    }
     /// <summary>名前からアイテムのIDを取得します</summary>
     /// <param name="name">アイテム名(複数)</param>
     /// <returns>IDを返します</returns>
-    public void GetItemID(in string[] names,out ItemID[] ids) {
+    public void GetItemID(in string[] names, out ItemID[] ids) {
         ids = new ItemID[names.Length];
         m_itemData.GetLineIndex((int)ItemDataCsvIndex.Name, name, out int index_y);
-        for(int i = 0; i < names.Length; i++) {
+        for (int i = 0; i < names.Length; i++) {
             m_itemData.GetData((int)ItemDataCsvIndex.ID, index_y, out int data);
             ids[i] = (ItemID)data;
         }
@@ -64,7 +63,7 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     /// <param name="messageType">メッセージタイプ</param>
     /// <param name="message">渡されるメッセージ</param>
     /// <returns>指定されたメッセージが空白だった場合はfalseを返します</returns>
-    public bool GetItemMessage(ItemID id,ItemMessageType messageType,out string message) {
+    public bool GetItemMessage(ItemID id, ItemMessageType messageType, out string message) {
         return m_itemData.GetData((int)messageType, (int)id, out message);
     }
     /// <summary>アイテムのメッセージを取得します</summary>
@@ -72,7 +71,7 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     /// <param name="messageType">メッセージタイプ</param>
     /// <param name="message">渡されるメッセージ</param>
     /// <returns>指定されたメッセージが空白だった場合はfalseを返します</returns>
-    public bool GetItemMessage(string name,ItemMessageType messageType, out string message) {
+    public bool GetItemMessage(string name, ItemMessageType messageType, out string message) {
         m_itemData.GetLineIndex((int)messageType, name, out int index_y);
         return m_itemData.GetData((int)messageType, index_y, out message);
     }
@@ -80,26 +79,44 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     /// <summary>ステージクリアに必要なアイテムの情報を１つ取得します</summary>
     /// <param name="stageNumber">ステージ番号(1~)</param>
     /// <param name="itemNumber">何番目のアイテムか</param>
-    /// <returns></returns>
-    public bool GetNeedItem(int stageNumber,int itemNumber,out ItemID data) {
-        int index = (int)MapSetting.StageCsvIndex.itemStart + itemNumber - 1;
-        bool check = m_itemData.GetData(index,stageNumber, out int dataInt);
+    /// <returns>指定されたアイテムの番号にアイテムが割り振られていた場合はtrueを返します</returns>
+    public bool GetNeedItem(int stageNumber, int itemNumber, out ItemID data) {
+        int index = (int)MapManager.StageCsvIndex.itemStart + itemNumber - 1;
+        bool check = m_stageData.GetData(index, stageNumber, out int dataInt);
         data = check ? (ItemID)dataInt : ItemID.Dummy;
-        return check; 
+        return check;
+    }
+
+    /// <summary>ステージクリアに必要なアイテムの情報を全て取得します</summary>
+    /// <param name="stageNumber">ステージ番号(1~)</param>
+    /// <param name="itemNumber">何番目のアイテムか</param>
+    /// <returns>アイテムが一つでも見つかった場合はtrueを返します</returns>
+    public bool GetAllNeedItem(int stageNumber, out List<ItemID> data) {
+        data = new List<ItemID>();
+        int end = (int)MapManager.StageCsvIndex.otherItem;
+        for (int i = (int)MapManager.StageCsvIndex.itemStart; i < end; i++) {
+            if (m_stageData.GetData(i, stageNumber, out int dataInt)) {
+                data.Add((ItemID)dataInt);
+            }
+        }
+        return data.Count > 0;
     }
 
     /// <summary>ステージクリアに必要ではないその他のアイテムを取得します</summary>
     /// <param name="stageNumber">ステージの番号</param>
     /// <param name="dataID">その他アイテムのデータ配列</param>
     /// <returns>その他のアイテムが無かった場合はfalseを返します</returns>
-    public bool GetOtherItem(int stageNumber,out ItemID[] dataID) {
-        int index =  m_stageData.GetLength(0) - 1;  //右端を取得
-        bool check = m_stageData.GetData(index,stageNumber,out string str);  //読み込む
-        var data = str.Split(',');                                          　//分離する
-        dataID = check? new ItemID[data.Length]: null;
-        for (int i = 0; i < data.Length; i++) {
-            dataID[i] = (ItemID)int.Parse(data[i]);
+    public bool GetOtherItems(int stageNumber, out ItemID[] dataID) {
+        int index = m_stageData.GetLength(stageNumber) - 1;  //右端を取得
+        bool check = m_stageData.GetData(index, stageNumber, out string str);  //読み込む
+        if (check) {
+            var data = str.Split(',');                                           //分離する
+            dataID = new ItemID[data.Length];
+            for (int i = 0; i < data.Length; i++) {
+                dataID[i] = (ItemID)int.Parse(data[i]);
+            }
         }
+        else { dataID = new ItemID[0]; }
         return check;
     }
 
@@ -109,11 +126,11 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     public int GetTotalItemNum(int stageNumber) {
         int total = 0;
         int length = m_stageData.GetLength(0) - 1; //右端を取得
-        for (int i = (int)MapSetting.StageCsvIndex.itemStart; i < length; i++) {
-            if (m_stageData.CheckData(i, stageNumber))total++;
-            else  break;      
+        for (int i = (int)MapManager.StageCsvIndex.itemStart; i < length; i++) {
+            if (m_stageData.CheckData(i, stageNumber)) total++;
+            else break;
         }
-        m_stageData.GetData(length - 1, stageNumber,out string str);
+        m_stageData.GetData(length - 1, stageNumber, out string str);
         total += str != "" ? str.Split(',').Length : 0;
         return total;
     }
@@ -127,12 +144,12 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
 
     /// <summary>アイテムの取得情報を初期の状態に戻します。</summary>
     public void _Reset() { m_itemFlag.Reset(); }
-   
+
     /// <summary>フラグの情報をログに表示します(デバッグ用)</summary>
     [System.Diagnostics.Conditional("UNITY_EDITOR")]
     public void Log() { Debug.Log(m_itemFlag.JsonToString()); }
 
-  
+
 
     // private //
 
@@ -149,16 +166,16 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     private CSVSetting m_itemData;                                 //総アイテムデータ 
     private CSVSetting m_stageData;                                //ステージデータ
     private ItemWindow m_itemWindow;                               //アイテムウィンドウ管理インスタンス
-   
 
     //初期化とJsonからのデータの読み込み
     protected override void Awake() {
         base.Awake();
-        if(m_itemFlag == null) {
+        if (m_itemFlag == null) {
             //アイテム情報を読み込む   TODO : セーブファイル情報を他で管理する
-            m_itemFlag = new JsonSettings<SettingsGetItemFlags>("Data1","JsonSaveFile", "ItemGetFlags");    //アイテム所持データ
+            m_itemFlag = new JsonSettings<SettingsGetItemFlags>("Data1", "JsonSaveFile", "ItemGetFlags");    //アイテム所持データ
             m_itemData = new CSVSetting("アイテム情報");   //アイテム情報(メッセージ等)       
             m_stageData = new CSVSetting("ステージ情報");
+
         }
     }
 }

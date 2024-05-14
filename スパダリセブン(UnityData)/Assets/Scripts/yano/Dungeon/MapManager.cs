@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using UnityEngine.SceneManagement;
 
 //TODO JSONに対応させる
 public enum MapType {
@@ -16,7 +17,7 @@ public enum MapType {
     Goal4 = 8,
 }
 
-public class MapSetting : SingletonMonoBehaviour<MapSetting> {
+public class MapManager : SingletonMonoBehaviour<MapManager> {
     
     /// <summary>マップを生成します</summary>
     /// <param name="stageNumber">マップ番号</param>
@@ -25,7 +26,10 @@ public class MapSetting : SingletonMonoBehaviour<MapSetting> {
     }
 
     /// <summary>現在のステージ番号を取得します</summary>
-    public int StageNumber { get { return m_stageData.number; } }
+    public int StageNumber { get { Debug.Assert(m_stageData.number > -1,"ステージが生成されていません。");  return m_stageData.number; } }
+
+    /// <summary>現在のステージの全アイテム数を取得します</summary>
+    public int TotalItem { get { Debug.Assert(m_stageData.number > -1, "ステージが生成されていません。"); return m_stageData.totalitem; } }
 
     /// <summary>ステージの制限時間を取得します</summary>
     public float Time { get { return m_stageData.time; } }
@@ -45,15 +49,13 @@ public class MapSetting : SingletonMonoBehaviour<MapSetting> {
         size = 3,
         danger = 4,
         itemStart = 5,
+        otherItem = 11,
     }
 
     //  プライベート変数  //------------------------------------------------------------------------------------------------------------------------------
 
     //マップデータ
     StageData m_stageData;
-    //UIマネージャーインスタンス
-    private UIManager m_uiManager;
-
 
     //ステージのデータを管理する構造体
     private struct StageData {
@@ -62,6 +64,7 @@ public class MapSetting : SingletonMonoBehaviour<MapSetting> {
         public string name { get { Data.GetData((int)StageCsvIndex.name,number, out string data); return data; } } //ステージ名
         public float time  { get { Data.GetData((int)StageCsvIndex.time, number, out int data); return data; } }    //制限時間
         public float size  { get { Data.GetData((int)StageCsvIndex.size,number, out int data); return data; } }    //一マスのサイズ
+        public int totalitem { get; set; }
     }
 
     //  プライベート関数  //------------------------------------------------------------------------------------------------------------------------------
@@ -72,7 +75,9 @@ public class MapSetting : SingletonMonoBehaviour<MapSetting> {
         //マップ情報だけ先に読み込んでおく
         if (StageData.Data == null) {
             //ステージ作成に必要なデータが入ったCSVを読み込む
-            StageData.Data = new CSVSetting("ステージ情報");         
+            StageData.Data = new CSVSetting("ステージ情報");
+            m_stageData.number = -1;
+            SceneManager.sceneUnloaded += SceneUnloaded;
         }
     }
     private void Start() {
@@ -86,8 +91,6 @@ public class MapSetting : SingletonMonoBehaviour<MapSetting> {
     /// <summary>マップを作成します Note:岬さんのシーンマネージャーから呼び出します</summary>
     /// <param name="mapNumber">作成するステージ番号 Note:ステージ番号はステージ情報一覧.csvに記載</param>
     private void _Create(int mapNumber) {
-        //インスタンスを取得
-        m_uiManager ??= UIManager.Instance;
         //ステージ名を格納しているインデックスを確保する
         StageData.Data.GetColumnIndex(0, "ステージ名", out int nameIndex);
         //ステージ名を取得
@@ -96,6 +99,11 @@ public class MapSetting : SingletonMonoBehaviour<MapSetting> {
         var mapData = new CSVSetting(data);
         //現在のステージ番号を格納する
         m_stageData.number = mapNumber;
+        //現在のステージのアイテム数を取得する
+        var im = ItemManager.Instance;
+        im.GetAllNeedItem(mapNumber, out List<ItemID> ni);
+        im.GetOtherItems(mapNumber, out ItemID[] oi);
+        m_stageData.totalitem = ni.Count + oi.Length;
         //マップの高さと１マスのサイズを取得
         int maxY = mapData.TotalLine;//高さ
          Vector2 scale = new Vector2(m_stageData.size, m_stageData.size); //サイズ
@@ -126,5 +134,9 @@ public class MapSetting : SingletonMonoBehaviour<MapSetting> {
         TimerManager.Instance.SetTimer(m_stageData.time);
         // アイテムウィンドウを表示
         ItemWindow.Instance.ActiveWindows();
+    }
+
+    private void SceneUnloaded(Scene thisScene) {
+        m_stageData.number = -1;
     }
 }

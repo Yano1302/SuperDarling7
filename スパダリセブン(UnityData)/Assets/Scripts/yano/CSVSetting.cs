@@ -38,6 +38,12 @@ public class CSVSetting {
     /// <param name="data">取得データ</param>
     /// <returns>指定されたデータに数字が書かれていない場合はfalseを返します</returns>
     public bool GetData(int x, int y, out int data) { return int.TryParse(m_csvData[y][x], out data); }
+    /// <summary>CSVファイルのデータ(数字)を取得します</summary>
+    /// <param name="x">取得する列数</param>
+    /// <param name="y">取得する行数</param>
+    /// <param name="data">取得データ</param>
+    /// <returns>指定されたデータに数字が書かれていない場合はfalseを返します</returns>
+    public bool GetData(int x, int y, out float data) { return float.TryParse(m_csvData[y][x], out data); }
 
     /// <summary>指定された箇所に記述があるかどうか確認します</summary>
     /// <param name="x">取得する列数</param>
