@@ -69,6 +69,7 @@ public class BaseTextController : DebugSetting
                 case TALKSTATE.LASTTALK:
                     if (testText) buttonText.text = "会話終了"; // ボタンテキストを"会話終了"に変更
                     break;
+                    
             }
         }
     }
@@ -207,7 +208,7 @@ public class BaseTextController : DebugSetting
     /// 会話に関するボタン関数(talkNum変更可)
     /// </summary>
     /// <param name="num">読み込みたいCSVの行</param>
-    public virtual void OnTalkButtonClicked(int num = 9999)
+    public virtual void OnTalkButtonClicked(int num)
     {
         sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.TInstance.volumeSE);
         if (TalkState == TALKSTATE.NOTALK) // 会話ステータスが話していないなら
@@ -222,7 +223,7 @@ public class BaseTextController : DebugSetting
         }
         if (TalkState != TALKSTATE.LASTTALK) // 会話ステータスが話し中,なら
         {
-            if (num != 9999 && num < storyTalks.Length) talkNum = num;
+            if (num < storyTalks.Length) talkNum = num;
             InitializeTalkField(); // 表示されているテキスト等を初期化
             InstantiateActors(); // 登場人物等を生成
             StartDialogueCoroutine(); // 文章を表示するコルーチンを開始
@@ -447,4 +448,10 @@ public class StoryTalkData
     public string talks; // 文章
     public string BGM; // BGM名
     public string stage; // ステージ番号
+    public string choices; // 選択肢の正解ID
+    public string correct; // 正解時のストーリー行数
+    public string miss; // 不正解時のストーリー行数
+    public string gameOver; // ゲームオーバー時のストーリー行数
+
+
 }

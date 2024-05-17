@@ -20,7 +20,8 @@ public enum TALKSTATE
     NOTALK, // 話していない
     TALKING, // 会話中
     NEXTTALK, // 次のセリフ
-    LASTTALK // 最後のセリフ
+    LASTTALK, // 最後のセリフ
+    Question // 解決シーンにてアイテムを選択する状態
 }
 // 環境設定のステータス
 public enum SETTINGSTATE
