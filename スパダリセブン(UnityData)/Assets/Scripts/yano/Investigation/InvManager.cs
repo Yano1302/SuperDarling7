@@ -116,6 +116,7 @@ public class InvManager : MonoBehaviour
         if (m_vigilance.VigilanceFlag) {
             CheckLevel();
         }
+
     }
 
     /// <summary>Œx‰ú“x‚ğİ’è‚µ‚Ü‚·</summary>

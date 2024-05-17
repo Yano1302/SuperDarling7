@@ -11,6 +11,7 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
 {
     public TextMeshProUGUI itemText; // アイテムの詳細を表示するテキスト　岬追記
     public Image itemImage; // アイテム画像　岬追記
+    public Supadari.SceneManager sceneManager; // シーンマネージャー変数
 
     //アイテムメッセージの選択を管理する列挙型
     public enum ItemMessageType {
@@ -202,6 +203,23 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
             g.SetActive(m_itemFlag.TInstance.GetFlag((ItemID)i + 1)); // 表示
         }
     }*/
+
+    private void Update()
+    {
+        // 岬追記　エスケープキーを押したらアイテムリストを開くまたは閉じる
+        SCENENAME sName = sceneManager.CheckSceneName;
+        if (sName == SCENENAME.InvestigationScene && Input.GetKeyDown(KeyCode.Escape) || sName == SCENENAME.SolveScene && Input.GetKeyDown(KeyCode.Escape))
+        {
+            m_itemWindow.WinSlide();
+        }
+        if (m_itemWindow.CheckOpen == false && itemText.text!="")
+        {
+            itemText.text = null;
+            itemImage.gameObject.SetActive(false);
+        }
+    }
+
+
 
     /// <summary>
     /// アイテムの詳細を表示する関数

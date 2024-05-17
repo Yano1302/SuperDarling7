@@ -16,6 +16,7 @@ namespace Supadari
         StoryController controller; // ストーリーコントローラー変数
         public UIManager uiManager; // UIマネージャー用変数
         public AudioManager audioManager; // オーディオマネージャー変数
+        public ItemWindow itemWindow; // アイテムウィンドウ変数
         public SCENENAME CheckSceneName { get { return currentSceneName; } } // 現在のシーン名を取得
         public Scene CheckScene { get { return currentScene; } } // 現在のシーンを取得
         // セーブデータを読み込み
@@ -34,9 +35,6 @@ namespace Supadari
             audioManager = GameObject.FindGameObjectWithTag("AudioManager").GetComponent<AudioManager>(); // audioManagerを検索して代入
             UnityEngine.SceneManagement.SceneManager.sceneLoaded += SceneLoaded;
             audioManager.BGM_Play("BGM_title", enviromentalData.TInstance.volumeBGM); // BGMを流す
-            //KeyDebug.AddKeyDebug("GameOver画面へ遷移", GameOver);
-            //KeyDebug.AddKeyDebug("GameClear画面へ遷移", GameClear);
-            //KeyDebug.AddKeyDebug("調査画面へ遷移", Investigation);
         }
         /// <summary>
         /// イベントハンドラー　シーン遷移時の関数
@@ -57,12 +55,18 @@ namespace Supadari
                 MapManager setting = MapManager.Instance; // MapManagerのインスタンス取得　※矢野変更
                 setting.CreateMap(stageNum); // マップを生成
             }
+            // 解決シーン以外の場合
             else if (currentSceneName != SCENENAME.SolveScene) 
             {
                 TimerManager.Instance.CloseTimer(true);   // タイマーを閉じる　※矢野追記
                 uiManager.CloseUI(UIType.ItemWindow); // アイテムウィンドウを閉じる
+                // ジャッジオブジェクトを非表示にする
+                if (itemWindow.CheckJudge() == true)
+                {
+                    itemWindow.InactiveJudge();
+                }
             } 
-            // 各シーンでのBGMを流す ストーリーシーンはCSVデータを参照して流すのでここでは流さない
+            // 各シーンでの個別設定 ストーリーシーンはCSVデータを参照して流すのでここでは流さない
             switch(currentSceneName)
             {
                 case SCENENAME.TitleScene:
@@ -83,6 +87,11 @@ namespace Supadari
                     break;
                 case SCENENAME.SolveScene:
                     audioManager.BGM_Play("BGM_solve", enviromentalData.TInstance.volumeBGM);
+                    // ジャッジオブジェクトを表示する
+                    if (itemWindow.CheckJudge() == true)
+                    {
+                        itemWindow.ActiveJudge();
+                    }
                     break;
                 case SCENENAME.Dungeon:
                     audioManager.BGM_Play("BGM_dungeon", enviromentalData.TInstance.volumeBGM);
