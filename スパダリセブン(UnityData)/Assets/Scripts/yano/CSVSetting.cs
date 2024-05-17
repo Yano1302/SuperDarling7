@@ -20,7 +20,6 @@ public class CSVSetting {
         m_csvData = new List<string[]>();                                 //メモリ確保                 
         while (reader.Peek() != -1) {
             string line = reader.ReadLine();// 1行ずつ読み込む
-            Debug.Log(line);
             m_csvData.Add(line.Split(',')); // csvDataリストに追加する
         }
         reader.Close();

@@ -6,15 +6,14 @@ using UnityEngine.SceneManagement;
 
 //TODO JSONに対応させる
 public enum MapType {
-    player = 0,
-    road   = 1,
-    wall   = 2,
-    catchtrap = 3,
-    pitfall = 4,
-    Goal1 = 5,
-    Goal2 = 6,
-    Goal3 = 7,
-    Goal4 = 8,
+    Dummy = 0,
+    Player = 1,
+    road   = 2,
+    wall   = 3,
+    catchtrap = 4,
+    pitfall = 5,
+    Goal1 = 6,
+    
 }
 
 public class MapManager : SingletonMonoBehaviour<MapManager> {
@@ -114,20 +113,19 @@ public class MapManager : SingletonMonoBehaviour<MapManager> {
                 //読み込んだものを数字に変換する。変換できた場合にマスの作成を行う
                 if(mapData.GetData(x, y, out int typeNum)) {
                     //数字から配置するマスを決定し配置する
-                    if (typeNum >= 0) {
-                        //マスの配置場所を計算する
-                        Vector2 vec = new Vector2(m_stageData.size * x, m_stageData.size - (m_stageData.size * y));
-                        //マスを作成
-                        var obj = Instantiate(MapObject[typeNum], vec, Quaternion.identity);
-                        obj.transform.localScale = scale;
-                        if (typeNum != 1 && typeNum != 2) {
-                            //他の背景用に道オブジェクトを配置する　TODO:仮置き
-                            Instantiate(MapObject[1], vec, Quaternion.identity);
-                        }
+                    if (typeNum == 0) {  continue;  }//０の場合は配置しない
+                    Vector2 vec = new Vector2(m_stageData.size * x, m_stageData.size - (m_stageData.size * y));//マスの配置場所を計算する
+                    //マスを作成
+                    var obj = Instantiate(MapObject[typeNum], vec, Quaternion.identity);
+                    obj.transform.localScale = scale;
+                    if (typeNum != (int)MapType.road && typeNum != (int)MapType.wall) {
+                        //他の背景用に道オブジェクトを配置する　TODO:仮置き
+                        Instantiate(MapObject[(int)MapType.road], vec, Quaternion.identity);
                     }
                 }     
             }        
         }
+    
         //マップ生成後にタイマーを開く
         TimerManager.Instance.SetTimer(m_stageData.time);
         // アイテムウィンドウを表示
