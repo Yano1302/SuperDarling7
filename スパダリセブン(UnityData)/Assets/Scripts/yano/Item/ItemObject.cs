@@ -15,6 +15,7 @@ public class ItemObject : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     public void GetItem() {
         ItemManager.Instance.AddItem(ID);
         m_invManager.GetItemNum += 1;
+        m_invManager.SetMouseIcon(null);
         Destroy(gameObject);
     }
 

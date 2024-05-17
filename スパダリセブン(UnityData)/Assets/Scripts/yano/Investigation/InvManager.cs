@@ -1,10 +1,12 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Supadari;
 using SceneManager = Supadari.SceneManager;
 
 
-public enum InvBackGroundType {
+public enum InvType {
    A, B, C,
 }
 
@@ -18,7 +20,8 @@ public class InvManager : MonoBehaviour
     /// <summary>警戒度が上がるフラグを設定します。</summary>
     public bool VigilanceFlag { get { return m_vigilance.VigilanceFlag; } set { m_vigilance.VigilanceFlag = value; } }
 
-    public void Open(InvBackGroundType type) {
+    /// <summary>調査パートを開きます</summary>
+    public void Open(InvType type) {
         Debug.Assert(!m_isOpen,"探索パートが既に開かれています");
         //シーンを開く
         m_currentInvType = type;  m_invObj[(int)m_currentInvType].SetActive(true);
@@ -41,9 +44,7 @@ public class InvManager : MonoBehaviour
        
     }
 
-    /// <summary>
-    /// 戻るボタンにアタッチします
-    /// </summary>
+    /// <summary>調査パートを閉じ、探索パートにもどります(ボタンにアタッチしてます)</summary>
     public void Close() {
         if (m_vigilance.VigilanceFlag) {
             //シーンを閉じる
@@ -69,29 +70,39 @@ public class InvManager : MonoBehaviour
        SetCursor(target);
     }
 
+    //自身のインスタンス
     private static InvManager m_instance;
     private InvManager() { }
-
+        
+    //  アタッチ用   //------------------------------------------------------------------------------
     [SerializeField, Header("戻るボタン")]
     private GameObject m_backBtn;
     [SerializeField, Header("警戒度ゲージ")]
     private Image m_gauge;
     [SerializeField]
     private Image m_gaugefill;
+    [SerializeField]
+    private Image m_waves;
+    [SerializeField]
+    private float m_waveDirectionTime;
+    [SerializeField]
+    private float m_waveInterval;
 
     [SerializeField, Header("マウスカーソル画像1")]
     Texture2D m_cursor; 
     [SerializeField, Header("マウスカーソル画像1")]
     Texture2D m_cursorTaget;
 
-    [SerializeField,Header("探索パート背景用ImageObjct"),EnumIndex(typeof(InvBackGroundType))]
+    [SerializeField,Header("探索パート背景用ImageObjct"),EnumIndex(typeof(InvType))]
     private GameObject[] m_invObj;
-   
 
-    private InvBackGroundType  m_currentInvType;
+    //-----------------------------------------------------------------------------------------------
+
+    private InvType  m_currentInvType;           //現在の調査パート状態
     private bool m_isOpen;                       //開いているかのフラグ
     private Vigilance m_vigilance;               //警戒度用構造体
-    private int m_getItemNum;                    //現在取得しているアイテム数          
+    private int m_getItemNum;                    //現在取得しているアイテム数
+    private ItemManager m_itemManager;           //アイテムマネージャーインスタンス
 
     private struct Vigilance {
         public float MaxVigilance;               //最大警戒度
@@ -100,21 +111,31 @@ public class InvManager : MonoBehaviour
         public bool IsOver { get { return m_VigilanceLevel >= MaxVigilance; } }
         public Vector2 mouseVec;               //マウス座標
         public bool VigilanceFlag;              //このフラグがOnの時のみ警戒度を設定できます
+        public float WaveInterval;           //鼓動の間隔
         private float m_VigilanceLevel;         //警戒度
+
     }
     
-
     private void Awake() {
         m_isOpen = false;
         m_getItemNum = 0;
+        m_vigilance.WaveInterval = m_waveInterval;
         m_instance = GetComponent<InvManager>();
         m_gauge.enabled = false;
         m_gaugefill.enabled = false;
+        m_itemManager = ItemManager.Instance;
+    }
+
+    private void Start() {
+        m_itemManager = ItemManager.Instance;
     }
 
     private void Update() {
         if (m_vigilance.VigilanceFlag) {
-            CheckLevel();
+            CheckMouseMove();
+        }
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+            m_itemManager.SwichItemWindow();
         }
 
     }
@@ -132,12 +153,17 @@ public class InvManager : MonoBehaviour
     private bool AddVigilance(float addValue) {
         m_vigilance.Level += addValue;
         m_gaugefill.fillAmount = m_vigilance.Rate;
+        if (m_vigilance.Rate > m_vigilance.WaveInterval) {
+            StartCoroutine("Waves");
+            m_vigilance.WaveInterval += m_waveInterval;
+        }
+        
         return m_vigilance.IsOver;
     }
 
     /// <summary>マウスが動いたかどうかを調べます</summary>
     /// <returns>ゲームオーバーの場合にはfalseを返します</returns>
-    private void CheckLevel() {
+    private void CheckMouseMove() {
             Vector2 pos = Input.mousePosition;
             //マウスが動かされている場合
             if (m_vigilance.mouseVec != pos) {
@@ -154,6 +180,7 @@ public class InvManager : MonoBehaviour
     /// <summary>全てのアイテムを取得した際の処理を記述します</summary>
     private void ClearInv() {
         m_vigilance.VigilanceFlag = false;
+        StopCoroutine("Waves");
         SceneManager.Instance.SceneChange(SCENENAME.SolveScene, () => { UIManager.Instance.CloseUI(UIType.Timer); SetCursor(null); });
     }
 
@@ -169,6 +196,31 @@ public class InvManager : MonoBehaviour
     /// 警戒度がマックスの際にマウスを動かしてしまった場合の処理
     /// </summary>
     private void OverVigilance() {
+        StopCoroutine("Waves");
         SceneManager.Instance.SceneChange(SCENENAME.GameOverScene, () => { UIManager.Instance.CloseUI(UIType.Timer); SetCursor(null); });
+    }
+
+    private IEnumerator Waves() {
+        float time = 0; 
+        WaitForSeconds wait = new WaitForSeconds(Time.deltaTime);
+        while (time < 0.5) {
+            float t = Time.deltaTime / m_waveDirectionTime;
+            Color c = m_waves.color;
+            c.a += t * 2;
+            m_waves.color = c;
+            time += t;
+            yield return wait;
+        }
+        while(time < 1) {
+            float t = Time.deltaTime / m_waveDirectionTime;
+            Color c = m_waves.color;
+            c.a -= t * 2;
+            m_waves.color = c;
+            time += t;
+            yield return wait;
+        }
+        Color col = m_waves.color;
+        col.a = 0;
+        m_waves.color = col;
     }
 }

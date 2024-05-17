@@ -7,28 +7,30 @@ using UnityEngine.UI;
 
 public class ItemWindow : SingletonMonoBehaviour<ItemWindow>
 {
-    [SerializeField, Header("ƒAƒCƒeƒ€ƒEƒBƒ“ƒhƒEƒIƒuƒWƒFƒNƒgˆê——"), EnumIndex(typeof(ItemID))]
+    [SerializeField, Header("ï¿½Aï¿½Cï¿½eï¿½ï¿½ï¿½Eï¿½Bï¿½ï¿½ï¿½hï¿½Eï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ê——"), EnumIndex(typeof(ItemID))]
     private GameObject[] m_windows;
     [SerializeField]
-    private GameObject m_judge; // –¦’Ç‹L@ƒWƒƒƒbƒW•Ï”
+    private GameObject m_judge; // ï¿½ï¿½ï¿½Ç‹Lï¿½@ï¿½Wï¿½ï¿½ï¿½bï¿½Wï¿½Ïï¿½
 
-    /// <summary>ƒEƒBƒ“ƒhƒE‚ğƒAƒNƒeƒBƒu‰»‚µ‚Ü‚·</summary>
-    public void ActiveWindows() { machWindow(); m_managerUI ??= UIManager.Instance; m_managerUI.OpenUI(UIType.ItemWindow); }
-    /// <summary>ƒEƒBƒ“ƒhƒE‚ğ”ñƒAƒNƒeƒBƒu‰»‚µ‚Ü‚·</summary>
-    public void InactiveWindows() { m_managerUI ??= UIManager.Instance; m_managerUI.CloseUI(UIType.ItemWindow); }
-    /// <summary>ƒWƒƒƒbƒW‚ğƒAƒNƒeƒBƒu‰»‚µ‚Ü‚·</summary>@–¦’Ç‹L
+    /// <summary>ï¿½Eï¿½Bï¿½ï¿½ï¿½hï¿½Eï¿½ï¿½ï¿½Aï¿½Nï¿½eï¿½Bï¿½uï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½</summary>
+    public void ActiveWindows() { machWindow();m_uiManager.OpenUI(UIType.ItemWindow); }
+    /// <summary>ï¿½Eï¿½Bï¿½ï¿½ï¿½hï¿½Eï¿½ï¿½ï¿½Aï¿½Nï¿½eï¿½Bï¿½uï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½</summary>
+    public void InactiveWindows() { m_uiManager.CloseUI(UIType.ItemWindow); }
+    /// <summary>ï¿½Wï¿½ï¿½ï¿½bï¿½Wï¿½ï¿½ï¿½Aï¿½Nï¿½eï¿½Bï¿½uï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½</summary>ï¿½@ï¿½ï¿½ï¿½Ç‹L
     public void ActiveJudge() { m_judge.SetActive(true); }
-    /// <summary>ƒWƒƒƒbƒW‚ğ”ñƒAƒNƒeƒBƒu‰»‚µ‚Ü‚·</summary>@–¦’Ç‹L
+    /// <summary>ï¿½Wï¿½ï¿½ï¿½bï¿½Wï¿½ï¿½ï¿½Aï¿½Nï¿½eï¿½Bï¿½uï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½</summary>ï¿½@ï¿½ï¿½ï¿½Ç‹L
     public void InactiveJudge() { m_judge.SetActive(false); }
     public bool CheckJudge(){ return m_judge.activeSelf; }
-    public GameObject GetWinObj(ItemID itemID) { return m_windows[(int)itemID]; } // ƒQƒbƒ^[ŠÖ”@–¦’Ç‹L
+
+
+    public GameObject GetWinObj(ItemID itemID) { return m_windows[(int)itemID]; } // ï¿½Qï¿½bï¿½^ï¿½[ï¿½Öï¿½ï¿½@ï¿½ï¿½ï¿½Ç‹L
 
     /// <summary>
-    /// ƒAƒCƒeƒ€ƒEƒBƒ“ƒhƒE‚ğƒXƒ‰ƒCƒh‚³‚¹‚éŠÖ” –¦’Ç‹L
+    /// ï¿½Aï¿½Cï¿½eï¿½ï¿½ï¿½Eï¿½Bï¿½ï¿½ï¿½hï¿½Eï¿½ï¿½ï¿½Xï¿½ï¿½ï¿½Cï¿½hï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öï¿½ ï¿½ï¿½ï¿½Ç‹L
     /// </summary>
     public void WinSlide()
     {
-        // ItemOpen‚ÅƒXƒ‰ƒCƒh‚³‚¹‚é•ûŒü‚ğŒˆ‚ß‚é
+        // ItemOpenï¿½ÅƒXï¿½ï¿½ï¿½Cï¿½hï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß‚ï¿½
         if (CheckOpen == false)
         {
             transform.localPosition = new Vector3(0, 0, 0);
@@ -42,22 +44,26 @@ public class ItemWindow : SingletonMonoBehaviour<ItemWindow>
     }
 
 
-    /// <summary>w’è‚µ‚½ƒAƒCƒeƒ€ƒEƒBƒ“ƒhƒE‚ğŠJ‚«‚Ü‚·</summary>
-    /// <param name="id">ŠJ‚­ƒEƒBƒ“ƒhƒE‚ÌID</param>
+    /// <summary>ï¿½wï¿½è‚µï¿½ï¿½ï¿½Aï¿½Cï¿½eï¿½ï¿½ï¿½Eï¿½Bï¿½ï¿½ï¿½hï¿½Eï¿½ï¿½ï¿½Jï¿½ï¿½ï¿½Ü‚ï¿½</summary>
+    /// <param name="id">ï¿½Jï¿½ï¿½ï¿½Eï¿½Bï¿½ï¿½ï¿½hï¿½Eï¿½ï¿½ID</param>
     public void SetWindow(ItemID id,bool isOpen) { m_windows[(int)id].SetActive(isOpen);}
 
+
     public bool CheckOpen { get { return m_isOpen; } set { m_isOpen = value; } }
+    /// <summary>ï¿½Aï¿½Cï¿½eï¿½ï¿½ï¿½Eï¿½Bï¿½ï¿½ï¿½hï¿½Eï¿½ÌƒAï¿½Nï¿½eï¿½Bï¿½uï¿½ï¿½Ô‚ï¿½ï¿½æ“¾ï¿½ï¿½ï¿½Ü‚ï¿½</summary>
+    public bool IsActiveItemWindow { get { return m_uiManager.ChekIsOpen(UIType.ItemWindow);  }  }
 
+    private bool m_isOpen = false; // ï¿½ï¿½ï¿½Ç‹Lï¿½@ï¿½Eï¿½Bï¿½ï¿½ï¿½hï¿½Eï¿½ï¿½ï¿½Jï¿½ï¿½ï¿½Ä‚ï¿½ï¿½é‚©ï¿½Ç‚ï¿½ï¿½ï¿½
+        private ItemManager m_itemManager { get { IM ??= ItemManager.Instance; return IM; } } //ï¿½Cï¿½ï¿½ï¿½Xï¿½^ï¿½ï¿½ï¿½Xï¿½æ“¾
+    private UIManager m_uiManager { get { UIM ??= UIManager.Instance; return UIM; } }ï¿½@ï¿½@//ï¿½Cï¿½ï¿½ï¿½Xï¿½^ï¿½ï¿½ï¿½Xï¿½æ“¾
+    private ItemManager IM; //ï¿½Cï¿½ï¿½ï¿½Xï¿½^ï¿½ï¿½ï¿½Xï¿½{ï¿½ï¿½
+    private UIManager UIM; //ï¿½Cï¿½ï¿½ï¿½Xï¿½^ï¿½ï¿½ï¿½Xï¿½{ï¿½ï¿½
 
-    private bool m_isOpen = false; // –¦’Ç‹L@ƒEƒBƒ“ƒhƒE‚ğŠJ‚¢‚Ä‚¢‚é‚©‚Ç‚¤‚©
-    private ItemManager m_managerIT;
-    private UIManager m_managerUI;
 
     private void machWindow() {
-        m_managerIT ??= ItemManager.Instance;
         for (int i = 1; i < m_windows.Length; i++) {
-            //ŠƒAƒCƒeƒ€î•ñ‚ÆƒIƒuƒWƒFƒNƒg‚ÌƒAƒNƒeƒBƒuî•ñ‚ğˆê’v‚³‚¹‚é
-            m_windows[i].SetActive(m_managerIT.GetFlag((ItemID)i));
+            //ï¿½ï¿½ï¿½ï¿½ï¿½Aï¿½Cï¿½eï¿½ï¿½ï¿½ï¿½ï¿½ÆƒIï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ÌƒAï¿½Nï¿½eï¿½Bï¿½uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+            m_windows[i].SetActive(m_itemManager.GetFlag((ItemID)i));
         }
     }
 }

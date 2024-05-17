@@ -22,11 +22,10 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
 
     // 関数一覧 //
 
-    /// <summary>アイテムを所持します。</summary>
+    /// <summary>アイテムを取得します。※現在アイテムは重複して持てないので複数回呼んでも変わりません</summary>
     /// <param name="id">所持するアイテムのID</param>
     public void AddItem(ItemID id) {
         UsefulSystem.DebugAction(() => { if (m_itemFlag.TInstance.GetFlag(id)) { Debug.LogWarning("そのアイテムは既に取得しています。"); } });
-        m_itemWindow ??= ItemWindow.Instance;
         string itemName;
         m_itemData.GetData(1, (int)id, out itemName); // アイテム情報よりアイテム名を取得 岬追記
         GameObject item = m_itemWindow.GetWinObj(id); // アイテムのオブジェクトを取得
@@ -39,7 +38,6 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     /// <param name="id">消すアイテムのID</param>
     public void RemoveItem(ItemID id) {
         UsefulSystem.DebugAction(() => { if (!m_itemFlag.TInstance.GetFlag(id)) { Debug.LogWarning("指定されたアイテムの所持フラグは既にfalseです"); } });
-        m_itemWindow ??= ItemWindow.Instance;
         m_itemWindow.SetWindow(id,false);
     }
 
@@ -48,6 +46,7 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     /// <returns>指定されたアイテムの所持フラグ</returns>
     public bool GetFlag(ItemID id) { return m_itemFlag.TInstance.GetFlag(id); }
 
+    /// <summary>IDに対応するアイテムの名前を取得します</summary>
     public string GetItemName(ItemID id) { m_itemData.GetData((int)ItemDataCsvIndex.Name, (int)id, out string data); return data; }
 
     /// <summary>名前からアイテムのIDを取得します</summary>
@@ -145,6 +144,17 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
         return total;
     }
 
+    /// <summary>アイテムウィンドウを開きます</summary>
+    public void SetItemWindow(bool IsSetting) {
+        if (IsSetting) m_itemWindow.ActiveWindows();
+        else m_itemWindow.InactiveWindows();
+    }
+
+    /// <summary>アイテムウィンドウの状態を変更します</summary>
+    public void SwichItemWindow() {
+        if (m_itemWindow.IsActiveItemWindow) m_itemWindow.InactiveWindows();
+        else m_itemWindow.ActiveWindows();
+    }
 
     /// <summary> Jsonデータに現在の所持情報を書き込みます。</summary>
     public void Save() { m_itemFlag.Save(); }
@@ -175,7 +185,8 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     private static JsonSettings<SettingsGetItemFlags> m_itemFlag;  //アイテム所持情報
     private CSVSetting m_itemData;                                 //総アイテムデータ 
     private CSVSetting m_stageData;                                //ステージデータ
-    public ItemWindow m_itemWindow;                               //アイテムウィンドウ管理インスタンス
+    private ItemWindow m_itemWindow { get { IW ??= ItemWindow.Instance; return IW; } }//アイテムウィンドウ取得プロパティ
+    private ItemWindow IW;                                          //アイテムウィンドウ管理インスタンス
    
 
     //初期化とJsonからのデータの読み込み
