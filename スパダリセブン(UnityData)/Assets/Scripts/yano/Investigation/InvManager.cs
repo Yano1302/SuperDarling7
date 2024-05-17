@@ -6,7 +6,7 @@ using Supadari;
 using SceneManager = Supadari.SceneManager;
 
 
-public enum InvBackGroundType {
+public enum InvType {
    A, B, C,
 }
 
@@ -20,7 +20,8 @@ public class InvManager : MonoBehaviour
     /// <summary>警戒度が上がるフラグを設定します。</summary>
     public bool VigilanceFlag { get { return m_vigilance.VigilanceFlag; } set { m_vigilance.VigilanceFlag = value; } }
 
-    public void Open(InvBackGroundType type) {
+    /// <summary>調査パートを開きます</summary>
+    public void Open(InvType type) {
         Debug.Assert(!m_isOpen,"探索パートが既に開かれています");
         //シーンを開く
         m_currentInvType = type;  m_invObj[(int)m_currentInvType].SetActive(true);
@@ -43,9 +44,7 @@ public class InvManager : MonoBehaviour
        
     }
 
-    /// <summary>
-    /// 戻るボタンにアタッチします
-    /// </summary>
+    /// <summary>調査パートを閉じ、探索パートにもどります(ボタンにアタッチしてます)</summary>
     public void Close() {
         if (m_vigilance.VigilanceFlag) {
             //シーンを閉じる
@@ -71,9 +70,11 @@ public class InvManager : MonoBehaviour
        SetCursor(target);
     }
 
+    //自身のインスタンス
     private static InvManager m_instance;
     private InvManager() { }
-
+        
+    //  アタッチ用   //------------------------------------------------------------------------------
     [SerializeField, Header("戻るボタン")]
     private GameObject m_backBtn;
     [SerializeField, Header("警戒度ゲージ")]
@@ -92,14 +93,16 @@ public class InvManager : MonoBehaviour
     [SerializeField, Header("マウスカーソル画像1")]
     Texture2D m_cursorTaget;
 
-    [SerializeField,Header("探索パート背景用ImageObjct"),EnumIndex(typeof(InvBackGroundType))]
+    [SerializeField,Header("探索パート背景用ImageObjct"),EnumIndex(typeof(InvType))]
     private GameObject[] m_invObj;
-   
 
-    private InvBackGroundType  m_currentInvType;
+    //-----------------------------------------------------------------------------------------------
+
+    private InvType  m_currentInvType;           //現在の調査パート状態
     private bool m_isOpen;                       //開いているかのフラグ
     private Vigilance m_vigilance;               //警戒度用構造体
     private int m_getItemNum;                    //現在取得しているアイテム数
+    private ItemManager m_itemManager;           //アイテムマネージャーインスタンス
 
     private struct Vigilance {
         public float MaxVigilance;               //最大警戒度
@@ -113,7 +116,6 @@ public class InvManager : MonoBehaviour
 
     }
     
-
     private void Awake() {
         m_isOpen = false;
         m_getItemNum = 0;
@@ -121,11 +123,19 @@ public class InvManager : MonoBehaviour
         m_instance = GetComponent<InvManager>();
         m_gauge.enabled = false;
         m_gaugefill.enabled = false;
+        m_itemManager = ItemManager.Instance;
+    }
+
+    private void Start() {
+        m_itemManager = ItemManager.Instance;
     }
 
     private void Update() {
         if (m_vigilance.VigilanceFlag) {
-            CheckLevel();
+            CheckMouseMove();
+        }
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+            m_itemManager.SwichItemWindow();
         }
     }
 
@@ -152,7 +162,7 @@ public class InvManager : MonoBehaviour
 
     /// <summary>マウスが動いたかどうかを調べます</summary>
     /// <returns>ゲームオーバーの場合にはfalseを返します</returns>
-    private void CheckLevel() {
+    private void CheckMouseMove() {
             Vector2 pos = Input.mousePosition;
             //マウスが動かされている場合
             if (m_vigilance.mouseVec != pos) {

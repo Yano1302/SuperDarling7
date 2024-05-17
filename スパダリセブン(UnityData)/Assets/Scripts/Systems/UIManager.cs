@@ -148,8 +148,8 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
         }
     }
 
-
-
+    /// <summary>指定されたUIが開かれているか調べます</summary>
+    public bool ChekIsOpen(UIType type) { return UIObjects[(int)type].activeSelf; }
 
     //  プライベート変数  //-------------------------------------------------------------------------------------------------------
 
