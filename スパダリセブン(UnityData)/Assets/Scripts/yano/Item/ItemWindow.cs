@@ -7,30 +7,30 @@ using UnityEngine.UI;
 
 public class ItemWindow : SingletonMonoBehaviour<ItemWindow>
 {
-    [SerializeField, Header("�A�C�e���E�B���h�E�I�u�W�F�N�g�ꗗ"), EnumIndex(typeof(ItemID))]
+    [SerializeField, Header("アイテムウィンドウオブジェクト一覧"), EnumIndex(typeof(ItemID))]
     private GameObject[] m_windows;
     [SerializeField]
-    private GameObject m_judge; // ���ǋL�@�W���b�W�ϐ�
+    private GameObject m_judge; // 岬追記　ジャッジ変数
 
-    /// <summary>�E�B���h�E���A�N�e�B�u�����܂�</summary>
+    /// <summary>ウィンドウをアクティブ化します</summary>
     public void ActiveWindows() { machWindow();m_uiManager.OpenUI(UIType.ItemWindow); }
-    /// <summary>�E�B���h�E���A�N�e�B�u�����܂�</summary>
+    /// <summary>ウィンドウを非アクティブ化します</summary>
     public void InactiveWindows() { m_uiManager.CloseUI(UIType.ItemWindow); }
-    /// <summary>�W���b�W���A�N�e�B�u�����܂�</summary>�@���ǋL
+    /// <summary>ジャッジ変数をアクティブ化します</summary>　岬追記
     public void ActiveJudge() { m_judge.SetActive(true); }
-    /// <summary>�W���b�W���A�N�e�B�u�����܂�</summary>�@���ǋL
+    /// <summary>ジャッジ変数を非アクティブ化します</summary>　岬追記
     public void InactiveJudge() { m_judge.SetActive(false); }
     public bool CheckJudge(){ return m_judge.activeSelf; }
 
-
-    public GameObject GetWinObj(ItemID itemID) { return m_windows[(int)itemID]; } // �Q�b�^�[�֐��@���ǋL
+    // ゲッター関数　岬追記
+    public GameObject GetWinObj(ItemID itemID) { return m_windows[(int)itemID]; } 
 
     /// <summary>
-    /// �A�C�e���E�B���h�E���X���C�h������֐� ���ǋL
+    /// アイテムウィンドウのスライドを行う関数　岬追記
     /// </summary>
     public void WinSlide()
     {
-        // ItemOpen�ŃX���C�h��������������߂�
+        // ItemOpenを参照してスライド方向を決める
         if (CheckOpen == false)
         {
             transform.localPosition = new Vector3(0, 0, 0);
@@ -44,25 +44,26 @@ public class ItemWindow : SingletonMonoBehaviour<ItemWindow>
     }
 
 
-    /// <summary>�w�肵���A�C�e���E�B���h�E���J���܂�</summary>
-    /// <param name="id">�J���E�B���h�E��ID</param>
+    /// <summary>指定したアイテムウィンドウを開きます</summary>
+    /// <param name="id">開くウィンドウのID</param>
     public void SetWindow(ItemID id,bool isOpen) { m_windows[(int)id].SetActive(isOpen);}
 
+    public bool CheckOpen { get { return m_isOpen; } set { m_isOpen = value; } } // m_isOpenのゲッターセッター関数
 
-    public bool CheckOpen { get { return m_isOpen; } set { m_isOpen = value; } }
-    /// <summary>�A�C�e���E�B���h�E�̃A�N�e�B�u��Ԃ��擾���܂�</summary>
+    /// <summary>アイテムウィンドウのアクティブ状態を取得します</summary>
     public bool IsActiveItemWindow { get { return m_uiManager.ChekIsOpen(UIType.ItemWindow);  }  }
 
-    private bool m_isOpen = false; // ���ǋL�@�E�B���h�E���J���Ă��邩�ǂ���
-        private ItemManager m_itemManager { get { IM ??= ItemManager.Instance; return IM; } } //�C���X�^���X�擾
-    private UIManager m_uiManager { get { UIM ??= UIManager.Instance; return UIM; } }�@�@//�C���X�^���X�擾
-    private ItemManager IM; //�C���X�^���X�{��
-    private UIManager UIM; //�C���X�^���X�{��
+    private bool m_isOpen = false; // アイテムウィンドウが開いているかどうか
+
+    private ItemManager IM; //インスタンス本体
+    private UIManager UIM; //インスタンス本体
+    private ItemManager m_itemManager { get { IM ??= ItemManager.Instance; return IM; } } //インスタンス取得
+    private UIManager m_uiManager { get { UIM ??= UIManager.Instance; return UIM; } }　//インスタンス取得
 
 
     private void machWindow() {
         for (int i = 1; i < m_windows.Length; i++) {
-            //�����A�C�e�����ƃI�u�W�F�N�g�̃A�N�e�B�u������v������
+            //所持アイテム情報とオブジェクトのアクティブ情報を一致させる
             m_windows[i].SetActive(m_itemManager.GetFlag((ItemID)i));
         }
     }

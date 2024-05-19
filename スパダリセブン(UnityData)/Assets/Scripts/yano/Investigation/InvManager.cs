@@ -134,10 +134,6 @@ public class InvManager : MonoBehaviour
         if (m_vigilance.VigilanceFlag) {
             CheckMouseMove();
         }
-        if (Input.GetKeyDown(KeyCode.Escape)) {
-            m_itemManager.SwichItemWindow();
-        }
-
     }
 
     /// <summary>Œx‰ú“x‚ğİ’è‚µ‚Ü‚·</summary>

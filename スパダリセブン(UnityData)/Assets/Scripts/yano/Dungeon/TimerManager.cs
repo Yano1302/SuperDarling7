@@ -53,7 +53,7 @@ public class TimerManager : SingletonMonoBehaviour<TimerManager>
         DisplayManager.Instance.FadeOut(
             FadeType.Entire, 
             () => {
-                Supadari.SceneManager.Instance.SceneChange(SCENENAME.SolveScene);
+                Supadari.SceneManager.Instance.SceneChange(SCENENAME.GameOverScene);
             });
     }
 

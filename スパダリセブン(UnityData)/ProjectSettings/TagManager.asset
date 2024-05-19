@@ -13,6 +13,9 @@ TagManager:
   - BackTitle
   - ItemText
   - Content
+  - ItemWindow
+  - Item
+  - Judge
   layers:
   - Default
   - TransparentFX

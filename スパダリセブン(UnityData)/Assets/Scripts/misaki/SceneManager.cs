@@ -13,7 +13,7 @@ namespace Supadari
         [SerializeField] Button autoButton; // オートボタン変数
         public int saveSlot; // セーブスロット変数
         public int stageNum = 0; // ステージ番号
-        StoryController controller; // ストーリーコントローラー変数
+        BaseTextController controller; // ストーリーコントローラー変数
         public UIManager uiManager; // UIマネージャー用変数
         public AudioManager audioManager; // オーディオマネージャー変数
         public ItemWindow itemWindow; // アイテムウィンドウ変数
@@ -29,7 +29,6 @@ namespace Supadari
             base.Awake();
             Application.targetFrameRate = 60;
         }
-        // Start is called before the first frame update
         void Start()
         {
             audioManager = GameObject.FindGameObjectWithTag("AudioManager").GetComponent<AudioManager>(); // audioManagerを検索して代入
@@ -47,27 +46,27 @@ namespace Supadari
             // 現在のシーンを代入する
             currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene(); 
             currentSceneName = (SCENENAME)currentScene.buildIndex;
-            // ストーリーシーンであればストーリーメニューを出す
-            if (currentSceneName == SCENENAME.StoryScene) uiManager.OpenUI(UIType.StoryMenu);
+            // ストーリーシーンまたは解決シーンであればストーリーメニューを出す
+            if (currentSceneName == SCENENAME.StoryScene || currentSceneName == SCENENAME.SolveScene) uiManager.OpenUI(UIType.StoryMenu);
             else uiManager.CloseUI(UIType.StoryMenu);
             // 現在のシーンが探索シーンであれば
-            if (currentSceneName == SCENENAME.Dungeon || currentSceneName == SCENENAME.InvestigationScene) {
+            if (currentSceneName == SCENENAME.Dungeon || currentSceneName == SCENENAME.InvestigationScene)
+            {
                 MapManager setting = MapManager.Instance; // MapManagerのインスタンス取得　※矢野変更
                 setting.CreateMap(stageNum); // マップを生成
             }
+            // 探索シーン以外の場合
+            if (currentSceneName != SCENENAME.InvestigationScene) TimerManager.Instance.CloseTimer(true);   // タイマーを閉じる　※矢野追記
             // 解決シーン以外の場合
-            else if (currentSceneName != SCENENAME.SolveScene) 
+            if (currentSceneName != SCENENAME.SolveScene)
             {
-                TimerManager.Instance.CloseTimer(true);   // タイマーを閉じる　※矢野追記
                 uiManager.CloseUI(UIType.ItemWindow); // アイテムウィンドウを閉じる
                 // ジャッジオブジェクトを非表示にする
-                if (itemWindow.CheckJudge() == true)
-                {
-                    itemWindow.InactiveJudge();
-                }
-            } 
-            // 各シーンでの個別設定 ストーリーシーンはCSVデータを参照して流すのでここでは流さない
-            switch(currentSceneName)
+                if (itemWindow.CheckJudge() == true) itemWindow.InactiveJudge();
+            }
+
+                // 各シーンでの個別設定 ストーリーシーンはCSVデータを参照して流すのでここでは流さない
+            switch (currentSceneName)
             {
                 case SCENENAME.TitleScene:
                     audioManager.BGM_Play("BGM_title", enviromentalData.TInstance.volumeBGM);
@@ -84,14 +83,15 @@ namespace Supadari
                     break;
                 case SCENENAME.InvestigationScene:
                     audioManager.BGM_Play("BGM_dungeon", enviromentalData.TInstance.volumeBGM);
+                    uiManager.OpenUI(UIType.ItemWindow);
                     break;
                 case SCENENAME.SolveScene:
                     audioManager.BGM_Play("BGM_solve", enviromentalData.TInstance.volumeBGM);
+                    controller = GameObject.FindGameObjectWithTag("Coroutine").GetComponent<SolveTextController>();
+                    autoButton.onClick.AddListener(controller.OnAutoModeCllicked);
+                    uiManager.OpenUI(UIType.ItemWindow);
                     // ジャッジオブジェクトを表示する
-                    if (itemWindow.CheckJudge() == true)
-                    {
-                        itemWindow.ActiveJudge();
-                    }
+                    if (itemWindow.CheckJudge() == false) itemWindow.ActiveJudge();
                     break;
                 case SCENENAME.Dungeon:
                     audioManager.BGM_Play("BGM_dungeon", enviromentalData.TInstance.volumeBGM);
@@ -106,6 +106,7 @@ namespace Supadari
                     break;
             }
         }
+
         /// <summary>
         /// シーン遷移を行う関数
         /// </summary>
@@ -114,6 +115,7 @@ namespace Supadari
         {
             displayManager.FadeOut(FadeType.Entire,()=> UnityEngine.SceneManagement.SceneManager.LoadScene(LoadScene)); // フェードアウトする
         }
+
         /// <summary>
         /// シーン遷移を行う関数
         /// </summary>
@@ -122,6 +124,7 @@ namespace Supadari
         {
             displayManager.FadeOut(FadeType.Entire,()=> UnityEngine.SceneManagement.SceneManager.LoadScene(LoadScene)); // フェードアウトする
         }
+
         /// <summary>
         /// シーン遷移を行う関数
         /// </summary>
@@ -130,6 +133,7 @@ namespace Supadari
         {
             displayManager.FadeOut(FadeType.Entire,()=> UnityEngine.SceneManagement.SceneManager.LoadScene((int)LoadScene)); // フェードアウトする
         }
+
         /// <summary>
         /// シーン遷移を行う関数
         /// </summary>
@@ -138,18 +142,6 @@ namespace Supadari
         public void SceneChange(SCENENAME LoadScene, UnityAction action)
         {
             displayManager.FadeOut(FadeType.Entire, () => { action?.Invoke(); UnityEngine.SceneManagement.SceneManager.LoadScene((int)LoadScene); }); // フェードアウトする
-        }
-        void GameOver()
-        {
-            SceneChange(SCENENAME.GameOverScene);
-        }
-        void GameClear()
-        {
-            SceneChange(SCENENAME.GameClearScene);
-        }
-        void Investigation()
-        {
-            SceneChange(SCENENAME.Dungeon);
         }
     }
 }

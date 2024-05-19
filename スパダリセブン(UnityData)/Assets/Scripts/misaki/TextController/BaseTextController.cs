@@ -48,6 +48,12 @@ public class BaseTextController : DebugSetting
     [SerializeField]bool testText = false; // ボタンのテキストを表示するかどうか
     [SerializeField] GameObject autoImage; // オートモードの画像
 
+    protected ItemWindow itemWindow; // アイテムウィンドウ変数
+
+    protected ItemID rightID; // 正しいアイテムID変数
+
+    protected int missCount = 0; // ミスをした回数
+
     public TALKSTATE talkState; // 会話ステータス変数
     public TALKSTATE TalkState
     {
@@ -79,6 +85,7 @@ public class BaseTextController : DebugSetting
         if(storynum!="") StorySetUp(storynum); // 対応する会話文をセットする
         TalkState = TALKSTATE.NOTALK; // 会話ステータスを話していないに変更
         sceneManager = GameObject.FindGameObjectWithTag("SceneManager").GetComponent<SceneManager>(); // オーディオマネージャーを取得
+        itemWindow = GameObject.FindGameObjectWithTag("ItemWindow").GetComponent<ItemWindow>(); // アイテムウィンドウを取得
         playerTextSpeed = sceneManager.enviromentalData.TInstance.textSpeed; // テキストスピードを設定
     }
     /// <summary>
@@ -143,6 +150,7 @@ public class BaseTextController : DebugSetting
         /// ここまで ///
         Debug.Log("Story" + storynum + "を読み込みました");
     }
+
     /// <summary>
     /// 会話に関するボタン関数(変更不可)
     /// </summary>
@@ -159,7 +167,7 @@ public class BaseTextController : DebugSetting
             TalkState = TALKSTATE.NEXTTALK; // 会話ステータスを次のセリフに変更
             return;
         }
-        if (TalkState != TALKSTATE.LASTTALK) // 会話ステータスが話し中,なら
+        if (TalkState != TALKSTATE.LASTTALK && TalkState != TALKSTATE.Question) // 会話ステータスが最後のセリフかつアイテム選択状態以外なら
         {
             InitializeTalkField(); // 表示されているテキスト等を初期化
             InstantiateActors(); // 登場人物等を生成
@@ -170,6 +178,7 @@ public class BaseTextController : DebugSetting
             TalkEnd(); //会話を終了する
         }
     }
+
     /// <summary>
     /// 会話に関するボタン関数(読み込むCSV変更可)
     /// </summary>
@@ -193,7 +202,7 @@ public class BaseTextController : DebugSetting
             TalkState = TALKSTATE.NEXTTALK; // 会話ステータスを次のセリフに変更
             return;
         }
-        if (TalkState != TALKSTATE.LASTTALK) // 会話ステータスが話し中,なら
+        if (TalkState != TALKSTATE.LASTTALK && TalkState!=TALKSTATE.Question) // 会話ステータスが最後のセリフかつアイテム選択状態以外なら
         {
             InitializeTalkField(); // 表示されているテキスト等を初期化
             InstantiateActors(); // 登場人物等を生成
@@ -221,7 +230,7 @@ public class BaseTextController : DebugSetting
             TalkState = TALKSTATE.NEXTTALK; // 会話ステータスを次のセリフに変更
             return;
         }
-        if (TalkState != TALKSTATE.LASTTALK) // 会話ステータスが話し中,なら
+        if (TalkState != TALKSTATE.LASTTALK) // 会話ステータスが最後のセリフ以外なら
         {
             if (num < storyTalks.Length) talkNum = num;
             InitializeTalkField(); // 表示されているテキスト等を初期化
@@ -357,7 +366,7 @@ public class BaseTextController : DebugSetting
             yield return new WaitForSeconds(CalculataTextSpeed());
         }
         NextDialogue(); // 次のダイアログに変更する
-        if (talkAuto) // オートモードであれば
+        if (talkAuto && TalkState != TALKSTATE.Question) // オートモードであれば、かつ、アイテム選択状態でなければ
         {
             yield return new WaitForSeconds(textDelay); // textDelay秒待つ
             OnTalkButtonClicked(); // 次の会話を自動でスタートする
@@ -391,7 +400,7 @@ public class BaseTextController : DebugSetting
             yield return new WaitForSeconds(CalculataTextSpeed());
         }
         NextDialogue(); // 次のダイアログに変更する
-        if (talkAuto) // オートモードであれば
+        if (talkAuto && TalkState != TALKSTATE.Question) // オートモードであれば、かつ、アイテム選択状態でなければ
         {
             yield return new WaitForSeconds(textDelay); // textDelay秒待つ
             OnTalkButtonClicked(); // 次の会話を自動でスタートする
@@ -403,14 +412,32 @@ public class BaseTextController : DebugSetting
     protected virtual void NextDialogue()
     {
         // トークスキップフラグが立ったら
-        if (talkSkip == true) textLabel.text = storyTalks[talkNum].talks; // 全文を表示
+        if (talkSkip == true)
+        {
+            textLabel.text = storyTalks[talkNum].talks; // 全文を表示
+            if(talkAuto)OnAutoModeCllicked(); // オートモード中ならオートモードを止める
+        }
+        talkSkip = false; // トークスキップフラグをfalseにする
+        runtimeCoroutine = false; // フラグを未実行に変更
+        // アイテム選択状態にする場合
+        if (storyTalks[talkNum].rightItemID != null) // 正解のアイテムを設定されていれば
+        {
+            TalkState = TALKSTATE.Question; // アイテム選択状態にする
+            rightID = (ItemID)int.Parse(storyTalks[talkNum].rightItemID); // 正解のアイテムを代入する
+            if (itemWindow.CheckOpen == false) itemWindow.WinSlide(); // アイテムウィンドウを開いていなければ開く
+            return;
+        }
+        // シーン遷移先の記載があった場合
+        if (storyTalks[talkNum].transition != null)
+        {
+            TalkState = TALKSTATE.LASTTALK; // 会話ステータスを最後のセリフに変更
+            return;
+        }
         talkNum++; // 次のダイアログに移動
         
         TalkState = TALKSTATE.NEXTTALK; // 会話ステータスを次のセリフに変更
-        talkSkip = false; // トークスキップフラグをfalseにする
         // 次のダイアログで最後なら会話ステータスを最後のセリフに変更
         if (talkNum >= storyTalks.Length) TalkState = TALKSTATE.LASTTALK;
-        runtimeCoroutine = false; // フラグを未実行に変更
     }
     /// <summary>
     /// テキストスピードを計算する関数
@@ -434,6 +461,7 @@ public class BaseTextController : DebugSetting
         else autoImage.SetActive(false);
     }
 }
+
 [System.Serializable] // サブプロパティを埋め込む
 public class StoryTalkData
 {
@@ -448,10 +476,9 @@ public class StoryTalkData
     public string talks; // 文章
     public string BGM; // BGM名
     public string stage; // ステージ番号
-    public string choices; // 選択肢の正解ID
+    public string rightItemID; // 選択肢の正解ID
     public string correct; // 正解時のストーリー行数
     public string miss; // 不正解時のストーリー行数
     public string gameOver; // ゲームオーバー時のストーリー行数
-
-
+    public string transition; // 遷移するどうか
 }
