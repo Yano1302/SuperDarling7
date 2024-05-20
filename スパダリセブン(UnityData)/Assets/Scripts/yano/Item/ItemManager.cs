@@ -178,6 +178,8 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     /// <param name="itemName">アイテム名</param>
     public void ItemDetails(string itemName)
     {
+        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.TInstance.volumeSE); // SEを鳴らす
+
         string details;
         string imageName;
         ItemID id = GetItemID(itemName); // アイテムIDを取得

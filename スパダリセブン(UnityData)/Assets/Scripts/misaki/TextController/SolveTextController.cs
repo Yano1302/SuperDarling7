@@ -17,6 +17,10 @@ public class SolveTextController : BaseTextController
     /// </summary>
     public void Judge()
     {
+        if (TalkState != TALKSTATE.Question) return; // アイテム選択状態ではない場合はリターンする
+
+        sceneManager.audioManager.SE_Play("SE", sceneManager.enviromentalData.TInstance.volumeSE); // SEを鳴らす
+
         ItemID selectedID = ItemManager.GetSelectedID; // 選択したアイテムIDを代入
 
         // 選択したアイテムIDが正解のアイテムIDかどうかを判断し、次に表示するストーリーを変える

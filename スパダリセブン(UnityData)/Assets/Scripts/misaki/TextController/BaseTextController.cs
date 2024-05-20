@@ -453,6 +453,8 @@ public class BaseTextController : DebugSetting
     /// </summary>
     public void OnAutoModeCllicked()
     {
+        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.TInstance.volumeSE);
+
         // talkAutoがtrueならfalseに、falseならtrueに変換
         talkAuto = !talkAuto;
         // オートモードならオートモード画像を出す　オートモードではないなら画像を出さない

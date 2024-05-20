@@ -49,7 +49,7 @@ public class MenuScript : SingletonMonoBehaviour <MenuScript>
     /// <param name="saveSlotIndex">セーブスロットの番号</param>
     public void Save(int saveSlotIndex)
     {
-        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.TInstance.volumeSE);
+        sceneManager.audioManager.SE_Play("SE_item01", sceneManager.enviromentalData.TInstance.volumeSE);
         JsonSettings<MasterData> saveData = new JsonSettings<MasterData>(string.Format("SaveData{0}", saveSlotIndex), "/Resources/プランナー監獄エリア/Json", "MasterData");
         // 現在のシーンを保存
         saveData.TInstance.scenename = sceneManager.CheckSceneName;
@@ -78,7 +78,7 @@ public class MenuScript : SingletonMonoBehaviour <MenuScript>
             Debug.Log("セーブされていません");
             return; // 一度もセーブされたことがないのならリターン
         }
-        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.TInstance.volumeSE);
+        sceneManager.audioManager.SE_Play("SE_item01", sceneManager.enviromentalData.TInstance.volumeSE);
         // ロードしてシーン遷移
         sceneManager.saveSlot = saveSlotIndex;
         sceneManager.SceneChange(saveData.TInstance.scenename);

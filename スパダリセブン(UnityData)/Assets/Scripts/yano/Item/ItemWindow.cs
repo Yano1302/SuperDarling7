@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class ItemWindow : SingletonMonoBehaviour<ItemWindow>
@@ -11,6 +12,9 @@ public class ItemWindow : SingletonMonoBehaviour<ItemWindow>
     private GameObject[] m_windows;
     [SerializeField]
     private GameObject m_judge; // 岬追記　ジャッジ変数
+
+    public Supadari.SceneManager sceneManager; // シーンマネージャー変数
+
 
     /// <summary>ウィンドウをアクティブ化します</summary>
     public void ActiveWindows() { machWindow();m_uiManager.OpenUI(UIType.ItemWindow); }
@@ -23,13 +27,15 @@ public class ItemWindow : SingletonMonoBehaviour<ItemWindow>
     public bool CheckJudge(){ return m_judge.activeSelf; }
 
     // ゲッター関数　岬追記
-    public GameObject GetWinObj(ItemID itemID) { return m_windows[(int)itemID]; } 
+    public GameObject GetWinObj(ItemID itemID) { return m_windows[(int)itemID]; }
 
     /// <summary>
     /// アイテムウィンドウのスライドを行う関数　岬追記
     /// </summary>
     public void WinSlide()
     {
+        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.TInstance.volumeSE); // SEを鳴らす
+
         // ItemOpenを参照してスライド方向を決める
         if (CheckOpen == false)
         {
