@@ -10,6 +10,8 @@ using UnityEngine.SceneManagement;
 //フェードイン・アウト時のフェードタイプ
 public enum FadeType
 {
+    /// <summary>現在のフェードタイプでフェードインします</summary>
+    CurrentFadeType,
     /// <summary>画面全体が徐々に暗く(明るく)なります</summary>
     Entire,
     /// <summary>右から左に向かってフェードします</summary>
@@ -107,6 +109,7 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
     /// <param name="action">フェード後に実行したい関数があれば記載してください</param>
     public void FadeIn(FadeType type, UnityAction action = null) {
         if (PrepareForFade(type, false)) {
+            type = type == FadeType.CurrentFadeType? FadeType.CurrentFadeType:type;
             m_action = action;
             StartCoroutine(_FadeInSetting(type));
         }
@@ -117,6 +120,7 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
     /// <param name="action">フェード後に実行したい関数があれば記載してください</param>
     public void FadeOut(FadeType type, UnityAction action = null) {
         if (PrepareForFade(type, true)) {
+            type = type == FadeType.CurrentFadeType ?  FadeType.CurrentFadeType : type;
             m_action = action;
             StartCoroutine(_FadeOutSetting(type));
         }   

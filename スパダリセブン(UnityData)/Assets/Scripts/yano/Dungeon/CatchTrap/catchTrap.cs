@@ -7,6 +7,7 @@ public class catchTrap : MonoBehaviour
     public static GameObject CaughtTrap = null;
     private void OnTriggerEnter2D(Collider2D collision) {
       if(collision.gameObject.tag == "Player") {
+            AudioManager.Instance.SE_Play("SE_dungeon02");
             CaughtTrap = gameObject;
             collision.transform.position = transform.position;
             Player.Instance.MoveFlag = false;

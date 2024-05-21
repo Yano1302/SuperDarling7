@@ -4,15 +4,15 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using System;
+using Supadari;
+using SceneManager = Supadari.SceneManager;
 
 /// <summary>
 /// アイテムの所持などを管理するクラスです
 /// </summary>
 public class ItemManager : SingletonMonoBehaviour<ItemManager>
 {
-    public TextMeshProUGUI itemText; // アイテムの詳細を表示するテキスト　岬追記
-    public Image itemImage; // アイテム画像　岬追記
-    public Supadari.SceneManager sceneManager; // シーンマネージャー変数
+   
 
     //アイテムメッセージの選択を管理する列挙型
     public enum ItemMessageType {
@@ -178,7 +178,7 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     /// <param name="itemName">アイテム名</param>
     public void ItemDetails(string itemName)
     {
-        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.TInstance.volumeSE); // SEを鳴らす
+        m_sceneManager.audioManager.SE_Play("SE_click", m_sceneManager.enviromentalData.TInstance.volumeSE); // SEを鳴らす
 
         string details;
         string imageName;
@@ -193,6 +193,14 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
 
 
     // private //
+    [SerializeField]
+    private TextMeshProUGUI itemText; // アイテムの詳細を表示するテキスト　岬追記
+    [SerializeField]
+    private Image itemImage;         // アイテム画像　岬追記
+
+
+
+
 
     //ItemのCSVファイルのインデックスを管理するEnumです
     private enum ItemDataCsvIndex {
@@ -208,7 +216,7 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     private CSVSetting m_stageData;                                //ステージデータ
     private ItemWindow m_itemWindow { get { IW ??= ItemWindow.Instance; return IW; } }//アイテムウィンドウ取得プロパティ
     private ItemWindow IW;                                          //アイテムウィンドウ管理インスタンス
-
+    private SceneManager m_sceneManager;    // シーンマネージャー変数
     static private ItemID selectedID = 0; // 選択したアイテム 岬追記
     static public ItemID GetSelectedID { get { return selectedID; }  } // 選択したアイテムのゲッター関数　岬追記
 
@@ -224,9 +232,14 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
         }
     }
 
+    protected void Start() {
+        m_sceneManager = SceneManager.Instance;
+    }
+
+
     private void Update()
     {
-        if (sceneManager.CheckSceneName == SCENENAME.InvestigationScene && Input.GetKeyDown(KeyCode.Escape) || sceneManager.CheckSceneName == SCENENAME.SolveScene && Input.GetKeyDown(KeyCode.Escape))
+        if (m_sceneManager.CheckSceneName == SCENENAME.InvestigationScene && Input.GetKeyDown(KeyCode.Escape) || m_sceneManager.CheckSceneName == SCENENAME.SolveScene && Input.GetKeyDown(KeyCode.Escape))
         {
             m_itemWindow.WinSlide();
         }

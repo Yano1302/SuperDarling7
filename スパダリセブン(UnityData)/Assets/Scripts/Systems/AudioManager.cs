@@ -753,8 +753,8 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     /// <returns>音源情報を返します。見つからなかった場合はnullを返します。</returns>
     public AudioClip GetAudioClip(string clipName) { GetClip(out var clip, clipName, true); return clip;}
 
-    //現在再生されているSE数を取得します。
-    public int PlaySENum() {
+    /// <summary>現在再生されているSE数を取得します。</summary>
+    public int GetPlaySENum() {
         int num = 0;
         foreach(var sd in m_SEDatas) {
             if (sd.Source.isPlaying) num++;
