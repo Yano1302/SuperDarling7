@@ -11,6 +11,8 @@ public class ItemWindow : SingletonMonoBehaviour<ItemWindow>
     [SerializeField, Header("アイテムウィンドウオブジェクト一覧"), EnumIndex(typeof(ItemID))]
     private GameObject[] m_windows;
     [SerializeField]
+    private GameObject m_window; // 岬追記　アイテムウィンドウ変数
+    [SerializeField]
     private GameObject m_judge; // 岬追記　ジャッジ変数
 
     public Supadari.SceneManager sceneManager; // シーンマネージャー変数
@@ -39,12 +41,12 @@ public class ItemWindow : SingletonMonoBehaviour<ItemWindow>
         // ItemOpenを参照してスライド方向を決める
         if (CheckOpen == false)
         {
-            transform.localPosition = new Vector3(0, 0, 0);
+            m_window.transform.localPosition = new Vector3(0, 0, 0);
             CheckOpen = true;
         }
         else if (CheckOpen == true)
         {
-            transform.localPosition = new Vector3(1170, 0, 0);
+            m_window.transform.localPosition = new Vector3(1170, 0, 0);
             CheckOpen = false;
         }
     }

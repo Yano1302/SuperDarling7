@@ -44,8 +44,8 @@ public class BaseTextController : DebugSetting
     protected string richTextTag = string.Empty; // リッチテキストタグ用変数
     protected bool isTag = false; // リッチテキストタグを格納しているかどうか
 
-    [SerializeField]protected SceneManager sceneManager; // シーンマネージャー変数
-    [SerializeField]bool testText = false; // ボタンのテキストを表示するかどうか
+    [SerializeField] protected SceneManager sceneManager; // シーンマネージャー変数
+    [SerializeField] bool testText = false; // ボタンのテキストを表示するかどうか
     [SerializeField] GameObject autoImage; // オートモードの画像
 
     protected ItemWindow itemWindow; // アイテムウィンドウ変数
@@ -53,6 +53,8 @@ public class BaseTextController : DebugSetting
     protected ItemID rightID; // 正しいアイテムID変数
 
     protected int missCount = 0; // ミスをした回数
+
+    [SerializeField] GameObject clickIcon; // クリックを催促するアイコン変数
 
     public TALKSTATE talkState; // 会話ステータス変数
     public TALKSTATE TalkState
@@ -85,7 +87,7 @@ public class BaseTextController : DebugSetting
         if(storynum!="") StorySetUp(storynum); // 対応する会話文をセットする
         TalkState = TALKSTATE.NOTALK; // 会話ステータスを話していないに変更
         sceneManager = GameObject.FindGameObjectWithTag("SceneManager").GetComponent<SceneManager>(); // オーディオマネージャーを取得
-        itemWindow = GameObject.FindGameObjectWithTag("ItemWindow").GetComponent<ItemWindow>(); // アイテムウィンドウを取得
+        itemWindow = GameObject.FindGameObjectWithTag("ItemWindow").GetComponent<ItemWindow>(); // アイテムウィンドウを取得 
         playerTextSpeed = sceneManager.enviromentalData.TInstance.textSpeed; // テキストスピードを設定
     }
     /// <summary>
@@ -267,6 +269,7 @@ public class BaseTextController : DebugSetting
         if (rightCharaImage) Destroy(rightCharaImage);
         // 中央キャラクター画像が表示されていれば画像を破壊する
         if (centerCharaImage) Destroy(centerCharaImage);
+        if (clickIcon != null) clickIcon.SetActive(false); // クリックアイコンを非表示にする
     }
     /// <summary>
     /// 登場人物等を生成する関数
@@ -417,6 +420,7 @@ public class BaseTextController : DebugSetting
             textLabel.text = storyTalks[talkNum].talks; // 全文を表示
             if(talkAuto)OnAutoModeCllicked(); // オートモード中ならオートモードを止める
         }
+        if (clickIcon != null) clickIcon.SetActive(true); // クリックアイコンを表示にする
         talkSkip = false; // トークスキップフラグをfalseにする
         runtimeCoroutine = false; // フラグを未実行に変更
         // アイテム選択状態にする場合
