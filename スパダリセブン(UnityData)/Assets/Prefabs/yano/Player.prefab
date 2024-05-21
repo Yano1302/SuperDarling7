@@ -51,7 +51,7 @@ MonoBehaviour:
   m_speed: 5
   isMoving: 1
   m_visRect: {fileID: 4816432755211130893}
-  m_motionSwichTime: 0.1
+  m_motionSwichTime: 0.3
   m_motionSprites:
   - {fileID: 21300000, guid: 9ac739196470a7e409f43035a48b336c, type: 3}
   - {fileID: 21300000, guid: 39f22632d174db54db0b6f4ed9e22eb8, type: 3}

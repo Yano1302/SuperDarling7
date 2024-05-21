@@ -61,11 +61,10 @@ public class InvManager : MonoBehaviour
         }
     }
 
-    /// <summary>マウスアイコンを設定します</summary>
-    /// <param name="target">targetがnullの場合;デフォルトのマウスカーソルになります<br />
-    /// targetがtrueの場合:カーソルがターゲットカーソルになります
-    /// targetがfalseの場合:カーソルが非ターゲットカーソルになります
-    /// </param>
+    /// <summary>マウスアイコンを設定します<br />
+    /// targetがnullの場合;デフォルトのマウスカーソルになります<br />
+    /// targetがtrueの場合:カーソルがターゲットカーソルになります<br />
+    /// targetがfalseの場合:カーソルが非ターゲットカーソルになります</summary>
     public void SetMouseIcon(bool? target) {
        SetCursor(target);
     }

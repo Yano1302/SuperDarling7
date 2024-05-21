@@ -16,7 +16,7 @@ public class ItemObject : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         ItemManager.Instance.AddItem(ID);
         AudioManager.Instance.SE_Play("SE_item01");
         m_invManager.GetItemNum += 1;
-        m_invManager.SetMouseIcon(null);
+        m_invManager.SetMouseIcon(false);
         Destroy(gameObject);
     }
 
