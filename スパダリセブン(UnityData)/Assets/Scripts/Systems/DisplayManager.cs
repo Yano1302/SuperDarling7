@@ -10,6 +10,8 @@ using UnityEngine.SceneManagement;
 //フェードイン・アウト時のフェードタイプ
 public enum FadeType
 {
+    /// <summary>現在のフェードタイプでフェードインします</summary>
+    CurrentFadeType,
     /// <summary>画面全体が徐々に暗く(明るく)なります</summary>
     Entire,
     /// <summary>右から左に向かってフェードします</summary>
@@ -98,7 +100,7 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
     public FadeType CurrentFadeType { get { return m_currentFadeType; } private set { m_currentFadeType = value; if (value != m_currentFadeType) Log("フェードタイプが " + m_currentFadeType + " から " + value + " に変更されます", false); } }
     /// <summary>シーンを切り替えた際に自動でフェードインするかどうか</summary>
     public bool AutoFading { get { return m_autoFading; } set { m_autoFading = value; } }
-    /// <summary>フェード後の呼び出し関数を設定します。デリゲードは関数呼び出し後に破棄されます。</summary>
+    /// <summary>フェード後の呼び出し関数を設定します。(引数とは別で、設定後はnullを設定するまで常に呼ばれます。引数の方が先に処理されます)</summary>
     public UnityAction FadeAction {set { m_action = value; } }
     // パブリック関数　//-----------------------------------------------------------------------------------------------------------------
 
@@ -107,8 +109,8 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
     /// <param name="action">フェード後に実行したい関数があれば記載してください</param>
     public void FadeIn(FadeType type, UnityAction action = null) {
         if (PrepareForFade(type, false)) {
-            m_action = action;
-            StartCoroutine(_FadeInSetting(type));
+            type = type == FadeType.CurrentFadeType? FadeType.CurrentFadeType:type;
+            StartCoroutine(_FadeInSetting(type,action));
         }
     }
 
@@ -117,8 +119,8 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
     /// <param name="action">フェード後に実行したい関数があれば記載してください</param>
     public void FadeOut(FadeType type, UnityAction action = null) {
         if (PrepareForFade(type, true)) {
-            m_action = action;
-            StartCoroutine(_FadeOutSetting(type));
+            type = type == FadeType.CurrentFadeType ?  FadeType.CurrentFadeType : type;
+            StartCoroutine(_FadeOutSetting(type,action));
         }   
     }
 
@@ -245,7 +247,7 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
     }
 
     /// <summary>画面のフェードインの実際の処理を行います</summary>
-    private IEnumerator _FadeInSetting(FadeType type) {
+    private IEnumerator _FadeInSetting(FadeType type,UnityAction action) {
         Log("フェードインを開始します", false);
         //インデックスを取得
         int index = (int)type;
@@ -276,12 +278,13 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
         m_fadeImage.material.SetFloat(m_pID[index].m_ID_Fade, 0);
         IsFading = false;
         Log("フェードが完了しました。", false);
-        Action();
+        action?.Invoke();
+        m_action?.Invoke();
         m_fadeImage.raycastTarget = false;
     }
 
     /// <summary>画面のフェードアウトの実際の処理を行います</summary>
-    private IEnumerator _FadeOutSetting(FadeType type) {
+    private IEnumerator _FadeOutSetting(FadeType type,UnityAction action) {
         Log("フェードアウトを開始します", false);
         //インデックスを取得
         int index = (int)type;
@@ -312,7 +315,8 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
         m_fadeImage.material.SetFloat(m_pID[index].m_ID_Fade, 1);
         IsFading = false;
         Log("フェードが完了しました。", false);
-        Action();
+        action?.Invoke();
+        m_action?.Invoke();
     }
 
     /// <summary>自動フェードインの処理を行います</summary>
@@ -323,9 +327,7 @@ public class DisplayManager : SingletonMonoBehaviour<DisplayManager> {
         }
     }
 
-    /// <summary>保存されているunityactionがある場合に実行します</summary>
-    private void Action() { m_action?.Invoke(); m_action = null; }
-
+  
     [Conditional("UNITY_EDITOR")]
     private void Log(string message,bool warning) { if (!m_Log) return;  if (warning) Debug.LogWarning(message); else Debug.Log(message); }
 

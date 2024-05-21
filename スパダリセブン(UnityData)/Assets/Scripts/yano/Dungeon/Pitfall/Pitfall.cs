@@ -13,14 +13,24 @@ public class Pitfall : MonoBehaviour
         m_ccol = gameObject.GetComponent<CircleCollider2D>();
     }
 
-    private void OnCollisionEnter2D(Collision2D collision) {
+    private void OnTriggerEnter2D(Collider2D collision) {
         if (collision.gameObject.CompareTag("Player")) {
+            AudioManager.Instance.SE_Play("SE_dungeon03");
             m_sr.enabled = true;
-            m_ccol.radius = 0.5537109f;
-            Player ins = Player.Instance;
-            ins.MoveFlag = false;
-            UsefulSystem.Instance.WaitCallBack(0.2f,()=>ins.MoveFlag = true);
-            Destroy(this);
+            Player pins = Player.Instance;
+            pins.MoveFlag = false;
+            DisplayManager dins = DisplayManager.Instance;
+            dins.FadeOut(FadeType.CurrentFadeType, () =>{
+                pins.ResetPositon();
+                dins.FadeIn(FadeType.CurrentFadeType, () =>
+                {
+                    m_ccol.isTrigger = false;
+                    pins.MoveFlag = true;                 
+                    m_ccol.radius = 0.5537109f;
+                    Destroy(this);
+                }); 
+            });
+           
         }   
     }
 }

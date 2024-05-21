@@ -59,6 +59,7 @@ MonoBehaviour:
   m_fadeImage: {fileID: 2701549627594919201}
   m_FadeShaders:
   - {fileID: 4800000, guid: 7e78bd375cea97f4cbba6458ebb32f57, type: 3}
+  - {fileID: 4800000, guid: 7e78bd375cea97f4cbba6458ebb32f57, type: 3}
   - {fileID: 4800000, guid: b0d292421343b8b4f9252c6c358245a5, type: 3}
   - {fileID: 4800000, guid: a48aa41725cb5184294f5e14285179fc, type: 3}
   - {fileID: 4800000, guid: cd382f14756266846870cbe61634cd4a, type: 3}

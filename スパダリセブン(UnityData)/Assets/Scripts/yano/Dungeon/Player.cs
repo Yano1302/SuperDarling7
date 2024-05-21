@@ -21,21 +21,32 @@ public class Player : MonoBehaviour
     public Vector2 Direction { get { return m_direction; } }
     /// <summary>視野狭窄の設定を取得・変更する</summary>
     public bool VisibilityImage { get { return m_visImage.enabled; } set{ m_visImage.enabled = value; } }
-    // プライベート変数・関数 //
+
+    /// <summary>プレイヤーを初期位置に戻します</summary>
+    public void ResetPositon() {
+        transform.position = m_originPos;
+    }
+
+
+    // アタッチ用 //
     [SerializeField, Header("視界のImageのtransform")]
     private RectTransform m_visRect;
     [SerializeField, Header("プレイヤーのモーション切り替え時間")]
     private float m_motionSwichTime;
     [SerializeField, Header("プレイヤーのモーションスプライト")]
     private Sprite[] m_motionSprites;
-   
 
+
+    // プライベート変数・関数 //
+    private static Player m_instance;       //このクラスのインスタンス
+    private CameraManager m_CamIns;         //カメラマネージャーインスタンス
+    private AudioManager m_AudioManager;    //オーディオマネージャーインスタンス
 
     private Image m_visImage;               //視野狭窄用イメージ
-    private CameraManager m_CamIns;         //カメラマネージャーインスタンス
-    private Rigidbody2D m_rb;               //移動用rigidbody
-    private static Player m_instance;       //このクラスのインスタンス
+    private Rigidbody2D m_rb;               //移動用rigidbody 
     private Vector3 m_direction;            //プレイヤーの向き
+    private Vector3 m_originPos;            //プレイヤーの元々の位置
+
     private SpriteRenderer m_playerImage;   //プレイヤーイメージ
     private float m_motionTime = 0;         //モーションの切り替えタイミングを計測する
     private int m_motionIndex = 0;          //モーションのインデックスを管理する
@@ -52,6 +63,8 @@ public class Player : MonoBehaviour
     {       
         m_CamIns = Camera.main.GetComponent<CameraManager>();
         m_CamIns.SetTarget = transform;
+        m_AudioManager = AudioManager.Instance;
+        m_originPos = transform.position;
     }
 
     private void FixedUpdate() {
@@ -84,6 +97,7 @@ public class Player : MonoBehaviour
                     m_motionIndex = m_motionSprites.Length <= m_motionIndex? 0 : m_motionIndex;
                     //モーションスプライトを格納
                     m_playerImage.sprite = m_motionSprites[m_motionIndex];
+                    m_AudioManager.SE_Play("SE_dungeon05");
                 }
             }           
         }

@@ -61,20 +61,17 @@ public class InvManager : MonoBehaviour
         }
     }
 
-    /// <summary>マウスアイコンを設定します</summary>
-    /// <param name="target">targetがnullの場合;デフォルトのマウスカーソルになります<br />
-    /// targetがtrueの場合:カーソルがターゲットカーソルになります
-    /// targetがfalseの場合:カーソルが非ターゲットカーソルになります
-    /// </param>
+    /// <summary>マウスアイコンを設定します<br />
+    /// targetがnullの場合;デフォルトのマウスカーソルになります<br />
+    /// targetがtrueの場合:カーソルがターゲットカーソルになります<br />
+    /// targetがfalseの場合:カーソルが非ターゲットカーソルになります</summary>
     public void SetMouseIcon(bool? target) {
        SetCursor(target);
     }
 
-    //自身のインスタンス
-    private static InvManager m_instance;
-    private InvManager() { }
-        
+
     //  アタッチ用   //------------------------------------------------------------------------------
+    #region Attach
     [SerializeField, Header("戻るボタン")]
     private GameObject m_backBtn;
     [SerializeField, Header("警戒度ゲージ")]
@@ -95,14 +92,18 @@ public class InvManager : MonoBehaviour
 
     [SerializeField,Header("探索パート背景用ImageObjct"),EnumIndex(typeof(InvType))]
     private GameObject[] m_invObj;
-
+    #endregion
     //-----------------------------------------------------------------------------------------------
+    //自身のインスタンス
+    private static InvManager m_instance;
+    private InvManager() { }
+    
+    private AudioManager m_audioManager;
 
     private InvType  m_currentInvType;           //現在の調査パート状態
     private bool m_isOpen;                       //開いているかのフラグ
     private Vigilance m_vigilance;               //警戒度用構造体
     private int m_getItemNum;                    //現在取得しているアイテム数
-    private ItemManager m_itemManager;           //アイテムマネージャーインスタンス
 
     private struct Vigilance {
         public float MaxVigilance;               //最大警戒度
@@ -110,9 +111,9 @@ public class InvManager : MonoBehaviour
         public float Rate { get { return m_VigilanceLevel / MaxVigilance; } }
         public bool IsOver { get { return m_VigilanceLevel >= MaxVigilance; } }
         public Vector2 mouseVec;               //マウス座標
-        public bool VigilanceFlag;              //このフラグがOnの時のみ警戒度を設定できます
-        public float WaveInterval;           //鼓動の間隔
-        private float m_VigilanceLevel;         //警戒度
+        public bool VigilanceFlag;             //このフラグがOnの時のみ警戒度を設定できます
+        public float WaveInterval;             //鼓動の間隔
+        private float m_VigilanceLevel;        //警戒度
 
     }
     
@@ -123,11 +124,9 @@ public class InvManager : MonoBehaviour
         m_instance = GetComponent<InvManager>();
         m_gauge.enabled = false;
         m_gaugefill.enabled = false;
-        m_itemManager = ItemManager.Instance;
     }
-
     private void Start() {
-        m_itemManager = ItemManager.Instance;
+        m_audioManager = AudioManager.Instance;
     }
 
     private void Update() {
@@ -149,6 +148,7 @@ public class InvManager : MonoBehaviour
     private bool AddVigilance(float addValue) {
         m_vigilance.Level += addValue;
         m_gaugefill.fillAmount = m_vigilance.Rate;
+        //警戒度が更新された場合の処理
         if (m_vigilance.Rate > m_vigilance.WaveInterval) {
             StartCoroutine("Waves");
             m_vigilance.WaveInterval += m_waveInterval;
@@ -197,7 +197,10 @@ public class InvManager : MonoBehaviour
     }
 
     private IEnumerator Waves() {
-        float time = 0; 
+        float time = 0;
+        if (m_vigilance.IsOver) { m_audioManager.SE_Play("SE_survey01"); }
+        else { m_audioManager.SE_Play("SE_survey02"); }
+
         WaitForSeconds wait = new WaitForSeconds(Time.deltaTime);
         while (time < 0.5) {
             float t = Time.deltaTime / m_waveDirectionTime;
