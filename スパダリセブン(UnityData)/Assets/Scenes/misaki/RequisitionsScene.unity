@@ -688,10 +688,18 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1060256993065565413, guid: db701c84868fbc145ba5c2c88a17d9b3, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1726979040524166841, guid: db701c84868fbc145ba5c2c88a17d9b3, type: 3}
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 519420031}
+    - target: {fileID: 2560512701960455431, guid: db701c84868fbc145ba5c2c88a17d9b3, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3792078856305552004, guid: db701c84868fbc145ba5c2c88a17d9b3, type: 3}
       propertyPath: m_Name
       value: AssistantTalkPrefab

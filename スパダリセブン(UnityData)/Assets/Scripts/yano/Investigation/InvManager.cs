@@ -89,6 +89,8 @@ public class InvManager : MonoBehaviour
     Texture2D m_cursor; 
     [SerializeField, Header("マウスカーソル画像1")]
     Texture2D m_cursorTaget;
+    [SerializeField, Header("ターゲット(マウスカーソル)サイズ")]
+    int size;
 
     [SerializeField,Header("探索パート背景用ImageObjct"),EnumIndex(typeof(InvType))]
     private GameObject[] m_invObj;
@@ -185,13 +187,14 @@ public class InvManager : MonoBehaviour
     private void SetCursor(bool? target) {
         Texture2D tex = target == null ? null : (bool)target ? m_cursorTaget : m_cursor;
         Vector2 vec = tex  == null ? Vector2.zero : new Vector2(tex.width/2,tex.height/2);
-        Cursor.SetCursor(tex, vec, CursorMode.Auto);
+        Cursor.SetCursor(tex, vec, CursorMode.Auto); 
     }
-  
-    /// <summary>
-    /// 警戒度がマックスの際にマウスを動かしてしまった場合の処理
-    /// </summary>
-    private void OverVigilance() {
+
+
+        /// <summary>
+        /// 警戒度がマックスの際にマウスを動かしてしまった場合の処理
+        /// </summary>
+        private void OverVigilance() {
         StopCoroutine("Waves");
         SceneManager.Instance.SceneChange(SCENENAME.GameOverScene, () => { UIManager.Instance.CloseUI(UIType.Timer); SetCursor(null); });
     }
