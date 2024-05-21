@@ -46,7 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MapObject:
   - {fileID: 0}
-  - {fileID: 8391926190528614295, guid: e228d106f0241754e8f3fb5bba2e0e9c, type: 3}
+  - {fileID: 3174281287409515212, guid: e228d106f0241754e8f3fb5bba2e0e9c, type: 3}
   - {fileID: 2691956872546690097, guid: 32359397dee6f5044b783b5b4a55f0a6, type: 3}
   - {fileID: 3851441910350345178, guid: c6f5630cbac9e2244a8be82f8a1a41d7, type: 3}
   - {fileID: 2794328576331544150, guid: 9e8b71e267fb5274c8d7a4de09061f3e, type: 3}

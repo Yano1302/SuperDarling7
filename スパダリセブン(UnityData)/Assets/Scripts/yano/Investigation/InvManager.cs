@@ -27,10 +27,6 @@ public class InvManager : MonoBehaviour
         m_currentInvType = type;  m_invObj[(int)m_currentInvType].SetActive(true);
         //ボタンをアクティブにする
         m_backBtn.SetActive(true);
-        //最大値を設定する
-        m_vigilance.MaxVigilance = 10;
-        //警戒度を初期化する
-        SetVigilance(0);
         //座標を初期化する
         m_vigilance.mouseVec = Input.mousePosition;
         //フラグ設定
@@ -69,6 +65,7 @@ public class InvManager : MonoBehaviour
        SetCursor(target);
     }
 
+    public void ResetVigilance() { SetVigilance(0); }
 
     //  アタッチ用   //------------------------------------------------------------------------------
     #region Attach
@@ -84,13 +81,12 @@ public class InvManager : MonoBehaviour
     private float m_waveDirectionTime;
     [SerializeField]
     private float m_waveInterval;
-
+    [SerializeField, Header("危険メッセージボックス")]
+    private GameObject m_warningMessage;
     [SerializeField, Header("マウスカーソル画像1")]
     Texture2D m_cursor; 
     [SerializeField, Header("マウスカーソル画像1")]
     Texture2D m_cursorTaget;
-    [SerializeField, Header("ターゲット(マウスカーソル)サイズ")]
-    int size;
 
     [SerializeField,Header("探索パート背景用ImageObjct"),EnumIndex(typeof(InvType))]
     private GameObject[] m_invObj;
@@ -120,6 +116,10 @@ public class InvManager : MonoBehaviour
     }
     
     private void Awake() {
+        //最大値を設定する
+        m_vigilance.MaxVigilance = 20;
+        //警戒度を初期化する
+        SetVigilance(0);
         m_isOpen = false;
         m_getItemNum = 0;
         m_vigilance.WaveInterval = m_waveInterval;
@@ -132,9 +132,40 @@ public class InvManager : MonoBehaviour
     }
 
     private void Update() {
+        
         if (m_vigilance.VigilanceFlag) {
+            AddVigilance(Time.deltaTime);
             CheckMouseMove();
         }
+    }
+    /// <summary>マウスが動いたかどうかを調べます</summary>
+    /// <returns>ゲームオーバーの場合にはfalseを返します</returns>
+    private void CheckMouseMove() {
+        Vector2 pos = Input.mousePosition;
+        //マウスが動かされている場合
+        if (m_vigilance.mouseVec != pos) {
+            if (m_vigilance.IsOver) {
+                OverVigilance();
+            }
+            else {
+                m_vigilance.mouseVec = pos;
+                AddVigilance(Time.deltaTime);
+            }
+        }
+    }
+
+    /// <summary>警戒度を追加します</summary>
+    /// <returns>警戒度が最大値以上の場合にtrueを返します</returns>
+    private bool AddVigilance(float addValue) {
+        m_vigilance.Level += m_vigilance.IsOver? 0 : addValue;
+        m_gaugefill.fillAmount = m_vigilance.Rate;
+        //警戒度が更新された場合の処理
+        if (m_vigilance.Rate > m_vigilance.WaveInterval) {
+            StartCoroutine("Waves");
+            m_vigilance.WaveInterval += m_waveInterval;
+        }
+        m_warningMessage.SetActive(m_vigilance.IsOver);
+        return m_vigilance.IsOver;
     }
 
     /// <summary>警戒度を設定します</summary>
@@ -142,38 +173,10 @@ public class InvManager : MonoBehaviour
     private bool SetVigilance(float value) {
         m_vigilance.Level = value;
         m_gaugefill.fillAmount = m_vigilance.Rate;
+        m_warningMessage.SetActive(m_vigilance.IsOver);
         return m_vigilance.IsOver;
     }
 
-    /// <summary>警戒度を追加します</summary>
-    /// <returns>警戒度が最大値以上の場合にtrueを返します</returns>
-    private bool AddVigilance(float addValue) {
-        m_vigilance.Level += addValue;
-        m_gaugefill.fillAmount = m_vigilance.Rate;
-        //警戒度が更新された場合の処理
-        if (m_vigilance.Rate > m_vigilance.WaveInterval) {
-            StartCoroutine("Waves");
-            m_vigilance.WaveInterval += m_waveInterval;
-        }
-        
-        return m_vigilance.IsOver;
-    }
-
-    /// <summary>マウスが動いたかどうかを調べます</summary>
-    /// <returns>ゲームオーバーの場合にはfalseを返します</returns>
-    private void CheckMouseMove() {
-            Vector2 pos = Input.mousePosition;
-            //マウスが動かされている場合
-            if (m_vigilance.mouseVec != pos) {
-                if (m_vigilance.IsOver) {
-                    OverVigilance();
-                }
-                else {
-                    m_vigilance.mouseVec = pos;
-                    AddVigilance(Time.deltaTime);
-                }
-            }
-    }
 
     /// <summary>全てのアイテムを取得した際の処理を記述します</summary>
     private void ClearInv() {
@@ -187,16 +190,18 @@ public class InvManager : MonoBehaviour
     private void SetCursor(bool? target) {
         Texture2D tex = target == null ? null : (bool)target ? m_cursorTaget : m_cursor;
         Vector2 vec = tex  == null ? Vector2.zero : new Vector2(tex.width/2,tex.height/2);
-        Cursor.SetCursor(tex, vec, CursorMode.Auto); 
+        Cursor.SetCursor(tex, vec, CursorMode.Auto);
     }
 
-
-        /// <summary>
-        /// 警戒度がマックスの際にマウスを動かしてしまった場合の処理
-        /// </summary>
-        private void OverVigilance() {
-        StopCoroutine("Waves");
-        SceneManager.Instance.SceneChange(SCENENAME.GameOverScene, () => { UIManager.Instance.CloseUI(UIType.Timer); SetCursor(null); });
+    /// <summary>
+    /// 警戒度がマックスの際にマウスを動かしてしまった場合の処理
+    /// </summary>
+    private void OverVigilance() {
+        if (m_vigilance.VigilanceFlag) {
+            m_warningMessage.SetActive(false);
+            StopCoroutine("Waves");
+            SceneManager.Instance.SceneChange(SCENENAME.GameOverScene, () => { UIManager.Instance.CloseUI(UIType.Timer); SetCursor(null); });
+        }
     }
 
     private IEnumerator Waves() {
