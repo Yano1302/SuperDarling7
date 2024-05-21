@@ -1,38 +1,75 @@
+using Supadari;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class ItemWindow :SingletonMonoBehaviour<ItemWindow>
+public class ItemWindow : SingletonMonoBehaviour<ItemWindow>
 {
-    [SerializeField, Header("ƒAƒCƒeƒ€ƒEƒBƒ“ƒhƒEƒIƒuƒWƒFƒNƒgˆê——"),EnumIndex(typeof(ItemID))]
+    [SerializeField, Header("ã‚¢ã‚¤ãƒ†ãƒ ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆä¸€è¦§"), EnumIndex(typeof(ItemID))]
     private GameObject[] m_windows;
+    [SerializeField]
+    private GameObject m_judge; // å²¬è¿½è¨˜ã€€ã‚¸ãƒ£ãƒƒã‚¸å¤‰æ•°
 
-    /// <summary>ƒEƒBƒ“ƒhƒE‚ğƒAƒNƒeƒBƒu‰»‚µ‚Ü‚·</summary>
+    public Supadari.SceneManager sceneManager; // ã‚·ãƒ¼ãƒ³ãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼å¤‰æ•°
+
+
+    /// <summary>ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ã‚¢ã‚¯ãƒ†ã‚£ãƒ–åŒ–ã—ã¾ã™</summary>
     public void ActiveWindows() { machWindow();m_uiManager.OpenUI(UIType.ItemWindow); }
-    /// <summary>ƒEƒBƒ“ƒhƒE‚ğ”ñƒAƒNƒeƒBƒu‰»‚µ‚Ü‚·</summary>
+    /// <summary>ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’éã‚¢ã‚¯ãƒ†ã‚£ãƒ–åŒ–ã—ã¾ã™</summary>
     public void InactiveWindows() { m_uiManager.CloseUI(UIType.ItemWindow); }
+    /// <summary>ã‚¸ãƒ£ãƒƒã‚¸å¤‰æ•°ã‚’ã‚¢ã‚¯ãƒ†ã‚£ãƒ–åŒ–ã—ã¾ã™</summary>ã€€å²¬è¿½è¨˜
+    public void ActiveJudge() { m_judge.SetActive(true); }
+    /// <summary>ã‚¸ãƒ£ãƒƒã‚¸å¤‰æ•°ã‚’éã‚¢ã‚¯ãƒ†ã‚£ãƒ–åŒ–ã—ã¾ã™</summary>ã€€å²¬è¿½è¨˜
+    public void InactiveJudge() { m_judge.SetActive(false); }
+    public bool CheckJudge(){ return m_judge.activeSelf; }
 
-    public GameObject GetWinObj(ItemID itemID) { return m_windows[(int)itemID]; } // ƒQƒbƒ^[ŠÖ”@–¦’Ç‹L
+    // ã‚²ãƒƒã‚¿ãƒ¼é–¢æ•°ã€€å²¬è¿½è¨˜
+    public GameObject GetWinObj(ItemID itemID) { return m_windows[(int)itemID]; }
+
+    /// <summary>
+    /// ã‚¢ã‚¤ãƒ†ãƒ ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚¹ãƒ©ã‚¤ãƒ‰ã‚’è¡Œã†é–¢æ•°ã€€å²¬è¿½è¨˜
+    /// </summary>
+    public void WinSlide()
+    {
+        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.TInstance.volumeSE); // SEã‚’é³´ã‚‰ã™
+
+        // ItemOpenã‚’å‚ç…§ã—ã¦ã‚¹ãƒ©ã‚¤ãƒ‰æ–¹å‘ã‚’æ±ºã‚ã‚‹
+        if (CheckOpen == false)
+        {
+            transform.localPosition = new Vector3(0, 0, 0);
+            CheckOpen = true;
+        }
+        else if (CheckOpen == true)
+        {
+            transform.localPosition = new Vector3(1170, 0, 0);
+            CheckOpen = false;
+        }
+    }
 
 
-    /// <summary>w’è‚µ‚½ƒAƒCƒeƒ€ƒEƒBƒ“ƒhƒE‚ğŠJ‚«‚Ü‚·</summary>
-    /// <param name="id">ŠJ‚­ƒEƒBƒ“ƒhƒE‚ÌID</param>
+    /// <summary>æŒ‡å®šã—ãŸã‚¢ã‚¤ãƒ†ãƒ ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’é–‹ãã¾ã™</summary>
+    /// <param name="id">é–‹ãã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ID</param>
     public void SetWindow(ItemID id,bool isOpen) { m_windows[(int)id].SetActive(isOpen);}
 
-    /// <summary>ƒAƒCƒeƒ€ƒEƒBƒ“ƒhƒE‚ÌƒAƒNƒeƒBƒuó‘Ô‚ğæ“¾‚µ‚Ü‚·</summary>
+    public bool CheckOpen { get { return m_isOpen; } set { m_isOpen = value; } } // m_isOpenã®ã‚²ãƒƒã‚¿ãƒ¼ã‚»ãƒƒã‚¿ãƒ¼é–¢æ•°
+
+    /// <summary>ã‚¢ã‚¤ãƒ†ãƒ ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚¢ã‚¯ãƒ†ã‚£ãƒ–çŠ¶æ…‹ã‚’å–å¾—ã—ã¾ã™</summary>
     public bool IsActiveItemWindow { get { return m_uiManager.ChekIsOpen(UIType.ItemWindow);  }  }
 
+    private bool m_isOpen = false; // ã‚¢ã‚¤ãƒ†ãƒ ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒé–‹ã„ã¦ã„ã‚‹ã‹ã©ã†ã‹
 
+    private ItemManager IM; //ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹æœ¬ä½“
+    private UIManager UIM; //ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹æœ¬ä½“
+    private ItemManager m_itemManager { get { IM ??= ItemManager.Instance; return IM; } } //ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹å–å¾—
+    private UIManager m_uiManager { get { UIM ??= UIManager.Instance; return UIM; } }ã€€//ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹å–å¾—
 
-    private ItemManager m_itemManager { get { IM ??= ItemManager.Instance; return IM; } } //ƒCƒ“ƒXƒ^ƒ“ƒXæ“¾
-    private UIManager m_uiManager { get { UIM ??= UIManager.Instance; return UIM; } }@@//ƒCƒ“ƒXƒ^ƒ“ƒXæ“¾
-    private ItemManager IM; //ƒCƒ“ƒXƒ^ƒ“ƒX–{‘Ì
-    private UIManager UIM; //ƒCƒ“ƒXƒ^ƒ“ƒX–{‘Ì
 
     private void machWindow() {
         for (int i = 1; i < m_windows.Length; i++) {
-            //ŠƒAƒCƒeƒ€î•ñ‚ÆƒIƒuƒWƒFƒNƒg‚ÌƒAƒNƒeƒBƒuî•ñ‚ğˆê’v‚³‚¹‚é
+            //æ‰€æŒã‚¢ã‚¤ãƒ†ãƒ æƒ…å ±ã¨ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ã‚¢ã‚¯ãƒ†ã‚£ãƒ–æƒ…å ±ã‚’ä¸€è‡´ã•ã›ã‚‹
             m_windows[i].SetActive(m_itemManager.GetFlag((ItemID)i));
         }
     }

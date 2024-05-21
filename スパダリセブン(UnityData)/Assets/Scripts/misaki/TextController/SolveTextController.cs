@@ -1,47 +1,45 @@
-using System.Collections;
+
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class SolveTextController : BaseTextController
 {
-    [SerializeField] bool firstWrite = true; // ゲームスタート時にCSV1行目を表示するか
-    [SerializeField] bool addOnClick = false; // ボタンチェック
-    private Button[] itemButtons = new Button[10]; // ボタン配列
     private void Start()
     {
-        if (firstWrite) OnTalkButtonClicked(0); // ゲームスタート時に表示する
-        if (addOnClick) itemButtons[0].onClick.AddListener(() => OnTalkButtonClicked(0)); // ラムダ式でonclick関数を設定
+        OnTalkButtonClicked(); // ゲームスタート時に表示する
+        Button judgeBu = GameObject.FindGameObjectWithTag("Judge").GetComponent<Button>(); // ジャッジボタンを取得
+        judgeBu.onClick.AddListener(Judge); // ジャッジボタンにジャッジ関数を設定
     }
-    protected override void StorySetUp(string storynum)
-    {
-        Debug.Log(storynum + "を読み込みます");
-        //　テキストファイルの読み込みを行ってくれるクラス
-        TextAsset textasset = new TextAsset();
-        //　先ほど用意したcsvファイルを読み込ませる。
-        //　ファイルは「Resources」フォルダを作り、そこに入れておくこと。
-        //　Resources.Load 内はcsvファイルの名前。
-        textasset = Resources.Load("プランナー監獄エリア/Solve/" + storynum, typeof(TextAsset)) as TextAsset;
 
-        /// CSVSerializerを用いてcsvファイルを配列に流し込む。///
-        storyTalks = CSVSerializer.Deserialize<StoryTalkData>(textasset.text); // CSVのテキストデータを配列に格納する
-        /// ここまで ///
-        Debug.Log(storynum + "を読み込みました");
-    }
-    protected override IEnumerator Dialogue()
+    /// <summary>
+    /// 選択したアイテムを突き付ける関数
+    /// </summary>
+    public void Judge()
     {
-        Debug.Log(storynum + "の" + (talkNum + 1) + "列目を再生");
-        words = storyTalks[talkNum].talks; // 文章を取得
-        // 文字を textLabel に追加します
-        textLabel.text = words;
-        yield return true;
+        if (TalkState != TALKSTATE.Question) return; // アイテム選択状態ではない場合はリターンする
+
+        sceneManager.audioManager.SE_Play("SE", sceneManager.enviromentalData.TInstance.volumeSE); // SEを鳴らす
+
+        ItemID selectedID = ItemManager.GetSelectedID; // 選択したアイテムIDを代入
+
+        // 選択したアイテムIDが正解のアイテムIDかどうかを判断し、次に表示するストーリーを変える
+        if (selectedID == rightID) OnTalkButtonClicked(int.Parse(storyTalks[talkNum].correct));
+        else if (selectedID != rightID && missCount < 2)
+        {
+            OnTalkButtonClicked(int.Parse(storyTalks[talkNum].miss));
+            missCount++;
+        }
+        else OnTalkButtonClicked(int.Parse(storyTalks[talkNum].gameOver));
+
+        itemWindow.WinSlide(); // アイテムウィンドウをしまう
     }
-    public override void OnTalkButtonClicked(int num = 9999)
+    public override void TalkEnd()
     {
-        // numがstoryTalks.length以上または現talkNumと同じかつnum==0ではないならリターン
-        if (num >= storyTalks.Length || num == talkNum && num != 0) return;
-        talkNum = num; // 指定された値を代入
-        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.TInstance.volumeSE);
-        InitializeTalkField(); // 表示されているテキスト等を初期化
-        StartDialogueCoroutine(); // 文章を表示するコルーチンを開始
+        Debug.Log("会話を終了");
+        TalkState = TALKSTATE.NOTALK; // 会話ステータスを話していないに変更
+        if (talkAuto) OnAutoModeCllicked(); // オートモードがオンであればオフにする
+        sceneManager.SceneChange(storyTalks[talkNum].transition + "Scene"); // ゲームクリアかゲームオーバーシーンに遷移
+        talkNum = default; // リセットする
     }
 }

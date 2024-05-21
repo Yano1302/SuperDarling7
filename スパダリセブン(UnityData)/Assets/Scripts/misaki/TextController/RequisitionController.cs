@@ -80,6 +80,8 @@ public class RequisitionController : BaseTextController
         talkNum = default; // リセットする
         if (TalkState == TALKSTATE.LASTTALK)
         {
+            sceneManager.audioManager.SE_Play("SE_quest", sceneManager.enviromentalData.TInstance.volumeSE); // SEを鳴らす
+
             sceneManager.stageNum = int.Parse(storyTalks[talkNum].stage); // ステージ番号をCSVから取得
             sceneManager.SceneChange(SCENENAME.InvestigationScene); // 探索シーンに遷移
             return;

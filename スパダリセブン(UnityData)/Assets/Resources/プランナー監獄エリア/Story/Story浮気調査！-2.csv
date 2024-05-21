@@ -1,66 +1,66 @@
-﻿backImage,leftTalkingChara,leftHighlight,rightTalkingChara,rightHighlight,centerTalkingChara,centerHighlight,name,talks,BGM,choices,correct,miss,gameOver
-彼氏宅,,,,,,,,──彼氏宅──,BGM_story02,,,,
-彼氏宅,story_character02,1,story_character03,,,,友人,「ねえ……彼氏君」,0,,,,
-彼氏宅,story_character02,,story_character03,1,,,彼氏,「なに？」,0,,,,
-彼氏宅,story_character02,1,story_character03,,,,友人,「最近何かあった？」,0,,,,
-彼氏宅,story_character02,,story_character03,1,,,彼氏,「別に何もないけど？」,0,,,,
-彼氏宅,story_character02,1,story_character03,,,,友人,「浮気してない？」,0,,,,
-彼氏宅,story_character02,,story_character03,1,,,彼氏,"「はぁ！？！？
-　浮気なんかするわけないだろ！？」",0,,,,
-彼氏宅,story_character02,1,story_character03,,,,友人,「じゃあなんでそんなに焦ってるの？」,0,,,,
-彼氏宅,story_character02,,story_character03,1,,,彼氏,「友人ちゃんが突拍子もないこと言うからだろ！」,0,,,,
-彼氏宅,story_character02,1,story_character03,,,,友人,「ほんとかなぁ……」,0,,,,
-彼氏宅,story_character02,,story_character03,1,,,彼氏,「そんなに疑うんだったら浮気の証拠でも見せてみなよ」,0,,,,
-彼氏宅,story_character01,,story_character02,1,,,友人,"「証拠あるよ。
-　ね、主人公ちゃん！！」",0,,,,
-彼氏宅,story_character01,,story_character03,1,,,彼氏,「！？！？」,0,,,,
-彼氏宅,story_character01,1,story_character03,,,,主人公,「（彼氏さんの浮気の証拠は……）」,0,1,13,32,38
-彼氏宅,story_character01,,story_character03,1,,,彼氏,"「それは……
-　おれのスマホ！！」",0,,,,
-彼氏宅,story_character01,1,story_character03,,,,主人公,「バッチリ浮気相手とのやり取りがこのスマホに残ってましたよ」,0,,,,
-彼氏宅,story_character01,,story_character03,1,,,彼氏,「！？！？」,0,,,,
-彼氏宅,story_character02,1,story_character03,,,,友人,"「『愛してるよー』だってさ。
-　誰にでも言ってるんだね～」",0,,,,
-彼氏宅,story_character02,,story_character03,1,,,彼氏,"「遊びで言っただけだよ。
-　本命は友人ちゃんだけ……」",0,,,,
-彼氏宅,story_character02,1,story_character03,,,,友人,"「遊びでも浮気は浮気じゃん。
-　浮気したらダメってことぐらいわかるでしょ」",0,,,,
-彼氏宅,story_character02,,story_character03,1,,,彼氏,「だって最近友人ちゃんかまってくれなかったし……」,0,,,,
-彼氏宅,story_character02,1,story_character03,,,,友人,"「はぁ！？
-　あたしのせいな訳！？」",0,,,,
-彼氏宅,story_character02,1,story_character03,,,,友人,"「もういいよ……
-　これ以上付き合えないわ」",0,,,,
-彼氏宅,story_character02,,story_character03,1,,,彼氏,「……」,0,,,,
-彼氏宅,story_character02,1,story_character03,,,,友人,"「じゃあね。
-　浮気男」",0,,,,
-story_background,,,,,,,,——某所——,BGM_story02,,,,
-story_background,story_character01,,story_character02,1,,,友人,「あースッキリした。」,0,,,,
-story_background,story_character01,1,story_character02,,,,主人公,「（迫力あったなあ……）」,0,,,,
-story_background,story_character01,,story_character02,1,,,友人,「浮気は悪いことだってわかってるはずになんでやっちゃうんだろうね」,0,,,,
+﻿backImage,leftTalkingChara,leftHighlight,rightTalkingChara,rightHighlight,centerTalkingChara,centerHighlight,name,talks,BGM,rightItemID,correct,miss,gameOver,transition
+dunguen_background,,,,,,,,──彼氏宅──,BGM_story02,,,,,
+dunguen_background,story_character02,1,story_character03,,,,友人,「ねえ……彼氏君」,0,,,,,
+dunguen_background,story_character02,,story_character03,1,,,彼氏,「なに？」,0,,,,,
+dunguen_background,story_character02,1,story_character03,,,,友人,「最近何かあった？」,0,,,,,
+dunguen_background,story_character02,,story_character03,1,,,彼氏,「別に何もないけど？」,0,,,,,
+dunguen_background,story_character02,1,story_character03,,,,友人,「浮気してない？」,0,,,,,
+dunguen_background,story_character02,,story_character03,1,,,彼氏,"「はぁ！？！？
+　浮気なんかするわけないだろ！？」",0,,,,,
+dunguen_background,story_character02,1,story_character03,,,,友人,「じゃあなんでそんなに焦ってるの？」,0,,,,,
+dunguen_background,story_character02,,story_character03,1,,,彼氏,「友人ちゃんが突拍子もないこと言うからだろ！」,0,,,,,
+dunguen_background,story_character02,1,story_character03,,,,友人,「ほんとかなぁ……」,0,,,,,
+dunguen_background,story_character02,,story_character03,1,,,彼氏,「そんなに疑うんだったら浮気の証拠でも見せてみなよ」,0,,,,,
+dunguen_background,story_character01,,story_character02,1,,,友人,"「証拠あるよ。
+　ね、主人公ちゃん！！」",0,,,,,
+dunguen_background,story_character01,,story_character03,1,,,彼氏,「！？！？」,0,,,,,
+dunguen_background,story_character01,1,story_character03,,,,主人公,「（彼氏さんの浮気の証拠は……）」,0,1,27,14,20,
+dunguen_background,story_character01,1,story_character03,,,,主人公,「これを見てください」,0,,,,,
+dunguen_background,story_character01,,story_character03,,,,彼氏,"「えっと……
+　これは？」",0,,,,,
+dunguen_background,story_character01,,story_character02,,,,友人,"「これはなに？
+　主人公ちゃん」",0,,,,,
+dunguen_background,story_character01,,story_character02,,,,主人公,"「えっと……
+　こんな感じで証拠を突き付けるよって練習だよ」",0,,,,,
+dunguen_background,story_character01,,story_character02,,,,主人公,"「（間違えてたみたい……
+　　ちゃんと証拠を確認しよう）」",0,,,,,
+dunguen_background,story_character01,1,story_character03,,,,主人公,「（彼氏さんの浮気の証拠は……）」,0,1,27,14,20,
+dunguen_background,story_character01,1,story_character03,,,,主人公,「これを見てください」,0,,,,,
+dunguen_background,story_character01,,story_character03,,,,彼氏,"「はぁ……
+　えっと、もういいですか？」",0,,,,,
+dunguen_background,story_character02,1,story_character03,,,,友人,"「ちょっと待ってよ！
+　ちゃんと証拠が……」",0,,,,,
+dunguen_background,story_character02,,story_character03,1,,,彼氏,"「何回も待ったじゃん。
+　証拠、ないんでしょ？」",0,,,,,
+dunguen_background,story_character02,,story_character03,1,,,彼氏,"「友人ちゃんの勘違いだって。
+　おれが浮気するわけないじゃん」",0,,,,,
+dunguen_background,story_character02,1,story_character03,,,,友人,"「う、うん……
+　勘違いだったかも……」",0,,,,,
+dunguen_background,story_character01,1,story_character03,,,,主人公,"「（本当に勘違いだったのかな？
+　　なんかもやもやする……）」",0,,,,,GameOver
+dunguen_background,story_character01,,story_character03,1,,,彼氏,"「それは……
+　おれのスマホ！！」",0,,,,,
+dunguen_background,story_character01,1,story_character03,,,,主人公,「バッチリ浮気相手とのやり取りがこのスマホに残ってましたよ」,0,,,,,
+dunguen_background,story_character01,,story_character03,1,,,彼氏,「！？！？」,0,,,,,
+dunguen_background,story_character02,1,story_character03,,,,友人,"「『愛してるよー』だってさ。
+　誰にでも言ってるんだね～」",0,,,,,
+dunguen_background,story_character02,,story_character03,1,,,彼氏,"「遊びで言っただけだよ。
+　本命は友人ちゃんだけ……」",0,,,,,
+dunguen_background,story_character02,1,story_character03,,,,友人,"「遊びでも浮気は浮気じゃん。
+　浮気したらダメってことぐらいわかるでしょ」",0,,,,,
+dunguen_background,story_character02,,story_character03,1,,,彼氏,「だって最近友人ちゃんかまってくれなかったし……」,0,,,,,
+dunguen_background,story_character02,1,story_character03,,,,友人,"「はぁ！？
+　あたしのせいな訳！？」",0,,,,,
+dunguen_background,story_character02,1,story_character03,,,,友人,"「もういいよ……
+　これ以上付き合えないわ」",0,,,,,
+dunguen_background,story_character02,,story_character03,1,,,彼氏,「……」,0,,,,,
+dunguen_background,story_character02,1,story_character03,,,,友人,"「じゃあね。
+　浮気男」",0,,,,,
+story_background,,,,,,,,——某所——,0,,,,,
+story_background,story_character01,,story_character02,1,,,友人,「あースッキリした。」,0,,,,,
+story_background,story_character01,1,story_character02,,,,主人公,「（迫力あったなあ……）」,0,,,,,
+story_background,story_character01,,story_character02,1,,,友人,「浮気は悪いことだってわかってるはずになんでやっちゃうんだろうね」,0,,,,,
 story_background,story_character01,1,story_character02,,,,主人公,"「ほんとにね。
-　じゃあ約束通り叙〇苑ね」",0,,,,
-story_background,story_character01,,story_character02,1,,,友人,「よし！彼氏と別れた祝いでパーッといっちゃいますか！」,0,,,,
-story_background,,,,,,,,——END——,0,,,,
-彼氏宅,story_character01,1,story_character03,,,,主人公,「これを見てください」,0,,,,
-彼氏宅,story_character01,,story_character03,,,,彼氏,"「えっと……
-　これは？」",0,,,,
-彼氏宅,story_character01,,story_character02,,,,友人,"「これはなに？
-　主人公ちゃん」",0,,,,
-彼氏宅,story_character01,,story_character02,,,,主人公,"「えっと……
-　こんな感じで証拠を突き付けるよって練習だよ」",0,,,,
-彼氏宅,story_character01,,story_character02,,,,主人公,"「（間違えてたみたい……
-　　ちゃんと証拠を確認しよう）」",0,,,,
-彼氏宅,story_character01,1,story_character03,,,,主人公,「（彼氏さんの浮気の証拠は……）」,0,1,13,32,38
-彼氏宅,story_character01,1,story_character03,,,,主人公,「これを見てください」,0,,,,
-彼氏宅,story_character01,,story_character03,,,,彼氏,"「はぁ……
-　えっと、もういいですか？」",0,,,,
-彼氏宅,story_character02,1,story_character03,,,,友人,"「ちょっと待ってよ！
-　ちゃんと証拠が……」",0,,,,
-彼氏宅,story_character02,,story_character03,1,,,彼氏,"「何回も待ったじゃん。
-　証拠、ないんでしょ？」",0,,,,
-彼氏宅,story_character02,,story_character03,1,,,彼氏,"「友人ちゃんの勘違いだって。
-　おれが浮気するわけないじゃん」",0,,,,
-彼氏宅,story_character02,1,story_character03,,,,友人,"「う、うん……
-　勘違いだったかも……」",0,,,,
-彼氏宅,story_character01,1,story_character03,,,,主人公,"「（本当に勘違いだったのかな？
-　　なんかもやもやする……）」",0,,,,
+　じゃあ約束通り叙〇苑ね」",0,,,,,
+story_background,story_character01,,story_character02,1,,,友人,「よし！彼氏と別れた祝いでパーッといっちゃいますか！」,0,,,,,
+story_background,,,,,,,,——END——,0,,,,,GameClear

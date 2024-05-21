@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using System;
 
 /// <summary>
 /// アイテムの所持などを管理するクラスです
@@ -11,6 +12,7 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
 {
     public TextMeshProUGUI itemText; // アイテムの詳細を表示するテキスト　岬追記
     public Image itemImage; // アイテム画像　岬追記
+    public Supadari.SceneManager sceneManager; // シーンマネージャー変数
 
     //アイテムメッセージの選択を管理する列挙型
     public enum ItemMessageType {
@@ -28,6 +30,7 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
         string itemName;
         m_itemData.GetData(1, (int)id, out itemName); // アイテム情報よりアイテム名を取得 岬追記
         GameObject item = m_itemWindow.GetWinObj(id); // アイテムのオブジェクトを取得
+        item.name = itemName; // アイテム名をオブジェクトの名前に代入　岬追記
         item.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = itemName; // アイテム名を子オブジェクトに代入 岬追記
         item.GetComponent<Button>().onClick.AddListener(() => ItemDetails(itemName)); // ボタンにItemDetails関数を設定
         m_itemWindow.SetWindow(id,true);
@@ -168,7 +171,26 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     [System.Diagnostics.Conditional("UNITY_EDITOR")]
     public void Log() { Debug.Log(m_itemFlag.JsonToString()); }
 
-  
+
+    /// <summary>
+    /// アイテムの詳細を表示する関数 岬追記
+    /// </summary>
+    /// <param name="itemName">アイテム名</param>
+    public void ItemDetails(string itemName)
+    {
+        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.TInstance.volumeSE); // SEを鳴らす
+
+        string details;
+        string imageName;
+        ItemID id = GetItemID(itemName); // アイテムIDを取得
+        GetItemMessage(id, ItemMessageType.Investigation, out details); // アイテム詳細文をdetailsに代入
+        itemText.text = details; // アイテムテキストにアイテム詳細文を代入
+        m_itemData.GetData(5, (int)id, out imageName); // アイテム画像名を取得
+        itemImage.gameObject.SetActive(true); // アイテム画像を表示
+        itemImage.sprite = Resources.Load<Sprite>("小物イラスト/" + imageName); // アイテム画像を代入
+        selectedID = id; // 選択したアイテムのIDを代入
+    }
+
 
     // private //
 
@@ -186,7 +208,10 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     private CSVSetting m_stageData;                                //ステージデータ
     private ItemWindow m_itemWindow { get { IW ??= ItemWindow.Instance; return IW; } }//アイテムウィンドウ取得プロパティ
     private ItemWindow IW;                                          //アイテムウィンドウ管理インスタンス
-   
+
+    static private ItemID selectedID = 0; // 選択したアイテム 岬追記
+    static public ItemID GetSelectedID { get { return selectedID; }  } // 選択したアイテムのゲッター関数　岬追記
+
 
     //初期化とJsonからのデータの読み込み
     protected override void Awake() {
@@ -198,35 +223,19 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
             m_stageData = new CSVSetting("ステージ情報");
         }
     }
-    ///テスト用
-    /*private void Start()
-    {
-        //所持アイテム情報とオブジェクトのアクティブ情報を一致させる　TODO:後で変える
-        int length = 6;
-        for (int i = 1; i < length; i++)
-        {
-            string itemName;
-            m_itemData.GetData(1, i, out itemName); // アイテム情報よりアイテム名を取得 岬追記
-            GameObject g = m_itemWindow.GetWinObj((ItemID)i); // アイテム名を子オブジェクトに代入 岬追記
-            g.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = itemName; // ボタンにItemDetails関数を設定
-            g.GetComponent<Button>().onClick.AddListener(() => ItemDetails(itemName)); // ボタンにItemDetails関数を設定
-            g.SetActive(m_itemFlag.TInstance.GetFlag((ItemID)i + 1)); // 表示
-        }
-    }*/
 
-    /// <summary>
-    /// アイテムの詳細を表示する関数
-    /// </summary>
-    /// <param name="itemName">アイテム名</param>
-    public void ItemDetails(string itemName)
+    private void Update()
     {
-        string details;
-        string imageName;
-        ItemID id = GetItemID(itemName); // アイテムIDを取得
-        GetItemMessage(id,ItemMessageType.Investigation, out details); // アイテム詳細文をdetailsに代入
-        itemText.text = details; // アイテムテキストにアイテム詳細文を代入
-        m_itemData.GetData(5, (int)id, out imageName); // アイテム画像名を取得
-        itemImage.gameObject.SetActive(true); // アイテム画像を表示
-        itemImage.sprite = Resources.Load<Sprite>("小物イラスト/" + imageName); // アイテム画像を代入
+        if (sceneManager.CheckSceneName == SCENENAME.InvestigationScene && Input.GetKeyDown(KeyCode.Escape) || sceneManager.CheckSceneName == SCENENAME.SolveScene && Input.GetKeyDown(KeyCode.Escape))
+        {
+            m_itemWindow.WinSlide();
+        }
+        // アイテムウィンドウを閉じた際にアイテムが選択されていない状態にする
+        if (m_itemWindow.CheckOpen == false && itemText.text != "")
+        {
+            itemText.text = null;
+            itemImage.gameObject.SetActive(false);
+            selectedID = default;
+        }
     }
 }
