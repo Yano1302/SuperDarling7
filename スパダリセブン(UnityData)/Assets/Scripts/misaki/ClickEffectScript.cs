@@ -1,4 +1,3 @@
-using Supadari;
 using UnityEngine;
 
 public class ClickEffectScript : SingletonMonoBehaviour<ClickEffectScript>

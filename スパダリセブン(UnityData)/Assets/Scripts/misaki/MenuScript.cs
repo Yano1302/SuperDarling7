@@ -4,8 +4,10 @@ public class MenuScript : SingletonMonoBehaviour <MenuScript>
 {
     private bool openWindow = false; // ウィンドウを開いているかどうか
     [SerializeField] GameObject menuWindow; // メニューウィンドウ用変数
+    [SerializeField] GameObject saveMessage; // セーブをした際に表示するテキスト変数
     [SerializeField] Supadari.SceneManager sceneManager; // スパダリのシーンマネージャー用変数
     private StoryController storyController = null; // ストーリーコントローラー用変数
+
     protected override void Awake()
     {
         base.Awake();
@@ -64,6 +66,8 @@ public class MenuScript : SingletonMonoBehaviour <MenuScript>
             sceneManager.SceneChange(SCENENAME.StoryScene); // シーン遷移
             sceneManager.uiManager.CloseUI(UIType.SaveSlot); // UIを閉じる
         }
+        // それ以外の場合はセーブテキストを表示
+        else ActiveSaveMessage();
     }
     /// <summary>
     /// ロードボタンをクリックしたときの関数
@@ -93,8 +97,25 @@ public class MenuScript : SingletonMonoBehaviour <MenuScript>
         sceneManager.SceneChange(0); // タイトルシーンへ遷移する
         Resume();
     }
+    /// <summary>
+    /// クリックした際にSEを鳴らす関数
+    /// </summary>
     public void ClickSE()
     {
         sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.TInstance.volumeSE);
+    }
+    /// <summary>
+    /// セーブメッセージを表示する関数
+    /// </summary>
+    private void ActiveSaveMessage()
+    {
+        saveMessage.SetActive(true);
+    }
+    /// <summary>
+    /// セーブメッセージを非表示にする関数
+    /// </summary>
+    public void InactiveSaveMessage()
+    {
+        saveMessage.SetActive(false);
     }
 }

@@ -13,6 +13,7 @@ public class BaseTextController : DebugSetting
     public float textDelay = 1.5f; // テキストとテキストの間の時間(オートモードのみ使用)
     protected bool talkSkip = false; // ボタンがクリックされたかどうかを示すフラグ
     protected bool talkAuto = false; // 会話がオート状態なのかを示すフラグ
+    private bool autoSetUp = false; // オートモードの準備状態かどうかのフラグ
     [Header("1-1のように入力")]
     public string storynum; //ストーリー番号
     protected string words; // 文章
@@ -56,6 +57,8 @@ public class BaseTextController : DebugSetting
 
     [SerializeField] GameObject clickIcon; // クリックを催促するアイコン変数
 
+    float autoMigration = 0; // オートモードに移行する時間を格納する変数
+
     public TALKSTATE talkState; // 会話ステータス変数
     public TALKSTATE TalkState
     {
@@ -89,6 +92,23 @@ public class BaseTextController : DebugSetting
         sceneManager = GameObject.FindGameObjectWithTag("SceneManager").GetComponent<SceneManager>(); // オーディオマネージャーを取得
         itemWindow = GameObject.FindGameObjectWithTag("ItemWindow").GetComponent<ItemWindow>(); // アイテムウィンドウを取得 
         playerTextSpeed = sceneManager.enviromentalData.TInstance.textSpeed; // テキストスピードを設定
+    }
+    private void Update()
+    {
+        // オートモードへ切り替え準備時に動く
+        if (autoSetUp)
+        {
+            // textDelay秒待ってから次のテキストに進む
+            if (autoMigration < textDelay)
+            {
+                autoMigration += Time.deltaTime;
+                return;
+            }
+            autoMigration = default;
+            autoSetUp = false;
+            OnTalkButtonClicked();
+        }
+        else  autoMigration = default;
     }
     /// <summary>
     /// 対応する会話文をセットする関数
@@ -372,6 +392,7 @@ public class BaseTextController : DebugSetting
         if (talkAuto && TalkState != TALKSTATE.Question) // オートモードであれば、かつ、アイテム選択状態でなければ
         {
             yield return new WaitForSeconds(textDelay); // textDelay秒待つ
+            if (!talkAuto) yield break; // textDelay秒待った間にオートモードではなくなった場合、コルーチンを終了する
             OnTalkButtonClicked(); // 次の会話を自動でスタートする
         }
     }
@@ -406,6 +427,7 @@ public class BaseTextController : DebugSetting
         if (talkAuto && TalkState != TALKSTATE.Question) // オートモードであれば、かつ、アイテム選択状態でなければ
         {
             yield return new WaitForSeconds(textDelay); // textDelay秒待つ
+            if (!talkAuto) yield break; // textDelay秒待った間にオートモードではなくなった場合、コルーチンを終了する
             OnTalkButtonClicked(); // 次の会話を自動でスタートする
         }
     }        
@@ -461,10 +483,20 @@ public class BaseTextController : DebugSetting
 
         // talkAutoがtrueならfalseに、falseならtrueに変換
         talkAuto = !talkAuto;
-        // オートモードならオートモード画像を出す　オートモードではないなら画像を出さない
         if (!autoImage) return;
-        if(talkAuto) autoImage.SetActive(true);
-        else autoImage.SetActive(false);
+        // オートモードならオートモード画像を出す
+        if (talkAuto)
+        {
+            // プレイヤーの入力受付中(NEXTTALKまたはLASTTALK時)はオートモード準備フラグを出す
+            if(TalkState == TALKSTATE.NEXTTALK || TalkState == TALKSTATE.LASTTALK) autoSetUp = true;
+            autoImage.SetActive(true);
+        }
+        // オートモードではないなら画像を出さない
+        else
+        {
+            autoSetUp = false;
+            autoImage.SetActive(false);
+        }
     }
 }
 

@@ -34,6 +34,10 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
         item.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = itemName; // アイテム名を子オブジェクトに代入 岬追記
         item.GetComponent<Button>().onClick.AddListener(() => ItemDetails(itemName)); // ボタンにItemDetails関数を設定
         m_itemWindow.SetWindow(id,true);
+
+        getMessage.SetActive(true); // アイテム取得メッセージを表示する
+        getItemName.text = itemName; // アイテム名を代入
+        ActiveItemImage(itemName, getItemImage); // アイテム画像を表示する
     }
 
     /// <summary>アイテムの所持フラグを消します。</summary>
@@ -186,9 +190,19 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
         GetItemMessage(id, ItemMessageType.Investigation, out details); // アイテム詳細文をdetailsに代入
         itemText.text = details; // アイテムテキストにアイテム詳細文を代入
         m_itemData.GetData(5, (int)id, out imageName); // アイテム画像名を取得
-        itemImage.gameObject.SetActive(true); // アイテム画像を表示
-        itemImage.sprite = Resources.Load<Sprite>("小物イラスト/" + imageName); // アイテム画像を代入
+        ActiveItemImage(imageName,itemImage); // アイテム画像を表示する
         selectedID = id; // 選択したアイテムのIDを代入
+    }
+
+    /// <summary>
+    /// アイテム画像を表示する関数
+    /// </summary>
+    /// <param name="imageName">表示したいアイテム名</param>
+    /// <param name="image">アイテム画像の代入先</param>
+    private void ActiveItemImage(string imageName,Image image)
+    {
+        image.gameObject.SetActive(true); // アイテム画像を表示
+        image.sprite = Resources.Load<Sprite>("小物イラスト/" + imageName); // アイテム画像を代入
     }
 
 
@@ -197,10 +211,10 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     private TextMeshProUGUI itemText; // アイテムの詳細を表示するテキスト　岬追記
     [SerializeField]
     private Image itemImage;         // アイテム画像　岬追記
-
-
-
-
+    [SerializeField]
+    private GameObject getMessage; // アイテム取得メッセージ　岬追記
+    private TextMeshProUGUI getItemName; // 取得したアイテム名を表示するテキスト　岬追記
+    private Image getItemImage; // 取得したアイテムの画像　岬追記
 
     //ItemのCSVファイルのインデックスを管理するEnumです
     private enum ItemDataCsvIndex {
@@ -217,6 +231,7 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     private ItemWindow m_itemWindow { get { IW ??= ItemWindow.Instance; return IW; } }//アイテムウィンドウ取得プロパティ
     private ItemWindow IW;                                          //アイテムウィンドウ管理インスタンス
     private SceneManager m_sceneManager;    // シーンマネージャー変数
+    private UIManager m_uiManager; // UIマネージャー変数　岬追記
     static private ItemID selectedID = 0; // 選択したアイテム 岬追記
     static public ItemID GetSelectedID { get { return selectedID; }  } // 選択したアイテムのゲッター関数　岬追記
 
@@ -234,6 +249,8 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
 
     protected void Start() {
         m_sceneManager = SceneManager.Instance;
+        m_uiManager = UIManager.Instance; // 岬追記
+        ItemMessageSetUp(); // アイテム取得メッセージのセットアップを行う　岬追記
     }
 
 
@@ -250,5 +267,23 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
             itemImage.gameObject.SetActive(false);
             selectedID = default;
         }
+    }
+    /// <summary>
+    /// アイテム取得メッセージの準備を行う関数　岬追記
+    /// getMessageの子オブジェクトの順番が変わると動かなくなります
+    /// </summary>
+    private void ItemMessageSetUp()
+    {
+        getItemName = getMessage.transform.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>();
+        getItemImage = getMessage.transform.GetChild(1).GetChild(2).GetComponent<Image>();
+    }
+    /// <summary>
+    /// アイテム取得メッセージの非表示とテキストの初期化を行う関数
+    /// </summary>
+    public void ItemMessageRelease()
+    {
+        itemText.text = null;
+        getItemImage.gameObject.SetActive(false);
+        getMessage.gameObject.SetActive(false);
     }
 }
