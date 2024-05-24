@@ -46,9 +46,8 @@ public class MapManager : SingletonMonoBehaviour<MapManager> {
         name = 1,
         time = 2,
         size = 3,
-        danger = 4,
-        itemStart = 5,
-        otherItem = 11,
+        itemStart = 4,
+        otherItem = 10,
     }
 
     //  プライベート変数  //------------------------------------------------------------------------------------------------------------------------------

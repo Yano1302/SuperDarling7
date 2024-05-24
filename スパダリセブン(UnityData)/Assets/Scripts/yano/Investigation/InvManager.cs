@@ -7,7 +7,7 @@ using SceneManager = Supadari.SceneManager;
 
 
 public enum InvType {
-   A, B, C,
+   A,
 }
 
 public class InvManager : MonoBehaviour

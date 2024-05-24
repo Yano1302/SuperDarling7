@@ -12,8 +12,6 @@ using SceneManager = Supadari.SceneManager;
 /// </summary>
 public class ItemManager : SingletonMonoBehaviour<ItemManager>
 {
-   
-
     //アイテムメッセージの選択を管理する列挙型
     public enum ItemMessageType {
         Investigation = ItemDataCsvIndex.Investigation,             //探索パートメッセージ
