@@ -132,8 +132,9 @@ public class InvManager : MonoBehaviour
     }
 
     private void Update() {
-        
-        if (m_vigilance.VigilanceFlag) {
+
+        if (m_vigilance.VigilanceFlag)
+        {
             AddVigilance(Time.deltaTime);
             CheckMouseMove();
         }
@@ -180,8 +181,17 @@ public class InvManager : MonoBehaviour
 
     /// <summary>全てのアイテムを取得した際の処理を記述します</summary>
     private void ClearInv() {
-        m_vigilance.VigilanceFlag = false;
+        TimerManager timerManager=TimerManager.Instance;
+        SceneManager sceneManager = SceneManager.Instance;
+        JsonSettings<SettingsGetItemFlags> saveItemData = new JsonSettings<SettingsGetItemFlags>(string.Format("Data{0}", sceneManager.saveSlot), "JsonSaveFile", "ItemGetFlags");
+        // 警戒ゲージと制限時間を止める　岬追記
+        m_vigilance.VigilanceFlag= false;
+        timerManager.TimerFlag = false;
         StopCoroutine("Waves");
+
+        // アイテム所持フラグを保存し、シーン遷移
+        saveItemData = ItemManager.Instance.UsingItemFlag;
+        saveItemData.Save();
         SceneManager.Instance.SceneChange(SCENENAME.SolveScene, () => { UIManager.Instance.CloseUI(UIType.Timer); SetCursor(null); });
     }
 

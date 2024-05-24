@@ -52,12 +52,19 @@ public class MenuScript : SingletonMonoBehaviour <MenuScript>
     public void Save(int saveSlotIndex)
     {
         sceneManager.audioManager.SE_Play("SE_item01", sceneManager.enviromentalData.TInstance.volumeSE);
+        ItemManager itemManager = ItemManager.Instance;
         JsonSettings<MasterData> saveData = new JsonSettings<MasterData>(string.Format("SaveData{0}", saveSlotIndex), "/Resources/プランナー監獄エリア/Json", "MasterData");
+        JsonSettings<SettingsGetItemFlags> saveItemData = new JsonSettings<SettingsGetItemFlags>(string.Format("Data{0}", saveSlotIndex), "JsonSaveFile", "ItemGetFlags");
         // 現在のシーンを保存
         saveData.TInstance.scenename = sceneManager.CheckSceneName;
         // セーブしたことがあるをtrueにする
         if (saveData.TInstance.scenename != SCENENAME.TitleScene) saveData.TInstance.haveSaved = true;
-        saveData.Save(); // セーブする
+        // 現在のアイテム取得情報を上書きする
+        saveItemData = itemManager.UsingItemFlag;
+
+        // セーブする
+        saveData.Save();
+        saveItemData.Save();
         Debug.Log("セーブします");
         // タイトルシーンの場合
         if (saveData.TInstance.scenename == SCENENAME.TitleScene)
@@ -75,7 +82,9 @@ public class MenuScript : SingletonMonoBehaviour <MenuScript>
     /// <param name="saveSlotIndex">セーブスロットの番号</param>
     public void Load(int saveSlotIndex)
     {
+        ItemManager itemManager = ItemManager.Instance;
         JsonSettings<MasterData> saveData = new JsonSettings<MasterData>(string.Format("SaveData{0}", saveSlotIndex), "/Resources/プランナー監獄エリア/Json", "MasterData");
+        JsonSettings<SettingsGetItemFlags> saveItemData = new JsonSettings<SettingsGetItemFlags>(string.Format("Data{0}", saveSlotIndex), "JsonSaveFile", "ItemGetFlags");
         if (saveData.TInstance.haveSaved == false)
         {
             sceneManager.audioManager.SE_Play("SE_dungeon05");
@@ -83,6 +92,7 @@ public class MenuScript : SingletonMonoBehaviour <MenuScript>
             return; // 一度もセーブされたことがないのならリターン
         }
         sceneManager.audioManager.SE_Play("SE_item01", sceneManager.enviromentalData.TInstance.volumeSE);
+        itemManager.UsingItemFlag = saveItemData; // ItemManagerで使用するアイテム取得フラグを上書きする
         // ロードしてシーン遷移
         sceneManager.saveSlot = saveSlotIndex;
         sceneManager.SceneChange(saveData.TInstance.scenename);

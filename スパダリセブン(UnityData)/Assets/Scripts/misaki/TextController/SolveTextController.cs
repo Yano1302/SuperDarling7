@@ -24,12 +24,16 @@ public class SolveTextController : BaseTextController
 
         // 選択したアイテムIDが正解のアイテムIDかどうかを判断し、次に表示するストーリーを変える
         if (selectedID == rightID) OnTalkButtonClicked(int.Parse(storyTalks[talkNum].correct));
-        else if (selectedID != rightID && missCount < 2)
+        else if (selectedID != rightID && MissCount < 2)
         {
             OnTalkButtonClicked(int.Parse(storyTalks[talkNum].miss));
-            missCount++;
+            MissCount++;
         }
-        else OnTalkButtonClicked(int.Parse(storyTalks[talkNum].gameOver));
+        else
+        {
+            OnTalkButtonClicked(int.Parse(storyTalks[talkNum].gameOver));
+            MissCount++;
+        }
 
         itemWindow.WinSlide(); // アイテムウィンドウをしまう
     }

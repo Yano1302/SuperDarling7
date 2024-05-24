@@ -28,16 +28,28 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     public void AddItem(ItemID id) {
         UsefulSystem.DebugAction(() => { if (m_itemFlag.TInstance.GetFlag(id)) { Debug.LogWarning("そのアイテムは既に取得しています。"); } });
         string itemName;
+        string imageName;
+
+        m_itemFlag.TInstance.SetFlag(id, true); // アイテムの所持を記録する
+
         m_itemData.GetData(1, (int)id, out itemName); // アイテム情報よりアイテム名を取得 岬追記
-        GameObject item = m_itemWindow.GetWinObj(id); // アイテムのオブジェクトを取得
+        GameObject item = m_itemWindow.GetWinObj(id); // アイテムのオブジェクトを取得 岬追記
         item.name = itemName; // アイテム名をオブジェクトの名前に代入　岬追記
         item.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = itemName; // アイテム名を子オブジェクトに代入 岬追記
-        item.GetComponent<Button>().onClick.AddListener(() => ItemDetails(itemName)); // ボタンにItemDetails関数を設定
-        m_itemWindow.SetWindow(id,true);
-
-        getMessage.SetActive(true); // アイテム取得メッセージを表示する
-        getItemName.text = itemName; // アイテム名を代入
-        ActiveItemImage(itemName, getItemImage); // アイテム画像を表示する
+        item.GetComponent<Button>().onClick.AddListener(() => ItemDetails(itemName)); // ボタンにItemDetails関数を設定 岬追記
+        m_itemWindow.SetWindow(id, true);
+        // 以降探索シーンのみ処理する
+        if (m_sceneManager.CheckSceneName == SCENENAME.InvestigationScene)
+        {
+            getMessage.SetActive(true); // アイテム取得メッセージを表示する 岬追記
+            getItemName.text = itemName; // アイテム名を代入 岬追記
+            m_itemData.GetData(5, (int)id, out imageName); // アイテム画像名を取得
+            ActiveItemImage(imageName, getItemImage); // アイテム画像を表示する 岬追記
+            TimerManager timerManager = TimerManager.Instance; // TimerManagerを取得 岬追記
+            InvManager invManager = InvManager.Instance; // InvManagerを取得 岬追記
+            timerManager.TimerFlag = false; // 制限時間を止める 岬追記
+            invManager.VigilanceFlag = false; // 警戒度上昇フラグを消す 岬追記
+        }
     }
 
     /// <summary>アイテムの所持フラグを消します。</summary>
@@ -175,6 +187,9 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     [System.Diagnostics.Conditional("UNITY_EDITOR")]
     public void Log() { Debug.Log(m_itemFlag.JsonToString()); }
 
+    /// <summary>アイテム取得情報のゲッターセッター関数岬追記</summary>
+    public JsonSettings<SettingsGetItemFlags> UsingItemFlag {  get { return m_itemFlag; } set { m_itemFlag = value; } }
+
 
     /// <summary>
     /// アイテムの詳細を表示する関数 岬追記
@@ -241,7 +256,7 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
         base.Awake();
         if(m_itemFlag == null) {
             //アイテム情報を読み込む   TODO : セーブファイル情報を他で管理する
-            m_itemFlag = new JsonSettings<SettingsGetItemFlags>("Data1","JsonSaveFile", "ItemGetFlags");    //アイテム所持データ
+            m_itemFlag = new JsonSettings<SettingsGetItemFlags>("DataDefault", "JsonSaveFile", "ItemGetFlags");    //アイテム所持データ
             m_itemData = new CSVSetting("アイテム情報");   //アイテム情報(メッセージ等)       
             m_stageData = new CSVSetting("ステージ情報");
         }
@@ -285,5 +300,10 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
         itemText.text = null;
         getItemImage.gameObject.SetActive(false);
         getMessage.gameObject.SetActive(false);
+        TimerManager timerManager = TimerManager.Instance; // TimerManagerを取得
+        InvManager invManager = InvManager.Instance; // InvManagerを取得
+        timerManager.TimerFlag = true; // 制限時間を動かす
+        invManager.VigilanceFlag = true; // 警戒度上昇フラグを立てる
+        invManager.GetItemNum += 1; // 取得したアイテム数を加算する
     }
 }

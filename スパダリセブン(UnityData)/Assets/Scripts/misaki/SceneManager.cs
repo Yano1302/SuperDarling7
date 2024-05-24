@@ -45,6 +45,7 @@ namespace Supadari
         void SceneLoaded(Scene nextScene, LoadSceneMode mode)
         {
             JsonSettings<MasterData> saveData = new JsonSettings<MasterData>(string.Format("SaveData{0}", saveSlot), "/Resources/プランナー監獄エリア/Json", "MasterData");
+
             // 現在のシーンを代入する
             currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene(); 
             currentSceneName = (SCENENAME)currentScene.buildIndex;
@@ -94,10 +95,14 @@ namespace Supadari
                     break;
                 case SCENENAME.SolveScene:
                     audioManager.BGM_Play("BGM_solve", enviromentalData.TInstance.volumeBGM);
+                    saveData.TInstance.scenename = currentSceneName; // 現在のシーンを代入
+                    saveData.Save(); // セーブする
                     controller = GameObject.FindGameObjectWithTag("Coroutine").GetComponent<SolveTextController>();
                     autoButton.onClick.AddListener(controller.OnAutoModeCllicked);
                     if (uiManager.ChekIsOpen(UIType.ItemWindow) == true) uiManager.CloseUI(UIType.ItemWindow);
                     uiManager.OpenUI(UIType.ItemWindow);
+                    // アイテムウィンドウとアイテム所持情報を一致させる
+                    itemWindow.machWindow();
                     // ジャッジオブジェクトを表示する
                     if (itemWindow.CheckJudge() == false) itemWindow.ActiveJudge();
                     break;

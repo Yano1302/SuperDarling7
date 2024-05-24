@@ -53,7 +53,17 @@ public class BaseTextController : DebugSetting
 
     protected ItemID rightID; // 正しいアイテムID変数
 
-    protected int missCount = 0; // ミスをした回数
+    [SerializeField] Image lifeImage; // ライフの画像変数
+
+    private int missCount = 0; // ミスをした回数
+    protected int MissCount {
+        get { return missCount; }
+        set
+        { 
+            missCount = value;
+            lifeImage.sprite = Resources.Load<Sprite>(string.Format("ライフ/Inference_life_{0}", missCount)); // アイテム画像を代入
+        } 
+    }
 
     [SerializeField] GameObject clickIcon; // クリックを催促するアイコン変数
 
