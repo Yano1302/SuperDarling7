@@ -16,6 +16,7 @@ TagManager:
   - ItemWindow
   - Item
   - Judge
+  - StoryMenu
   layers:
   - Default
   - TransparentFX

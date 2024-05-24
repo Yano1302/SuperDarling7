@@ -13,6 +13,7 @@ public class BaseTextController : DebugSetting
     public float textDelay = 1.5f; // テキストとテキストの間の時間(オートモードのみ使用)
     protected bool talkSkip = false; // ボタンがクリックされたかどうかを示すフラグ
     protected bool talkAuto = false; // 会話がオート状態なのかを示すフラグ
+    private bool autoSetUp = false; // オートモードの準備状態かどうかのフラグ
     [Header("1-1のように入力")]
     public string storynum; //ストーリー番号
     protected string words; // 文章
@@ -44,15 +45,29 @@ public class BaseTextController : DebugSetting
     protected string richTextTag = string.Empty; // リッチテキストタグ用変数
     protected bool isTag = false; // リッチテキストタグを格納しているかどうか
 
-    [SerializeField]protected SceneManager sceneManager; // シーンマネージャー変数
-    [SerializeField]bool testText = false; // ボタンのテキストを表示するかどうか
+    [SerializeField] protected SceneManager sceneManager; // シーンマネージャー変数
+    [SerializeField] bool testText = false; // ボタンのテキストを表示するかどうか
     [SerializeField] GameObject autoImage; // オートモードの画像
 
     protected ItemWindow itemWindow; // アイテムウィンドウ変数
 
     protected ItemID rightID; // 正しいアイテムID変数
 
-    protected int missCount = 0; // ミスをした回数
+    [SerializeField] Image lifeImage; // ライフの画像変数
+
+    private int missCount = 0; // ミスをした回数
+    protected int MissCount {
+        get { return missCount; }
+        set
+        { 
+            missCount = value;
+            lifeImage.sprite = Resources.Load<Sprite>(string.Format("ライフ/Inference_life_{0}", missCount)); // アイテム画像を代入
+        } 
+    }
+
+    [SerializeField] GameObject clickIcon; // クリックを催促するアイコン変数
+
+    float autoMigration = 0; // オートモードに移行する時間を格納する変数
 
     public TALKSTATE talkState; // 会話ステータス変数
     public TALKSTATE TalkState
@@ -85,8 +100,25 @@ public class BaseTextController : DebugSetting
         if(storynum!="") StorySetUp(storynum); // 対応する会話文をセットする
         TalkState = TALKSTATE.NOTALK; // 会話ステータスを話していないに変更
         sceneManager = GameObject.FindGameObjectWithTag("SceneManager").GetComponent<SceneManager>(); // オーディオマネージャーを取得
-        itemWindow = GameObject.FindGameObjectWithTag("ItemWindow").GetComponent<ItemWindow>(); // アイテムウィンドウを取得
+        itemWindow = GameObject.FindGameObjectWithTag("ItemWindow").GetComponent<ItemWindow>(); // アイテムウィンドウを取得 
         playerTextSpeed = sceneManager.enviromentalData.TInstance.textSpeed; // テキストスピードを設定
+    }
+    private void Update()
+    {
+        // オートモードへ切り替え準備時に動く
+        if (autoSetUp)
+        {
+            // textDelay秒待ってから次のテキストに進む
+            if (autoMigration < textDelay)
+            {
+                autoMigration += Time.deltaTime;
+                return;
+            }
+            autoMigration = default;
+            autoSetUp = false;
+            OnTalkButtonClicked();
+        }
+        else  autoMigration = default;
     }
     /// <summary>
     /// 対応する会話文をセットする関数
@@ -267,6 +299,7 @@ public class BaseTextController : DebugSetting
         if (rightCharaImage) Destroy(rightCharaImage);
         // 中央キャラクター画像が表示されていれば画像を破壊する
         if (centerCharaImage) Destroy(centerCharaImage);
+        if (clickIcon != null) clickIcon.SetActive(false); // クリックアイコンを非表示にする
     }
     /// <summary>
     /// 登場人物等を生成する関数
@@ -369,6 +402,7 @@ public class BaseTextController : DebugSetting
         if (talkAuto && TalkState != TALKSTATE.Question) // オートモードであれば、かつ、アイテム選択状態でなければ
         {
             yield return new WaitForSeconds(textDelay); // textDelay秒待つ
+            if (!talkAuto) yield break; // textDelay秒待った間にオートモードではなくなった場合、コルーチンを終了する
             OnTalkButtonClicked(); // 次の会話を自動でスタートする
         }
     }
@@ -403,6 +437,7 @@ public class BaseTextController : DebugSetting
         if (talkAuto && TalkState != TALKSTATE.Question) // オートモードであれば、かつ、アイテム選択状態でなければ
         {
             yield return new WaitForSeconds(textDelay); // textDelay秒待つ
+            if (!talkAuto) yield break; // textDelay秒待った間にオートモードではなくなった場合、コルーチンを終了する
             OnTalkButtonClicked(); // 次の会話を自動でスタートする
         }
     }        
@@ -417,6 +452,7 @@ public class BaseTextController : DebugSetting
             textLabel.text = storyTalks[talkNum].talks; // 全文を表示
             if(talkAuto)OnAutoModeCllicked(); // オートモード中ならオートモードを止める
         }
+        if (clickIcon != null) clickIcon.SetActive(true); // クリックアイコンを表示にする
         talkSkip = false; // トークスキップフラグをfalseにする
         runtimeCoroutine = false; // フラグを未実行に変更
         // アイテム選択状態にする場合
@@ -457,10 +493,20 @@ public class BaseTextController : DebugSetting
 
         // talkAutoがtrueならfalseに、falseならtrueに変換
         talkAuto = !talkAuto;
-        // オートモードならオートモード画像を出す　オートモードではないなら画像を出さない
         if (!autoImage) return;
-        if(talkAuto) autoImage.SetActive(true);
-        else autoImage.SetActive(false);
+        // オートモードならオートモード画像を出す
+        if (talkAuto)
+        {
+            // プレイヤーの入力受付中(NEXTTALKまたはLASTTALK時)はオートモード準備フラグを出す
+            if(TalkState == TALKSTATE.NEXTTALK || TalkState == TALKSTATE.LASTTALK) autoSetUp = true;
+            autoImage.SetActive(true);
+        }
+        // オートモードではないなら画像を出さない
+        else
+        {
+            autoSetUp = false;
+            autoImage.SetActive(false);
+        }
     }
 }
 

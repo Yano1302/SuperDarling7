@@ -11,6 +11,8 @@ namespace Supadari
         [SerializeField] SCENENAME currentSceneName; // 現在のシーン名
         [SerializeField] Scene currentScene; // 現在のシーン
         [SerializeField] Button autoButton; // オートボタン変数
+        [SerializeField] SlideWindow slideWindow; // スライドウィンドウ変数
+
         public int saveSlot; // セーブスロット変数
         public int stageNum = 0; // ステージ番号
         BaseTextController controller; // ストーリーコントローラー変数
@@ -43,11 +45,16 @@ namespace Supadari
         void SceneLoaded(Scene nextScene, LoadSceneMode mode)
         {
             JsonSettings<MasterData> saveData = new JsonSettings<MasterData>(string.Format("SaveData{0}", saveSlot), "/Resources/プランナー監獄エリア/Json", "MasterData");
+
             // 現在のシーンを代入する
             currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene(); 
             currentSceneName = (SCENENAME)currentScene.buildIndex;
             // ストーリーシーンまたは解決シーンであればストーリーメニューを出す
-            if (currentSceneName == SCENENAME.StoryScene || currentSceneName == SCENENAME.SolveScene) uiManager.OpenUI(UIType.StoryMenu);
+            if (currentSceneName == SCENENAME.StoryScene || currentSceneName == SCENENAME.SolveScene)
+            {
+                uiManager.OpenUI(UIType.StoryMenu);
+                slideWindow.InitializeStoryMenu(); // メニューを初期化する
+            }
             else uiManager.CloseUI(UIType.StoryMenu);
             // 現在のシーンが探索シーンであれば
             if (currentSceneName == SCENENAME.Dungeon || currentSceneName == SCENENAME.InvestigationScene)
@@ -83,13 +90,19 @@ namespace Supadari
                     break;
                 case SCENENAME.InvestigationScene:
                     audioManager.BGM_Play("BGM_dungeon", enviromentalData.TInstance.volumeBGM);
+                    if (uiManager.ChekIsOpen(UIType.ItemWindow) == true) uiManager.CloseUI(UIType.ItemWindow);
                     uiManager.OpenUI(UIType.ItemWindow);
                     break;
                 case SCENENAME.SolveScene:
                     audioManager.BGM_Play("BGM_solve", enviromentalData.TInstance.volumeBGM);
+                    saveData.TInstance.scenename = currentSceneName; // 現在のシーンを代入
+                    saveData.Save(); // セーブする
                     controller = GameObject.FindGameObjectWithTag("Coroutine").GetComponent<SolveTextController>();
                     autoButton.onClick.AddListener(controller.OnAutoModeCllicked);
+                    if (uiManager.ChekIsOpen(UIType.ItemWindow) == true) uiManager.CloseUI(UIType.ItemWindow);
                     uiManager.OpenUI(UIType.ItemWindow);
+                    // アイテムウィンドウとアイテム所持情報を一致させる
+                    itemWindow.machWindow();
                     // ジャッジオブジェクトを表示する
                     if (itemWindow.CheckJudge() == false) itemWindow.ActiveJudge();
                     break;

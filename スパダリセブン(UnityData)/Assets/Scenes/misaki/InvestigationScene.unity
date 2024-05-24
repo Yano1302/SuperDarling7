@@ -175,6 +175,26 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 661445093059865140, guid: 72c8c1ff1400bcf4d951056428919d14, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1031187246138886299, guid: 72c8c1ff1400bcf4d951056428919d14, type: 3}
+      propertyPath: m_Type
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1031187246138886299, guid: 72c8c1ff1400bcf4d951056428919d14, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: c65aa10726438544a886c97f1443e47a, type: 3}
+    - target: {fileID: 4966447068860082932, guid: 72c8c1ff1400bcf4d951056428919d14, type: 3}
+      propertyPath: size
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7784875632944991269, guid: 72c8c1ff1400bcf4d951056428919d14, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7912098541403421162, guid: 72c8c1ff1400bcf4d951056428919d14, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -255,12 +275,37 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7920774322383280501, guid: 72c8c1ff1400bcf4d951056428919d14, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 450
+      objectReference: {fileID: 0}
+    - target: {fileID: 7920774322383280501, guid: 72c8c1ff1400bcf4d951056428919d14, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 7920774322383280501, guid: 72c8c1ff1400bcf4d951056428919d14, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -710
+      objectReference: {fileID: 0}
+    - target: {fileID: 8164353545661041945, guid: 72c8c1ff1400bcf4d951056428919d14, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8734210150263257021, guid: 72c8c1ff1400bcf4d951056428919d14, type: 3}
       propertyPath: m_Name
       value: InvCanvas
       objectReference: {fileID: 0}
+    - target: {fileID: 8979458932545066914, guid: 72c8c1ff1400bcf4d951056428919d14, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: ddf175a4d5613844e88f961d34da80e0, type: 3}
+    - target: {fileID: 8979458932545066914, guid: 72c8c1ff1400bcf4d951056428919d14, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 1921281282046411195, guid: 72c8c1ff1400bcf4d951056428919d14, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 72c8c1ff1400bcf4d951056428919d14, type: 3}

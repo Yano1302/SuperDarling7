@@ -26,12 +26,28 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     public void AddItem(ItemID id) {
         UsefulSystem.DebugAction(() => { if (m_itemFlag.TInstance.GetFlag(id)) { Debug.LogWarning("そのアイテムは既に取得しています。"); } });
         string itemName;
+        string imageName;
+
+        m_itemFlag.TInstance.SetFlag(id, true); // アイテムの所持を記録する
+
         m_itemData.GetData(1, (int)id, out itemName); // アイテム情報よりアイテム名を取得 岬追記
-        GameObject item = m_itemWindow.GetWinObj(id); // アイテムのオブジェクトを取得
+        GameObject item = m_itemWindow.GetWinObj(id); // アイテムのオブジェクトを取得 岬追記
         item.name = itemName; // アイテム名をオブジェクトの名前に代入　岬追記
         item.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = itemName; // アイテム名を子オブジェクトに代入 岬追記
-        item.GetComponent<Button>().onClick.AddListener(() => ItemDetails(itemName)); // ボタンにItemDetails関数を設定
-        m_itemWindow.SetWindow(id,true);
+        item.GetComponent<Button>().onClick.AddListener(() => ItemDetails(itemName)); // ボタンにItemDetails関数を設定 岬追記
+        m_itemWindow.SetWindow(id, true);
+        // 以降探索シーンのみ処理する
+        if (m_sceneManager.CheckSceneName == SCENENAME.InvestigationScene)
+        {
+            getMessage.SetActive(true); // アイテム取得メッセージを表示する 岬追記
+            getItemName.text = itemName; // アイテム名を代入 岬追記
+            m_itemData.GetData(5, (int)id, out imageName); // アイテム画像名を取得
+            ActiveItemImage(imageName, getItemImage); // アイテム画像を表示する 岬追記
+            TimerManager timerManager = TimerManager.Instance; // TimerManagerを取得 岬追記
+            InvManager invManager = InvManager.Instance; // InvManagerを取得 岬追記
+            timerManager.TimerFlag = false; // 制限時間を止める 岬追記
+            invManager.VigilanceFlag = false; // 警戒度上昇フラグを消す 岬追記
+        }
     }
 
     /// <summary>アイテムの所持フラグを消します。</summary>
@@ -169,6 +185,9 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     [System.Diagnostics.Conditional("UNITY_EDITOR")]
     public void Log() { Debug.Log(m_itemFlag.JsonToString()); }
 
+    /// <summary>アイテム取得情報のゲッターセッター関数岬追記</summary>
+    public JsonSettings<SettingsGetItemFlags> UsingItemFlag {  get { return m_itemFlag; } set { m_itemFlag = value; } }
+
 
     /// <summary>
     /// アイテムの詳細を表示する関数 岬追記
@@ -184,9 +203,19 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
         GetItemMessage(id, ItemMessageType.Investigation, out details); // アイテム詳細文をdetailsに代入
         itemText.text = details; // アイテムテキストにアイテム詳細文を代入
         m_itemData.GetData(5, (int)id, out imageName); // アイテム画像名を取得
-        itemImage.gameObject.SetActive(true); // アイテム画像を表示
-        itemImage.sprite = Resources.Load<Sprite>("小物イラスト/" + imageName); // アイテム画像を代入
+        ActiveItemImage(imageName,itemImage); // アイテム画像を表示する
         selectedID = id; // 選択したアイテムのIDを代入
+    }
+
+    /// <summary>
+    /// アイテム画像を表示する関数
+    /// </summary>
+    /// <param name="imageName">表示したいアイテム名</param>
+    /// <param name="image">アイテム画像の代入先</param>
+    private void ActiveItemImage(string imageName,Image image)
+    {
+        image.gameObject.SetActive(true); // アイテム画像を表示
+        image.sprite = Resources.Load<Sprite>("小物イラスト/" + imageName); // アイテム画像を代入
     }
 
 
@@ -195,10 +224,10 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     private TextMeshProUGUI itemText; // アイテムの詳細を表示するテキスト　岬追記
     [SerializeField]
     private Image itemImage;         // アイテム画像　岬追記
-
-
-
-
+    [SerializeField]
+    private GameObject getMessage; // アイテム取得メッセージ　岬追記
+    private TextMeshProUGUI getItemName; // 取得したアイテム名を表示するテキスト　岬追記
+    private Image getItemImage; // 取得したアイテムの画像　岬追記
 
     //ItemのCSVファイルのインデックスを管理するEnumです
     private enum ItemDataCsvIndex {
@@ -215,6 +244,7 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     private ItemWindow m_itemWindow { get { IW ??= ItemWindow.Instance; return IW; } }//アイテムウィンドウ取得プロパティ
     private ItemWindow IW;                                          //アイテムウィンドウ管理インスタンス
     private SceneManager m_sceneManager;    // シーンマネージャー変数
+    private UIManager m_uiManager; // UIマネージャー変数　岬追記
     static private ItemID selectedID = 0; // 選択したアイテム 岬追記
     static public ItemID GetSelectedID { get { return selectedID; }  } // 選択したアイテムのゲッター関数　岬追記
 
@@ -224,7 +254,7 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
         base.Awake();
         if(m_itemFlag == null) {
             //アイテム情報を読み込む   TODO : セーブファイル情報を他で管理する
-            m_itemFlag = new JsonSettings<SettingsGetItemFlags>("Data1","JsonSaveFile", "ItemGetFlags");    //アイテム所持データ
+            m_itemFlag = new JsonSettings<SettingsGetItemFlags>("DataDefault", "JsonSaveFile", "ItemGetFlags");    //アイテム所持データ
             m_itemData = new CSVSetting("アイテム情報");   //アイテム情報(メッセージ等)       
             m_stageData = new CSVSetting("ステージ情報");
         }
@@ -232,6 +262,8 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
 
     protected void Start() {
         m_sceneManager = SceneManager.Instance;
+        m_uiManager = UIManager.Instance; // 岬追記
+        ItemMessageSetUp(); // アイテム取得メッセージのセットアップを行う　岬追記
     }
 
 
@@ -248,5 +280,28 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
             itemImage.gameObject.SetActive(false);
             selectedID = default;
         }
+    }
+    /// <summary>
+    /// アイテム取得メッセージの準備を行う関数　岬追記
+    /// getMessageの子オブジェクトの順番が変わると動かなくなります
+    /// </summary>
+    private void ItemMessageSetUp()
+    {
+        getItemName = getMessage.transform.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>();
+        getItemImage = getMessage.transform.GetChild(1).GetChild(2).GetComponent<Image>();
+    }
+    /// <summary>
+    /// アイテム取得メッセージの非表示とテキストの初期化を行う関数
+    /// </summary>
+    public void ItemMessageRelease()
+    {
+        itemText.text = null;
+        getItemImage.gameObject.SetActive(false);
+        getMessage.gameObject.SetActive(false);
+        TimerManager timerManager = TimerManager.Instance; // TimerManagerを取得
+        InvManager invManager = InvManager.Instance; // InvManagerを取得
+        timerManager.TimerFlag = true; // 制限時間を動かす
+        invManager.VigilanceFlag = true; // 警戒度上昇フラグを立てる
+        invManager.GetItemNum += 1; // 取得したアイテム数を加算する
     }
 }

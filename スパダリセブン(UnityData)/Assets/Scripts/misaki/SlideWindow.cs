@@ -10,15 +10,18 @@ public class SlideWindow : MonoBehaviour
     [SerializeField] SceneManager sceneManager; // SceneManager変数
     public float speacing = 20f; // オブジェクト間のスペースの大きさ
     float maxParentLength = 0; // 親オブジェクトの全長
+    float parentOffsetMin_x = 0; // 親オブジェクトのleft初期値
     public float speed = 1000f;
     float[] phase; // 次フェーズに進める目標値
     float phasePoint = 0; // 次フェーズに進むかどうかの判定で使うフロート値
     SLIDESTATE slideState; // SLIDESTATE変数
     bool openMenu = false; // メニューを開いているかどうか
+    public bool OpenCheck() => openMenu; // openMenuゲッター関数
 
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>(); // RectTransformを代入
+        parentOffsetMin_x = rectTransform.offsetMin.x; // 親オブジェクト
         rectTransforms = new RectTransform[transform.childCount]; // 子オブジェクト分の配列を用意する
         // 子オブジェクトのRectTransformを格納し、子オブジェクトの横幅を全て足して親オブジェクトの全長を算出する
         for (int i = 0; i < rectTransforms.Length; i++)
@@ -56,7 +59,6 @@ public class SlideWindow : MonoBehaviour
         if (phasePoint >= maxParentLength || slideState == SLIDESTATE.DEFAULT)
         {
             if (slideState == SLIDESTATE.DEFAULT) return; // デフォルトの場合はリターンして関数を動かさない
-            Debug.Log(rectTransform.offsetMin.x + maxParentLength);
             // 親オブジェクトの全長を最小に変更
             rectTransform.offsetMin = new Vector2(rectTransform.offsetMax.x  , rectTransform.offsetMin.y);
             for (int i = 0; i < rectTransforms.Length; i++)
@@ -167,6 +169,22 @@ public class SlideWindow : MonoBehaviour
             openMenu = !openMenu; // 反転して関数を動かす
             slideState = SLIDESTATE.SLIDE; // スライド中に変更
         }
+    }
+    /// <summary>
+    /// メニューのボタン配置を初期化する関数
+    /// </summary>
+    public void InitializeStoryMenu()
+    {
+        if (!openMenu) return; // メニューを開いていないならリターン
+        // 開いていない状態にする
+        openMenu = false;
+        rectTransform.offsetMin = new Vector2(parentOffsetMin_x, rectTransform.offsetMin.y);
+        
+        for (int i = 0; i < rectTransforms.Length; i++)
+        {
+            rectTransforms[i].localPosition = new Vector2(rectTransforms[i].localPosition.x - rectTransforms[i].localPosition.x, rectTransforms[i].localPosition.y);
+        }
+
     }
     /// <summary>
     /// セーブスロットを開く関数
