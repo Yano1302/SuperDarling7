@@ -48,9 +48,11 @@ public class InvManager : MonoBehaviour
             //ボタンを非表示に
             m_backBtn.SetActive(false);
             //フラグ設定
-            m_gaugefill.enabled = false;
+            VigilanceFlag = false; // 岬追記　警戒度はリセットしないようにしています
             m_isOpen = false;
-            Player.Instance.MoveFlag = true;
+            var ins= Player.Instance;
+            ins.MoveFlag = true;
+            ins.VisibilityImage = true;
             m_currentInvType = 0;
             //カーソルを元に戻す
             SetCursor(null);
@@ -189,7 +191,7 @@ public class InvManager : MonoBehaviour
         SceneManager sceneManager = SceneManager.Instance;
         JsonSettings<SettingsGetItemFlags> saveItemData = new JsonSettings<SettingsGetItemFlags>(string.Format("Data{0}", sceneManager.saveSlot), "JsonSaveFile", "ItemGetFlags");
         // 警戒ゲージと制限時間を止める　岬追記
-        m_vigilance.VigilanceFlag= false;
+        m_vigilance.VigilanceFlag = false;
         timerManager.TimerFlag = false;
         StopCoroutine("Waves");
 
