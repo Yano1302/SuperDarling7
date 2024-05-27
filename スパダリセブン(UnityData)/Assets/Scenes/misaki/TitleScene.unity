@@ -5226,6 +5226,10 @@ PrefabInstance:
       propertyPath: m_Direction
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 807140764298869851, guid: 928ff0fc2fc833f44b26840bfe64c7dc, type: 3}
+      propertyPath: m_FontData.m_RichText
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1382351846854889268, guid: 928ff0fc2fc833f44b26840bfe64c7dc, type: 3}
       propertyPath: getMessage
       value: 
@@ -5970,6 +5974,7 @@ MonoBehaviour:
   sceneManager: {fileID: 0}
   testText: 0
   autoImage: {fileID: 0}
+  lifeImage: {fileID: 0}
   clickIcon: {fileID: 0}
   talkState: 0
 --- !u!114 &8840372738266916836

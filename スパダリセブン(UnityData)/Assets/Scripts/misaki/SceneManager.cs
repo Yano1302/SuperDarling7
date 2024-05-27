@@ -82,6 +82,7 @@ namespace Supadari
                     audioManager.BGM_Play("BGM_quest", enviromentalData.TInstance.volumeBGM);
                     saveData.TInstance.scenename = currentSceneName; // 現在のシーンを代入
                     saveData.Save(); // セーブする
+                    ItemManager.Instance._Reset(); // アイテム取得情報をリセット
                     break;
                 case SCENENAME.StoryScene:
                     audioManager.BGM_Stop();
