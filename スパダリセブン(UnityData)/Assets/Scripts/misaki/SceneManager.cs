@@ -81,6 +81,7 @@ namespace Supadari
                 case SCENENAME.RequisitionsScene:
                     audioManager.BGM_Play("BGM_quest", enviromentalData.TInstance.volumeBGM);
                     saveData.TInstance.scenename = currentSceneName; // 現在のシーンを代入
+                    if (!saveData.TInstance.haveSaved) saveData.TInstance.haveSaved = true; // セーブされたことがなかったらtrueにする
                     saveData.Save(); // セーブする
                     ItemManager.Instance._Reset(); // アイテム取得情報をリセット
                     break;
@@ -97,6 +98,7 @@ namespace Supadari
                 case SCENENAME.SolveScene:
                     audioManager.BGM_Play("BGM_solve", enviromentalData.TInstance.volumeBGM);
                     saveData.TInstance.scenename = currentSceneName; // 現在のシーンを代入
+                    if (!saveData.TInstance.haveSaved) saveData.TInstance.haveSaved = true; // セーブされたことがなかったらtrueにする
                     saveData.Save(); // セーブする
                     controller = GameObject.FindGameObjectWithTag("Coroutine").GetComponent<SolveTextController>();
                     autoButton.onClick.AddListener(controller.OnAutoModeCllicked);
