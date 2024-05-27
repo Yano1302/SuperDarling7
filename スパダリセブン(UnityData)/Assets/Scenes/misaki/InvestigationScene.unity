@@ -191,6 +191,10 @@ PrefabInstance:
       propertyPath: size
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 4966447068860082932, guid: 72c8c1ff1400bcf4d951056428919d14, type: 3}
+      propertyPath: m_graceTime
+      value: 60
+      objectReference: {fileID: 0}
     - target: {fileID: 7784875632944991269, guid: 72c8c1ff1400bcf4d951056428919d14, type: 3}
       propertyPath: m_IsActive
       value: 0
