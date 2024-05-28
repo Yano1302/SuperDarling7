@@ -15,16 +15,16 @@ public class InvManager : MonoBehaviour
     /// <summary>探索パート～調査パート間のみ取得できるインスタンス</summary>
     public static InvManager Instance { get { Debug.Assert(m_instance, "シーンが違うのでインスタンスを取得できません。"); return m_instance; } }
     /// <summary>この調査パートに配置されたアイテムの中で取得しているアイテム数</summary>
-    public int GetItemNum { get { return m_getItemNum; } set { m_getItemNum = value; if (m_getItemNum >= MapManager.Instance.TotalItem){ ClearInv();} } }
+    public int GetItemNum { get { return m_getItemNum; } set { m_getItemNum = value; if (m_getItemNum >= MapManager.Instance.TotalItem) { ClearInv(); } } }
 
     /// <summary>警戒度が上がるフラグを設定します。</summary>
     public bool VigilanceFlag { get { return m_vigilance.VigilanceFlag; } set { m_vigilance.VigilanceFlag = value; } }
 
     /// <summary>調査パートを開きます</summary>
     public void Open(InvType type) {
-        Debug.Assert(!m_isOpen,"探索パートが既に開かれています");
+        Debug.Assert(!m_isOpen, "探索パートが既に開かれています");
         //シーンを開く
-        m_currentInvType = type;  m_invObj[(int)m_currentInvType].SetActive(true);
+        m_currentInvType = type; m_invObj[(int)m_currentInvType].SetActive(true);
         //ボタンをアクティブにする
         m_backBtn.SetActive(true);
         //座標を初期化する
@@ -32,12 +32,12 @@ public class InvManager : MonoBehaviour
         //フラグ設定
         m_gauge.enabled = true;
         m_gaugefill.enabled = true;
-        m_isOpen = true; 
+        m_isOpen = true;
         m_vigilance.VigilanceFlag = true;
         Player.Instance.MoveFlag = false;
         //カーソルを変更
         SetCursor(false);
-       
+
     }
 
     /// <summary>調査パートを閉じ、探索パートにもどります(ボタンにアタッチしてます)</summary>
@@ -48,9 +48,11 @@ public class InvManager : MonoBehaviour
             //ボタンを非表示に
             m_backBtn.SetActive(false);
             //フラグ設定
-            m_gaugefill.enabled = false;
+            VigilanceFlag = false; // 岬追記　警戒度はリセットしないようにしています
             m_isOpen = false;
-            Player.Instance.MoveFlag = true;
+            var ins= Player.Instance;
+            ins.MoveFlag = true;
+            ins.VisibilityImage = true;
             m_currentInvType = 0;
             //カーソルを元に戻す
             SetCursor(null);
@@ -62,7 +64,7 @@ public class InvManager : MonoBehaviour
     /// targetがtrueの場合:カーソルがターゲットカーソルになります<br />
     /// targetがfalseの場合:カーソルが非ターゲットカーソルになります</summary>
     public void SetMouseIcon(bool? target) {
-       SetCursor(target);
+        SetCursor(target);
     }
 
     public void ResetVigilance() { SetVigilance(0); }
@@ -84,24 +86,27 @@ public class InvManager : MonoBehaviour
     [SerializeField, Header("危険メッセージボックス")]
     private GameObject m_warningMessage;
     [SerializeField, Header("マウスカーソル画像1")]
-    Texture2D m_cursor; 
+    Texture2D m_cursor;
     [SerializeField, Header("マウスカーソル画像1")]
     Texture2D m_cursorTaget;
 
-    [SerializeField,Header("探索パート背景用ImageObjct"),EnumIndex(typeof(InvType))]
+    [SerializeField, Header("探索パート背景用ImageObjct"), EnumIndex(typeof(InvType))]
     private GameObject[] m_invObj;
     #endregion
     //-----------------------------------------------------------------------------------------------
     //自身のインスタンス
     private static InvManager m_instance;
     private InvManager() { }
-    
+
     private AudioManager m_audioManager;
 
-    private InvType  m_currentInvType;           //現在の調査パート状態
+    private InvType m_currentInvType;           //現在の調査パート状態
     private bool m_isOpen;                       //開いているかのフラグ
     private Vigilance m_vigilance;               //警戒度用構造体
     private int m_getItemNum;                    //現在取得しているアイテム数
+    [Header("警戒度最大時に動いても良い猶予時間")]
+    [SerializeField] private float m_graceTime = 60; // 警戒度最大時に動いても良い猶予時間 岬追記
+    private float m_reprieveGameOver = 0; // ゲームオーバーになるまでの猶予時間　岬追記
 
     private struct Vigilance {
         public float MaxVigilance;               //最大警戒度
@@ -146,7 +151,8 @@ public class InvManager : MonoBehaviour
         //マウスが動かされている場合
         if (m_vigilance.mouseVec != pos) {
             if (m_vigilance.IsOver) {
-                OverVigilance();
+                m_reprieveGameOver++;
+                if (m_reprieveGameOver>m_graceTime) OverVigilance();
             }
             else {
                 m_vigilance.mouseVec = pos;
@@ -185,7 +191,7 @@ public class InvManager : MonoBehaviour
         SceneManager sceneManager = SceneManager.Instance;
         JsonSettings<SettingsGetItemFlags> saveItemData = new JsonSettings<SettingsGetItemFlags>(string.Format("Data{0}", sceneManager.saveSlot), "JsonSaveFile", "ItemGetFlags");
         // 警戒ゲージと制限時間を止める　岬追記
-        m_vigilance.VigilanceFlag= false;
+        m_vigilance.VigilanceFlag = false;
         timerManager.TimerFlag = false;
         StopCoroutine("Waves");
 

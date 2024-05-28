@@ -59,6 +59,7 @@ public class MenuScript : SingletonMonoBehaviour <MenuScript>
         saveData.TInstance.scenename = sceneManager.CheckSceneName;
         // セーブしたことがあるをtrueにする
         if (saveData.TInstance.scenename != SCENENAME.TitleScene) saveData.TInstance.haveSaved = true;
+
         // 現在のアイテム取得情報を上書きする
         saveItemData = itemManager.UsingItemFlag;
 

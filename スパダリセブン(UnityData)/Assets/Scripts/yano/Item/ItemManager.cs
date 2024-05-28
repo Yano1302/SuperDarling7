@@ -53,7 +53,9 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     /// <summary>アイテムの所持フラグを消します。</summary>
     /// <param name="id">消すアイテムのID</param>
     public void RemoveItem(ItemID id) {
-        UsefulSystem.DebugAction(() => { if (!m_itemFlag.TInstance.GetFlag(id)) { Debug.LogWarning("指定されたアイテムの所持フラグは既にfalseです"); } });
+        UsefulSystem.DebugAction(() => { if (!m_itemFlag.TInstance.GetFlag(id)) { Debug.LogWarning("指定されたアイテムの所持フラグは既にfalseです"); return; } });
+        GameObject item = m_itemWindow.GetWinObj(id); // アイテムのオブジェクトを取得 岬追記
+        item.GetComponent<Button>().onClick.RemoveAllListeners(); // オンクリック関数に設定しているものを全て取り除く
         m_itemWindow.SetWindow(id,false);
     }
 
@@ -179,7 +181,19 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     public void Load() { m_itemFlag.Load(); }
 
     /// <summary>アイテムの取得情報を初期の状態に戻します。</summary>
-    public void _Reset() { m_itemFlag.Reset(); }
+    public void _Reset()
+    {
+        m_itemFlag.Reset();
+        
+        // 以降岬追記
+        int length=m_itemWindow.GetWinLength();
+        for (int i = 1; i < length; i++)
+        {
+            //所持アイテム情報とオブジェクトのアクティブ情報を一致させる
+            if (!GetFlag(((ItemID)i))) RemoveItem((ItemID)i);
+        }
+        // ここまで岬追記
+    }
    
     /// <summary>フラグの情報をログに表示します(デバッグ用)</summary>
     [System.Diagnostics.Conditional("UNITY_EDITOR")]

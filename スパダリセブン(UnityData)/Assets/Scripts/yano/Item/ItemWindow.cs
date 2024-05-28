@@ -31,6 +31,8 @@ public class ItemWindow : SingletonMonoBehaviour<ItemWindow>
 
     // ゲッター関数　岬追記
     public GameObject GetWinObj(ItemID itemID) { return m_windows[(int)itemID]; }
+    // ゲッター関数　岬追記
+    public int GetWinLength() { return m_windows.Length; }
 
     /// <summary>
     /// アイテムウィンドウのスライドを行う関数　岬追記
