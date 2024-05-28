@@ -437,7 +437,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   debugSettings: {fileID: 11400000, guid: e0bebd3eb006f154498ddc536a46f38f, type: 2}
   eventCheck: 1
-  requisitionController: {fileID: 0}
   storyname: 
   barImage: {fileID: 6989269191742538059}
   barFluctuationValue: 0.3
@@ -760,6 +759,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: e00a1df4543f7de4093a7b24f65a69e9, type: 3}
+    - target: {fileID: 4593306556577220587, guid: 866025499c67d4b48bc6e167654c3fe7, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 2100000, guid: 1126fb3ef18d87b41ab91938b2d28e04, type: 2}
     - target: {fileID: 6598070001334748123, guid: 866025499c67d4b48bc6e167654c3fe7, type: 3}
       propertyPath: m_Name
       value: BackTitleButtonaaaa
