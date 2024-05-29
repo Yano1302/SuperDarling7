@@ -6,6 +6,7 @@ Shader "Unlit/Entire"
        _MaxAlpha("_MaxAlpha",float) = 1
        _MinAlpha("_MinAlpha",float) = 0
        _Texture("Texture",2D) = "white" {}
+       _MainTex("Base (RGB)",2D) = "white" {}
     }
     SubShader
     {

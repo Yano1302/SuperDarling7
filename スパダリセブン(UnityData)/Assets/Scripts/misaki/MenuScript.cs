@@ -53,7 +53,7 @@ public class MenuScript : SingletonMonoBehaviour <MenuScript>
     {
         sceneManager.audioManager.SE_Play("SE_item01", sceneManager.enviromentalData.TInstance.volumeSE);
         ItemManager itemManager = ItemManager.Instance;
-        JsonSettings<MasterData> saveData = new JsonSettings<MasterData>(string.Format("SaveData{0}", saveSlotIndex), "/Resources/プランナー監獄エリア/Json", "MasterData");
+        JsonSettings<MasterData> saveData = new JsonSettings<MasterData>(string.Format("SaveData{0}", saveSlotIndex), "JsonSaveFile", "MasterData");
         JsonSettings<SettingsGetItemFlags> saveItemData = new JsonSettings<SettingsGetItemFlags>(string.Format("Data{0}", saveSlotIndex), "JsonSaveFile", "ItemGetFlags");
         // 現在のシーンを保存
         saveData.TInstance.scenename = sceneManager.CheckSceneName;
@@ -84,7 +84,7 @@ public class MenuScript : SingletonMonoBehaviour <MenuScript>
     public void Load(int saveSlotIndex)
     {
         ItemManager itemManager = ItemManager.Instance;
-        JsonSettings<MasterData> saveData = new JsonSettings<MasterData>(string.Format("SaveData{0}", saveSlotIndex), "/Resources/プランナー監獄エリア/Json", "MasterData");
+        JsonSettings<MasterData> saveData = new JsonSettings<MasterData>(string.Format("SaveData{0}", saveSlotIndex), "JsonSaveFile", "MasterData");
         JsonSettings<SettingsGetItemFlags> saveItemData = new JsonSettings<SettingsGetItemFlags>(string.Format("Data{0}", saveSlotIndex), "JsonSaveFile", "ItemGetFlags");
         if (saveData.TInstance.haveSaved == false)
         {
