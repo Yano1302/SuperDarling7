@@ -12,7 +12,7 @@ public enum MapType {
     wall   = 3,
     catchtrap = 4,
     pitfall = 5,
-    Goal1 = 6,
+    Goal = 6,
     
 }
 
