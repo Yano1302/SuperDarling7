@@ -1,13 +1,25 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameClearController : BaseTextController
 {
     [SerializeField] Animator animator; // スタンプのアニメーター
+    [SerializeField] GameObject buttonImage; // ボタンのイメージ
+    private bool animEnd = false; // アニメーション終了通知
+    /// <summary>
+    /// アニメーション終了通知セッター関数
+    /// </summary>
+    public bool AnimEnd { set { animEnd = value; } }
     // Start is called before the first frame update
     void Start()
     {
         charaName.text = storyTalks[talkNum].name; // 話しているキャラクター名を表示
     }
+    void Update()
+    {
+        if (animEnd) ButtonActive();
+    }
+
     protected override void StorySetUp(string storynum)
     {
         Debug.Log(storynum + "を読み込みます");
@@ -60,5 +72,12 @@ public class GameClearController : BaseTextController
     {
         sceneManager.audioManager.SE_Play("SE_dungeon05", sceneManager.enviromentalData.TInstance.volumeSE); // SEを鳴らす
         sceneManager.SceneChange(0); // タイトルシーンへ遷移する
+    }
+    /// <summary>
+    /// ボタンの表示を行う関数
+    /// </summary>
+    private void ButtonActive()
+    {
+        if (buttonImage.activeSelf == false) buttonImage.SetActive(true);
     }
 }

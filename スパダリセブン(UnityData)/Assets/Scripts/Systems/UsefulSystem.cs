@@ -43,7 +43,11 @@ public class UsefulSystem : SingletonMonoBehaviour<UsefulSystem>
         var paths = Directory.GetFiles(Application.dataPath, FileName, SearchOption.AllDirectories);
         if (paths != null && paths.Length > 0)
         {
+#if UNITY_EDITOR
             return paths[0].Replace("\\", "/").Replace(Application.dataPath, "Assets");
+#else
+            return paths[0].Replace("\\", "/");
+#endif
         }
         LogError("ファイルが見つかりませんでした   ファイル名 : " + FileName);
         return null;
@@ -287,4 +291,5 @@ public class UsefulSystem : SingletonMonoBehaviour<UsefulSystem>
 
     //--------------------------------------------------------------------------------------------------------------------------------------------------
     #endregion
+
 }

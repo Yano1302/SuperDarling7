@@ -788,6 +788,10 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5150184462722067084, guid: db701c84868fbc145ba5c2c88a17d9b3, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
     - target: {fileID: 5802671523323911255, guid: db701c84868fbc145ba5c2c88a17d9b3, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -804,6 +808,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6578340247776448978, guid: db701c84868fbc145ba5c2c88a17d9b3, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 2100000, guid: b5556884c18090b438283d3111762113, type: 2}
     - target: {fileID: 8542735579741465760, guid: db701c84868fbc145ba5c2c88a17d9b3, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -893,7 +901,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   debugSettings: {fileID: 11400000, guid: e0bebd3eb006f154498ddc536a46f38f, type: 2}
   eventCheck: 1
-  requisitionController: {fileID: 0}
   storyname: 
   barImage: {fileID: 6431423464619293315}
   barFluctuationValue: 0.3
@@ -911,7 +918,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   debugSettings: {fileID: 11400000, guid: e0bebd3eb006f154498ddc536a46f38f, type: 2}
   eventCheck: 1
-  requisitionController: {fileID: 0}
   storyname: 
   barImage: {fileID: 6431423464619293317}
   barFluctuationValue: 0.3

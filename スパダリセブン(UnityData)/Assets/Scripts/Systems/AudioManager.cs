@@ -20,8 +20,11 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
     #region Config変数
     [SerializeField, Header("BGMが格納されているResourcesフォルダのパス(Asset/～)")]
     private string c_FolderPath_BGM = "Audio\\BGM\\Resources"; //BGMが格納されているフォルダのパス
+
+
     [SerializeField, Header("SEが格納されているResourcesフォルダのパス(Asset/～)")]
     private string c_FolderPath_SE = "Audio\\SE\\Resources";   //SEが格納されているフォルダのパス
+
 
     [SerializeField,Header("オーディオの最大個数(BGM込み)")]
     private int m_maxSoundOverlap = 10;                    　　         //オーディオの最大個数(BGM込み)
@@ -925,7 +928,7 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
             dic[name] = audio;
         }
     }
-   
+
     /// <summary>音のフェードイン、アウトを行う</summary>
     private IEnumerator FadeSound(SoundData s,float time,float ev, UnityAction action, bool stop,bool stopToAction) {
 

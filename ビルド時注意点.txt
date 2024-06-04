@@ -1,0 +1,11 @@
+2024-05-29
+ビルドしたときの注意点
+
+「ビルドデータファイル」→「スパダリセブン_Data」の中に
+「SuperDarling7」→「スパダリセブン(UnityData)」→「Assets」→{「Audio」と「JsonSaveFile」}をフォルダごとコピーして入れること
+
+「ビルドデータファイル」→「スパダリセブン_Data」→「Resources」の中に
+「SuperDarling7」→「スパダリセブン(UnityData)」→「Assets」→｛「Resources」｝の中身を全てコピーして入れること
+
+上記２点を行わないとBGMとセーブデータが存在しないことになります
+

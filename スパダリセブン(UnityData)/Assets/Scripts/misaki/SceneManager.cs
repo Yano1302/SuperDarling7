@@ -22,7 +22,8 @@ namespace Supadari
         public SCENENAME CheckSceneName { get { return currentSceneName; } } // 現在のシーン名を取得
         public Scene CheckScene { get { return currentScene; } } // 現在のシーンを取得
         // セーブデータを読み込み
-        public JsonSettings<EnvironmentalData> enviromentalData = new JsonSettings<EnvironmentalData>("EnvironmentalData(0)", "/Resources/プランナー監獄エリア/Json", "EnvironmentalData");
+        public JsonSettings<EnvironmentalData> enviromentalData = new JsonSettings<EnvironmentalData>("EnvironmentalData(0)", "JsonSaveFile", "EnvironmentalData");
+        //public JsonSettings<EnvironmentalData> enviromentalData = new JsonSettings<EnvironmentalData>("EnvironmentalData(0)", "/Resources/プランナー監獄エリア/Json", "EnvironmentalData");
         //public JsonSettings<EnvironmentalData> environmentalData = new JsonSettings<EnvironmentalData>("EnvironmentalData", "/Resources/プランナー監獄エリア/Json");
         //public JsonSettings<MasterData> saveData = new JsonSettings<MasterData>("MasterData", "/Resources/プランナー監獄エリア/Json");
 
@@ -44,7 +45,7 @@ namespace Supadari
         /// <param name="mode"></param>
         void SceneLoaded(Scene nextScene, LoadSceneMode mode)
         {
-            JsonSettings<MasterData> saveData = new JsonSettings<MasterData>(string.Format("SaveData{0}", saveSlot), "/Resources/プランナー監獄エリア/Json", "MasterData");
+            JsonSettings<MasterData> saveData = new JsonSettings<MasterData>(string.Format("SaveData{0}", saveSlot), "JsonSaveFile", "MasterData");
 
             // 現在のシーンを代入する
             currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene(); 

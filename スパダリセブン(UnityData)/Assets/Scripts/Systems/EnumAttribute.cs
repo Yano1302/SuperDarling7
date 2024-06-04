@@ -4,11 +4,11 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
-using UnityEditorInternal;
 using UnityEngine.Events;
 using Object = UnityEngine.Object;
 #if UNITY_EDITOR
 using UnityEditor;
+using UnityEditorInternal;
 #endif
 
 /// <summary>
