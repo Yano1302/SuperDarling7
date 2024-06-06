@@ -89,6 +89,22 @@ public class UsefulSystem : SingletonMonoBehaviour<UsefulSystem>
     /// <returns>列挙型の項目数</returns>
     public static int GetEnumLength<T>() where T : Enum { return Enum.GetValues(typeof(T)).Length; }
 
+    /// <summary>文字列型から列挙型を取得します</summary>
+    /// <typeparam name="T">列挙型の型</typeparam>
+    /// <param name="t">列挙型が出力されます</param>
+    /// <param name="str">この文字列から列挙型を検索します</param>
+    /// <returns>一致する列挙型があった場合はtrueを返します</returns>
+    public static bool GetEnum<T>(out T t , in string str) where T : Enum {
+        foreach (T Value in Enum.GetValues(typeof(T))) {
+            if(Value.ToString() == str) {
+                t = Value;
+                return true;
+            }
+        }
+        t = (T)Enum.GetValues(typeof(T)).GetValue(0);
+        return false;
+    }
+
     //  デバッグ用   //--------------------------------------------------------------------------------------------------------------------------------
 
     /// <summary> エディタ上でのみ有効なログを表示します</summary>

@@ -52,3 +52,4 @@ MonoBehaviour:
   - {fileID: 2794328576331544150, guid: 9e8b71e267fb5274c8d7a4de09061f3e, type: 3}
   - {fileID: 6033727255272582526, guid: 52730d31e449ebb408d99964276d0cea, type: 3}
   - {fileID: 6597018043759559211, guid: e480ffe54641eaf4290eba534e84cfb0, type: 3}
+  InvManagerObject: {fileID: 8734210150263257021, guid: 72c8c1ff1400bcf4d951056428919d14, type: 3}

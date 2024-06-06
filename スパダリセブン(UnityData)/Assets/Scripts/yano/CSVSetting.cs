@@ -15,8 +15,8 @@ public class CSVSetting {
     public CSVSetting(string fileName) {
         string path = UsefulSystem.FindFilePath(fileName+".csv");      //全体パスの取得
         int index = path.IndexOf("Resources/") + 10;                   //相対パスの始めの位置を取得
-        m_csvFile = Resources.Load(path.Substring(index, path.Length - (index + 4))) as TextAsset; // CSVファイルのファイル名だけを取得してResourcesにあるCSVファイルを格納    
-        StringReader reader = new StringReader(m_csvFile.text);           // TextAsset内の文字列をStringReaderに変換
+        var csvFile = Resources.Load(path.Substring(index, path.Length - (index + 4)), typeof(TextAsset)) as TextAsset; // CSVファイルのファイル名だけを取得してResourcesにあるCSVファイルを格納    
+        StringReader reader = new StringReader(csvFile.text);           // TextAsset内の文字列をStringReaderに変換
         m_csvData = new List<string[]>();                                 //メモリ確保                 
         while (reader.Peek() != -1) {
             string line = reader.ReadLine();// 1行ずつ読み込む
@@ -66,6 +66,7 @@ public class CSVSetting {
     /// <returns>見つかったかどうかを返します</returns>
     public bool GetColumnIndex(int index_y,string name,out int index_x) {
         for (int i = 0; i < m_csvData[0].Length; i++){
+            Debug.Log(m_csvData[index_y][i]);
             if (m_csvData[index_y][i] == name) {
                 index_x = i;
                 return true;
@@ -96,14 +97,20 @@ public class CSVSetting {
     /// <summary>CSVの中身をログに表示します(デバッグ時のみ呼び出し)</summary>
     [System.Diagnostics.Conditional("UNITY_EDITOR")]
     public void LogCSV() {
-        Debug.Log(m_csvFile);
+        string str = "";
+        for(int i = 0; i < m_csvData.Count; i++) {
+            for (int j = 0; j < m_csvData[i].Length; j++) {
+                str += $"{ m_csvData[i][j]},";
+            }
+            str += "\n";    
+        }
     }
 
 
     //private 
     private CSVSetting() { }            // new抑制
     private List<string[]> m_csvData;   // 実際のテキストデータ
-    private TextAsset m_csvFile;        // CSVファイルを読み込むテキストアセット
+
 
     [System.Diagnostics.Conditional("UNITY_EDITOR")]
     public void LogWarning(object obj) { Debug.LogWarning(obj); }

@@ -7,7 +7,7 @@ using SceneManager = Supadari.SceneManager;
 
 public class Goal : MonoBehaviour
 {
-    [SerializeField] private InvType m_invType;
+    public InvType InvType;     //MapManagerから格納される
 
     private void OnCollisionEnter2D(Collision2D collision) {
         // ウィンドウを開く処理
@@ -15,7 +15,7 @@ public class Goal : MonoBehaviour
             var ins = Player.Instance;
             ins.MoveFlag = false;
             ins.VisibilityImage = false;
-            InvManager.Instance.Open(m_invType);
+            InvManager.Instance.Open(InvType);
         }
     }
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 using System.IO;
 using UnityEngine.SceneManagement;
 
+
 //TODO JSONに対応させる
 public enum MapType {
     Dummy = 0,
@@ -38,6 +39,9 @@ public class MapManager : SingletonMonoBehaviour<MapManager> {
     // アタッチ変数  //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
     [SerializeField, Header("マップオブジェクト"), EnumIndex(typeof(MapType))]
     private GameObject[] MapObject;
+
+    [SerializeField, Header("Invマネージャーオブジェクト")]
+    private GameObject InvManagerObject;
     //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
    
     /// <summary>ステージのCSVを読み込むためのインデックスを管理します</summary>
@@ -46,8 +50,9 @@ public class MapManager : SingletonMonoBehaviour<MapManager> {
         name = 1,
         time = 2,
         size = 3,
-        itemStart = 4,
-        otherItem = 10,
+        InvPart= 4,
+        itemStart = 5,
+        otherItem = 11,
     }
 
     //  プライベート変数  //------------------------------------------------------------------------------------------------------------------------------
@@ -70,7 +75,7 @@ public class MapManager : SingletonMonoBehaviour<MapManager> {
     //初期化
     protected override void Awake() {
         base.Awake();
-        //マップ情報だけ先に読み込んでおく
+        //ステージ情報だけ先に読み込んでおく
         if (StageData.Data == null) {
             //ステージ作成に必要なデータが入ったCSVを読み込む
             StageData.Data = new CSVSetting("ステージ情報");
@@ -89,10 +94,11 @@ public class MapManager : SingletonMonoBehaviour<MapManager> {
     /// <summary>マップを作成します Note:岬さんのシーンマネージャーから呼び出します</summary>
     /// <param name="mapNumber">作成するステージ番号 Note:ステージ番号はステージ情報一覧.csvに記載</param>
     private void _Create(int mapNumber) {
+        Instantiate(InvManagerObject);
         //ステージ名を格納しているインデックスを確保する
         StageData.Data.GetColumnIndex(0, "ステージ名", out int nameIndex);
-        //ステージ名を取得
         StageData.Data.GetData(nameIndex, mapNumber, out string data);
+       
         //ステージ名と一致するCSVファイルがあるはずなので読み込む
         var mapData = new CSVSetting(data);
         //現在のステージ番号を格納する
@@ -121,7 +127,20 @@ public class MapManager : SingletonMonoBehaviour<MapManager> {
                         //他の背景用に道オブジェクトを配置する　TODO:仮置き
                         Instantiate(MapObject[(int)MapType.road], vec, Quaternion.identity);
                     }
-                }     
+                }
+                else {
+                    //変換できない場合の例外処理
+                    mapData.GetData(x, y,out string str);
+                    int type = CutParentheses(str,out string d);
+                    switch ((MapType)type) {
+                        case MapType.Goal:
+                            Vector2 vec = new Vector2(m_stageData.size * x, m_stageData.size - (m_stageData.size * y));//マスの配置場所を計算する
+                            var obj = Instantiate(MapObject[type], vec, Quaternion.identity);
+                            UsefulSystem.GetEnum(out InvType t, str);
+                            obj.GetComponent<Goal>().InvType = t;
+                            break;
+                    } 
+                }
             }        
         }
     
@@ -134,4 +153,11 @@ public class MapManager : SingletonMonoBehaviour<MapManager> {
     private void SceneUnloaded(Scene thisScene) {
         m_stageData.number = -1;
     }
+
+    private int CutParentheses(in string str,out string Data) {
+        int startIndex = str.IndexOf('[');
+        Data = str.Substring(startIndex,str.Length - startIndex - 1 );  //-1は閉じかっこ　] の分
+        return int.Parse(str.Substring(0,startIndex));
+    }
+
 }

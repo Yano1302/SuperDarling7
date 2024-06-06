@@ -157,8 +157,6 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
             if (m_stageData.CheckData(i, stageNumber))total++;
             else  break;      
         }
-        m_stageData.GetData(length - 1, stageNumber,out string str);
-        total += str != "" ? str.Split(',').Length : 0;
         return total;
     }
 

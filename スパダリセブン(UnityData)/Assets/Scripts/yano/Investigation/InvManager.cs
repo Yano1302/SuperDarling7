@@ -5,13 +5,15 @@ using UnityEngine.UI;
 using Supadari;
 using SceneManager = Supadari.SceneManager;
 
-
+//ステージ名CSVと同じ名前の列挙子を記述してください
 public enum InvType {
    A,
 }
 
 public class InvManager : MonoBehaviour
 {
+
+
     /// <summary>探索パート～調査パート間のみ取得できるインスタンス</summary>
     public static InvManager Instance { get { Debug.Assert(m_instance, "シーンが違うのでインスタンスを取得できません。"); return m_instance; } }
     /// <summary>この調査パートに配置されたアイテムの中で取得しているアイテム数</summary>
@@ -67,6 +69,7 @@ public class InvManager : MonoBehaviour
         SetCursor(target);
     }
 
+    /// <summary>警戒度をリセットします</summary>
     public void ResetVigilance() { SetVigilance(0); }
 
     //  アタッチ用   //------------------------------------------------------------------------------
@@ -93,6 +96,11 @@ public class InvManager : MonoBehaviour
     [SerializeField, Header("探索パート背景用ImageObjct"), EnumIndex(typeof(InvType))]
     private GameObject[] m_invObj;
     #endregion
+
+
+    public class InvPart: MonoBehaviour {
+
+    }
     //-----------------------------------------------------------------------------------------------
     //自身のインスタンス
     private static InvManager m_instance;
@@ -209,9 +217,7 @@ public class InvManager : MonoBehaviour
         Cursor.SetCursor(tex, vec, CursorMode.Auto);
     }
 
-    /// <summary>
-    /// 警戒度がマックスの際にマウスを動かしてしまった場合の処理
-    /// </summary>
+    /// <summary>警戒度がマックスの際にマウスを動かしてしまった場合の処理</summary>
     private void OverVigilance() {
         if (m_vigilance.VigilanceFlag) {
             m_warningMessage.SetActive(false);
@@ -220,6 +226,7 @@ public class InvManager : MonoBehaviour
         }
     }
 
+    /// <summary>心臓のアニメーションを行います TODO アニメーションに切り替えるかも</summary>
     private IEnumerator Waves() {
         float time = 0;
         if (m_vigilance.IsOver) { m_audioManager.SE_Play("SE_survey01"); }
