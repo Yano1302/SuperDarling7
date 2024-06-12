@@ -94,15 +94,33 @@ public class MapManager : SingletonMonoBehaviour<MapManager> {
     /// <summary>マップを作成します Note:岬さんのシーンマネージャーから呼び出します</summary>
     /// <param name="mapNumber">作成するステージ番号 Note:ステージ番号はステージ情報一覧.csvに記載</param>
     private void _Create(int mapNumber) {
+        //調査パートを管理するオブジェクトを生成する
         Instantiate(InvManagerObject);
-        //ステージ名を格納しているインデックスを確保する
-        StageData.Data.GetColumnIndex(0, "ステージ名", out int nameIndex);
-        StageData.Data.GetData(nameIndex, mapNumber, out string data);
-       
+        //マップ情報の調査パート一覧を読み込む
+        StageData.Data.GetData((int)StageCsvIndex.InvPart,mapNumber,out string invStr);
+        //調査パート名は'/'で区切られているはずなので分解してそれぞれ取得する
+        var invData = invStr.Split('/');
+        //調査パートの配列にこのステージの全ての調査パートを格納する
+        InvType[] invTypes = new InvType[invData.Length];                               
+        for (int i = 0; i < invData.Length; i++) {
+            if(UsefulSystem.GetEnum(out InvType t, invData[i])) {
+                invTypes[i] = t;
+            }
+            else {
+                UsefulSystem.LogError($"{ invData[i]  }に一致する調査パート名が見つかりません。InvTypeの記述やCSV内を確認してください。");
+            }    
+        }
+        //調査パート全体の管理オブジェクトに情報を渡す
+        InvManager.Instance.SetUpInv(invTypes);                                        
+        
+        //ステージ名を取得する
+        StageData.Data.GetData((int)StageCsvIndex.name, mapNumber, out string data);
         //ステージ名と一致するCSVファイルがあるはずなので読み込む
         var mapData = new CSVSetting(data);
         //現在のステージ番号を格納する
         m_stageData.number = mapNumber;
+        
+
         //現在のステージのアイテム数を取得する
         var im = ItemManager.Instance;
         m_stageData.totalitem = im.GetTotalItemNum(mapNumber);

@@ -8,23 +8,22 @@ using System;
 //IDを設定　(Jsonファイルと同じ名前にする)
 public enum ItemID {
     Dummy = 0,
-    ID0　=  1,
-    ID1  =  2,
-    ID2  =  3,
-    ID3  =  4,
-    ID4  =  5,
-    ID5  =  6,
-    ID6  =  7,
-    ID7  =  8,
-    ID8  =  9,
-    ID9  =  10,
-    ID10 =  11,
+    ID1　=  1,
+    ID2  =  2,
+    ID3  =  3,
+    ID4  =  4,
+    ID5  =  5,
+    ID6  =  6,
+    ID7  =  7,
+    ID8  =  8,
+    ID9  =  9,
+    ID10  =  10,
+    ID11 =  11,
 }
 
 //ID名とbool変数名を一致させる
 [Serializable]
 public class SettingsGetItemFlags {
-    public bool ID0;
     public bool ID1;
     public bool ID2;
     public bool ID3;
@@ -35,10 +34,10 @@ public class SettingsGetItemFlags {
     public bool ID8;
     public bool ID9;
     public bool ID10;
+    public bool ID11;
 
     public bool GetFlag(ItemID id) {
         switch (id) {
-            case ItemID.ID0: return ID0;
             case ItemID.ID1: return ID1;
             case ItemID.ID2: return ID2;
             case ItemID.ID3: return ID3;
@@ -49,6 +48,7 @@ public class SettingsGetItemFlags {
             case ItemID.ID8: return ID8;
             case ItemID.ID9: return ID9;
             case ItemID.ID10: return ID10;
+            case ItemID.ID11: return ID11;
         }
         UsefulSystem.LogError("アイテムIDに対応する所持フラグがありませんでした。 ID : " + id);
         return false;
@@ -56,7 +56,6 @@ public class SettingsGetItemFlags {
 
     public void SetFlag(ItemID id, bool value) {
         switch (id) {
-            case ItemID.ID0: ID0 = value; break;
             case ItemID.ID1: ID1 = value; break;
             case ItemID.ID2: ID2 = value; break;
             case ItemID.ID3: ID3 = value; break;
@@ -67,6 +66,7 @@ public class SettingsGetItemFlags {
             case ItemID.ID8: ID8 = value; break;
             case ItemID.ID9: ID9 = value; break;
             case ItemID.ID10: ID10 = value; break;
+            case ItemID.ID11: ID11 = value; break;
 
 
             default: UsefulSystem.LogError("アイテムIDに対応する所持フラグがありませんでした。 ID : " + id);break;

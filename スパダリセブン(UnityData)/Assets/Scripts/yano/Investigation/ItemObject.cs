@@ -4,11 +4,13 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class ItemObject : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
-    public ItemID ID { get { return m_itemID; } }
+    //親のinvpartから格納されます
+    public ItemID ID { get { return m_itemID; } set { Debug.Assert(m_itemID == ItemID.Dummy, "アイテムのIDは既に割り振られています"); m_itemID = value; } }
+    public InvPart Part { set { m_invPart ??= value; } }
 
-    [SerializeField,Header("このアイテムのID")]
-    private ItemID m_itemID;
+    private ItemID m_itemID = ItemID.Dummy;
 
+    private InvPart m_invPart;
     private InvManager m_invManager;
     private bool m_OnMouse = false;
 
@@ -17,6 +19,7 @@ public class ItemObject : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         AudioManager.Instance.SE_Play("SE_item01");
         m_invManager.SetMouseIcon(false);
         Destroy(gameObject);
+            
     }
 
     private void Update() {
@@ -27,20 +30,24 @@ public class ItemObject : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
 
     private void OnEnable(){
-        m_invManager =  InvManager.Instance;
+        m_invManager ??=  InvManager.Instance;
+        //既に取得している場合はオブジェクトを破棄する
         if (ItemManager.Instance.GetFlag(m_itemID)) {
-            GetItem();
+            Destroy(gameObject);
         }
     }
 
     public void OnPointerEnter(PointerEventData eventData) {
         m_invManager.SetMouseIcon(true);
         m_OnMouse = true;
+        Debug.LogError("呼ばれました");
     }
 
     public void OnPointerExit(PointerEventData eventData) {
         m_invManager.SetMouseIcon(false);
         m_OnMouse = false;
     }
+
+   
 
 }

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using System.Text;
 
 /// <summary>
 /// CSVを読み込むクラスです。<br />
@@ -98,12 +99,25 @@ public class CSVSetting {
     [System.Diagnostics.Conditional("UNITY_EDITOR")]
     public void LogCSV() {
         string str = "";
-        for(int i = 0; i < m_csvData.Count; i++) {
+        var enc = Encoding.GetEncoding("UTF-8");
+        foreach (var s in m_csvData[0]) {
+            str += $"{ s }";
+            str += s.Length % 3 == 1? "," :　s.Length % 3 == 2 ? "　," : ",";
+        }
+        str += "\n";
+        for (int i = 1; i < m_csvData.Count; i++) {
             for (int j = 0; j < m_csvData[i].Length; j++) {
-                str += $"{ m_csvData[i][j]},";
+                string str2 = m_csvData[i][j];
+          
+                int diff = enc.GetByteCount(m_csvData[0][j]) - enc.GetByteCount(str2);
+                for (int k = 0; k < diff; k++) {
+                    str2 += " ";
+                }
+                str += $"{ str2 },";
             }
             str += "\n";    
         }
+        Debug.Log(str);
     }
 
 

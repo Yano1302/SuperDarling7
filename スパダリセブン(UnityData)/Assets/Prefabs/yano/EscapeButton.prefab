@@ -135,6 +135,7 @@ MonoBehaviour:
   Side: 0
   Rect: {fileID: 273343865090661677}
   m_text: {fileID: 2117332577731845093}
+  m_image: {fileID: 0}
   clear: 0
 --- !u!222 &6248923577946056365
 CanvasRenderer:
@@ -315,6 +316,7 @@ MonoBehaviour:
   Side: 1
   Rect: {fileID: 1455742313818085301}
   m_text: {fileID: 7380341121873395679}
+  m_image: {fileID: 0}
   clear: 0
 --- !u!114 &8974694627433740894
 MonoBehaviour:
