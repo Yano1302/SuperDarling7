@@ -5,6 +5,51 @@ using UnityEngine.UI;
 using Supadari;
 using SceneManager = Supadari.SceneManager;
 
+/// <summary>
+/// MapManagerがマップ生成のついでにステージ情報を全て取得する
+///                     ↓
+///  MapManagerがInvManagerを作成し、ステージ情報にある探索パート情報を渡す
+///                     ↓
+///  InvManagerが渡された情報を元にInvPartクラスを作成し、InvTypeを指定する。
+///  この際に作成したInvPart情報を保管しておき、Open()関数でこの作成したInvPartを開けるようにする
+///                     ↓
+///  InvTypeは指定されたInvTypeに対応するテクスチャをInvTextureholderから取得すると同時に、
+///  対応するCSVファイルを読み込み、アイテムオブジェクトを子として作成する
+///                     ↓
+///  この際にItemObjectにInvPart参照を渡し、ItemObjectからInvPartにアイテムが取得された事を報告する
+///  
+/// 
+///   管理者  /管理オブジェクト
+///     
+/// InvManager/警戒度フラグ ->　InvPart毎にフラグを設定する訳ではないので外部からもフラグが設定しやすいInvManagerに設置
+/// InvManager/マウスカーソル-> これも単一であるのが保証されているのでInvManagerに設置しItemObject等からも呼び出しやすいようにしている
+///  
+/// InvPart   / 警戒度ゲージ -> 調査パート毎に警戒度の設定が違うのでゲージクラスの管理はInvPartに委譲(SetUpInv()でゲージクラスを渡している)
+/// InvPart   / 危険メッセージ-> 最初はInvManagerで保管するつもりだったが、ステージによって危険メッセージが出てからの猶予を変える可能性があるためInvPartに委譲
+/// 
+/// アイテムについて
+/// 
+///                     全て取得している場合は推理パートに移行する
+///                                         ↑
+///             InvManagerが全てのInvPartを確認し、アイテムを全て取得しているか確認する　→　取得していない場合は現在のInvPartを閉じるだけ
+///                                         ↑
+///             InvPartが自身のパートのアイテムが全て無くなった(取得済み)なのを判断し、対応するゴールオブジェクトを破棄したのちInvManagerに報告する
+///                                         ↑
+///             InvPartが残りのアイテム数を確認する(自身の子の残数がそのまま残り個数) <----------------------------------------------------------------|
+///                                         ↑                                                                                                         |
+///             ItemObjectが自身を取得された場合にItemManagerへアイテムを追加しつつ、InvPartに報告する                                                 |
+///                                         ↑                                                                                                         |
+///             InvPartが開かれたタイミングでItemObjectが自身のアイテムを既に取得しているかどうかItemManagerに確認しに行く　→　既に持っていた場合には重複を防ぐため破壊しInvPartに報告する
+///                                         ↑
+/// //探索パートを開くまでの流れ            ↑
+///             ゴールオブジェクトに当たった際にInvManagerのOpenからゴールオブジェクトが持っているInvTypeの調査パートを呼び出す。      
+///                                         ↑
+///              MapManagerがマップ生成する際にゴールオブジェクトに対応するInvTypeを登録しておく。
+///   
+/// </summary>
+
+
+
 
 public class InvManager : MonoBehaviour
 {
@@ -12,13 +57,35 @@ public class InvManager : MonoBehaviour
     /// <summary>探索パート～調査パート間のみ取得できるインスタンス</summary>
     public static InvManager Instance { get { Debug.Assert(m_instance, "シーンが違うのでインスタンスを取得できません。"); return m_instance; } }
 
-   
-    
-    /// <summary>この調査パートに配置されたアイテムの中で取得しているアイテム数</summary>
-    public int GetItemNum { get { return m_getItemNum; } set { m_getItemNum = value; if (m_getItemNum >= MapManager.Instance.TotalItem) { ClearInv(); } } }
-
     /// <summary>警戒度上昇フラグを設定します。</summary>
     public bool VigilanceFlag { get { return m_vigilanceFlag; } set { m_vigilanceFlag = value; } }
+
+
+    /// <summary>MapManagerから調査パートのセットアップを行います</summary>
+    public void SetUpInv(in InvType[] type,List<Goal> goalList) {
+        if (m_invParts == null) {
+            m_invParts = new InvPart[type.Length];
+            for (int i = 0; i < type.Length; i++) {
+                //InvPart用オブジェクトを作成し、このManagerクラスの子にする
+                var obj = Instantiate(m_baseInvObject);
+                obj.transform.SetParent(m_invCanvas.transform, false);
+                //InvPartクラスをアタッチし、セットアップ関数を呼び出す
+                m_invParts[i] = obj.AddComponent<InvPart>();
+                m_invParts[i].SetUpInvPart(type[i], m_baseInvItem, m_gauge, m_warningMessage);
+                //InvPartに対応するゴールを検索し格納する
+                foreach(var g in goalList) {
+                    if(g.InvType == m_invParts[i].InvPartType) {
+                        m_invParts[i].SetGoal(g);
+                    }
+                }
+            }
+            //生成したアイテムで埋もれない様にUIを一番上に持ってくる
+            m_backBtn.gameObject.transform.SetAsLastSibling();
+            m_gauge.gameObject.transform.SetAsLastSibling();
+            m_warningMessage.gameObject.transform.SetAsLastSibling();
+
+        }
+    }
 
     /// <summary>調査パートを開きます</summary>
     public void Open(InvType type) {
@@ -55,10 +122,11 @@ public class InvManager : MonoBehaviour
         }
     }
 
-    /// <summary>マウスアイコンを設定します<br />
-    /// targetがnullの場合;デフォルトのマウスカーソルになります<br />
-    /// targetがtrueの場合:カーソルがターゲットカーソルになります<br />
-    /// targetがfalseの場合:カーソルが非ターゲットカーソルになります</summary>
+    /// <summary>マウスアイコンを設定します</summary>
+    ///  <param name="target">
+    ///  targetがnullの場合 ;デフォルトのマウスカーソルになります          <br />
+    ///  targetがtrueの場合 :カーソルがターゲットカーソルになります        <br />
+    ///  targetがfalseの場合:カーソルが非ターゲットカーソルになります      </param>
     public void SetMouseIcon(bool? target) {
         SetCursor(target);
     }
@@ -69,7 +137,7 @@ public class InvManager : MonoBehaviour
     /// <summary>指定した調査パートの警戒度をリセット(0)します</summary>
     public void ResetVigilance(InvType type) { 
         foreach (var inv in m_invParts) {
-            if (inv.MyIntType == type) {
+            if (inv.InvPartType == type) {
                 inv.ResetVigilance();
                 return;
             }
@@ -78,7 +146,20 @@ public class InvManager : MonoBehaviour
     }
 
     //全ての調査パートの警戒度をリセット(0)にします
-    public void AllResetVigilance() { foreach (var inv in m_invParts) { inv.ResetVigilance(); } }
+    public void AllResetVigilance() { foreach (var inv in m_invParts)inv.ResetVigilance();}
+
+    /// <summary>全てのInvPartがクリアされているか確認します。この関数はInvPartが一つクリアされる度呼ばれます。</summary>
+    public void CheckClear() { 
+        foreach(var part in m_invParts) {
+            if(!part.ClearFlag) {
+                //まだクリアしていないPartがあるので現在のPartを閉じるだけ
+                Close();
+                return;
+            }
+        }
+        //ここに到達した場合にはクリアしている
+        ClearInv();
+    }
 
     //  アタッチ用   //------------------------------------------------------------------------------
     #region Attach
@@ -103,13 +184,12 @@ public class InvManager : MonoBehaviour
 
 
     //-----------------------------------------------------------------------------------------------
-    //自身のインスタンス
-    private static InvManager m_instance;
+    
+    private static InvManager m_instance;        //自身のインスタンス
     private InvManager() { }
     private bool m_vigilanceFlag;                //警戒度上昇フラグ
     private InvType m_currentInvType;            //現在の調査パート状態
-    private int m_getItemNum;                    //現在取得しているアイテム数
-    private InvPart[] m_invParts;                //探索パート配列
+    private InvPart[] m_invParts;                //探索パート配列              
 
     private void Awake() {
         m_instance = GetComponent<InvManager>();
@@ -117,26 +197,9 @@ public class InvManager : MonoBehaviour
         m_gauge.CloseGauge();
         m_gauge.SetRate(0);
         m_currentInvType = InvType.None;
-        m_getItemNum = 0;
-    }
-
-    /// <summary>MapManagerから調査パートのセットアップを行います</summary>
-    public void SetUpInv(in InvType[] type) {
-        if(m_invParts == null) {
-            m_invParts = new InvPart[type.Length];
-            for (int i = 0; i < type.Length; i++) {
-                var obj = Instantiate(m_baseInvObject);
-                obj.transform.SetParent(m_invCanvas.transform,false);
-                m_invParts[i] = obj.AddComponent<InvPart>();
-                m_invParts[i].SetUpInvPart(type[i],m_baseInvItem,m_gauge,m_warningMessage);
-            }
-            m_gauge.gameObject.transform.SetAsLastSibling();
-        }
     }
 
    
-
-
     /// <summary>全てのアイテムを取得した際の処理を記述します</summary>
     private void ClearInv() {
         TimerManager timerManager=TimerManager.Instance;
@@ -153,8 +216,9 @@ public class InvManager : MonoBehaviour
         SceneManager.Instance.SceneChange(SCENENAME.SolveScene, () => { UIManager.Instance.CloseUI(UIType.Timer); SetCursor(null); });
     }
 
+
+
     /// <summary>カーソルを設定します</summary>
-    /// <param name="target"></param>
     private void SetCursor(bool? target) {
         Texture2D tex = target == null ? null : (bool)target ? m_cursorTaget : m_cursor;
         Vector2 vec = tex  == null ? Vector2.zero : new Vector2(tex.width/2,tex.height/2);

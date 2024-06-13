@@ -2,28 +2,39 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Events;
 using SceneManager = Supadari.SceneManager;
 
 //各調査パートを管理するクラスオブジェクト
 public class InvPart : MonoBehaviour {
-    /// <summary>MapManagerから格納されます</summary>-------------------------------------------------------------
-    public InvType MyIntType { get { return m_InvType; } }
+    // MapManagerから格納されます--------------------------------------------------------------------------------
+    /// <summary>自身のInvPartを取得します。設定はMapManagerからSetUpInvPart経由で格納されます</summary>
+    public InvType InvPartType { get { return m_InvType; } }
+    /// <summary>このInvPartを呼び出すゴールオブジェクトを設定します。MapManagerから呼ばれます</summary>
+    public void SetGoal(Goal g) {m_goalList ??= new List<Goal>();  m_goalList.Add(g);}
+  
     //------------------------------------------------------------------------------------------------------------
+
+    /// <summary>このパートがクリアされているか</summary>
+    public bool ClearFlag { get; private set; } = false;
 
     /// <summary>自身の調査パートの種類をInvManagerから設定します</summary>---------------------------------------
     public void SetUpInvPart(InvType type, GameObject itemCol, InvGauge invGage, GameObject warning) {
+        //自身の名前を調査パート名に変更
         gameObject.name = type.ToString();
+        //設定されたInvTypeから自身のテクスチャを取得する
         m_img = GetComponent<Image>();
         m_img.sprite = InvTextureholder.Instance.GetSprite(type);
         m_img.enabled = false;
+        //その他必要な情報を格納する
         m_InvType = type;
         m_InvGauge = invGage;
         m_warningMessage = warning;
+        //設定されたInvTypeから対応するCSVファイルを読み込み、必要な情報を格納する
         InitialiseInvPart(itemCol);
     }
 
-   // public bool ClearInv { get { return  } }
-
+   
     /// <summary>この調査パートを開く処理を行います</summary>
     public void Open() {
         //マウス座標を初期化する
@@ -46,30 +57,22 @@ public class InvPart : MonoBehaviour {
         }
     }
 
-    //-------------------------------------------------------------------------------------------------------------
-
-    /// <summary>残りのアイテムの個数を確認し、全て取得している場合にInvPartを閉じます。</summary>
-    private void CheckItemNum() {
-        if (m_itemObj.Count <= m_getItemCount) {
-            //ここに到達したらアイテムを全て取得していることになる
-            Debug.LogError("アイテムを全て取得しました。");
-        }
-    }
-
-
-
-
-
-
-
     //現在の警戒度を０にします
     public void ResetVigilance() {
         m_vig.CurrentVigilance = 0;
         m_InvGauge.ResetGauge();
     }
 
+    //-------------------------------------------------------------------------------------------------------------
 
-   
+    /// <summary>残りのアイテムの個数を確認し、全て取得している場合にItemManagerに報告します</summary>
+    public void CheckItemNum() {
+       if(transform.childCount == 0) {
+            ClearFlag = true;                                     //クリアフラグを立てる
+            foreach (var g in m_goalList) Destroy(g.gameObject); //このInvPartを呼び出すオブジェクトを全て破棄する
+            InvManager.Instance.CheckClear();                   //ItemManagerに全体のクリアを確認させる
+        }
+    }
 
     /// <summary>構造体の初期化とアイテム配置を行います</summary>
     private void InitialiseInvPart(GameObject itemCol) {
@@ -102,22 +105,20 @@ public class InvPart : MonoBehaviour {
             //アイテムを生成する
             var obj = Instantiate(itemCol);
             //アイテムをInvPartの子にする
-            obj.transform.SetParent(transform, false);
+            obj.transform.SetParent(transform);
             //生成したアイテムオブジェクトを取得する
             var itemObj = obj.AddComponent<ItemObject>();
             //ID等を割り振る
             var id = itemManager.GetItemID(name);
             itemObj.ID = id;
-            itemObj.Part = this;
             itemObj.name = name;
             m_itemObj.Add(itemObj);
             //座標を設定する
             var rect = obj.GetComponent<RectTransform>();
             data.GetData(i, 2, out float x);
             data.GetData(i, 3, out float y);
-            Vector2 vec = new Vector2(x - 960, y - 540);
-            rect.anchoredPosition = vec;
-            Debug.LogError($"{ name } : x[{ x }] , y[{y}]");
+            Vector2 vec = new Vector2(x, y);
+            rect.position = vec;
         }
     }
 
@@ -155,7 +156,8 @@ public class InvPart : MonoBehaviour {
     private GameObject m_warningMessage;
     //取得しているアイテムの数
     private int m_getItemCount;
-
+    //このパートを呼び出すゴールオブジェクト一覧
+    private List<Goal> m_goalList;
 
 
 
@@ -228,3 +230,4 @@ public class InvPart : MonoBehaviour {
     }
 
 }
+

@@ -6,11 +6,9 @@ using UnityEngine.EventSystems;
 public class ItemObject : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
     //e‚Ìinvpart‚©‚çŠi”[‚³‚ê‚Ü‚·
     public ItemID ID { get { return m_itemID; } set { Debug.Assert(m_itemID == ItemID.Dummy, "ƒAƒCƒeƒ€‚ÌID‚ÍŠù‚ÉŠ„‚èU‚ç‚ê‚Ä‚¢‚Ü‚·"); m_itemID = value; } }
-    public InvPart Part { set { m_invPart ??= value; } }
 
     private ItemID m_itemID = ItemID.Dummy;
 
-    private InvPart m_invPart;
     private InvManager m_invManager;
     private bool m_OnMouse = false;
 
@@ -40,7 +38,6 @@ public class ItemObject : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     public void OnPointerEnter(PointerEventData eventData) {
         m_invManager.SetMouseIcon(true);
         m_OnMouse = true;
-        Debug.LogError("ŒÄ‚Î‚ê‚Ü‚µ‚½");
     }
 
     public void OnPointerExit(PointerEventData eventData) {

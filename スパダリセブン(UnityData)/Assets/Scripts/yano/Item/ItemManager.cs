@@ -259,16 +259,16 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager> {
     /// <summary>
     /// アイテム取得メッセージの非表示とテキストの初期化を行う関数
     /// </summary>
-    private void ItemMessageRelease() {
-        itemText.text = null;
-        getItemImage.gameObject.SetActive(false);
-        getMessage.gameObject.SetActive(false);
-        TimerManager timerManager = TimerManager.Instance; // TimerManagerを取得
-        InvManager invManager = InvManager.Instance; // InvManagerを取得
-        timerManager.TimerFlag = true; // 制限時間を動かす
-        invManager.VigilanceFlag = true; // 警戒度上昇フラグを立てる
-        invManager.GetItemNum += 1; // 取得したアイテム数を加算する
-    }
+   // private void ItemMessageRelease() {
+   //     itemText.text = null;
+   //     getItemImage.gameObject.SetActive(false);
+   //     getMessage.gameObject.SetActive(false);
+   //     TimerManager timerManager = TimerManager.Instance; // TimerManagerを取得
+   //     InvManager invManager = InvManager.Instance; // InvManagerを取得
+   //     timerManager.TimerFlag = true; // 制限時間を動かす
+   //     invManager.VigilanceFlag = true; // 警戒度上昇フラグを立てる
+   //     //invManager.GetItemNum += 1; // 取得したアイテム数を加算する
+   // }
 
     /// <summary>ステージ毎のアイテム情報を取得し保管します</summary>
     private void SetDictionary() {
