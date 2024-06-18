@@ -60,6 +60,8 @@ public class InvManager : MonoBehaviour
     /// <summary>警戒度上昇フラグを設定します。</summary>
     public bool VigilanceFlag { get { return m_vigilanceFlag; } set { m_vigilanceFlag = value; } }
 
+    ///
+    public InvPart CurrentPart { get { return m_currentPart; } }
 
     /// <summary>MapManagerから調査パートのセットアップを行います</summary>
     public void SetUpInv(in InvType[] type,List<Goal> goalList) {
@@ -94,12 +96,14 @@ public class InvManager : MonoBehaviour
         //シーンを開く
         m_currentInvType = type;
         int index = (int)m_currentInvType;
+        m_currentPart = m_invParts[index];
         m_invParts[index].gameObject.SetActive(true);
         m_invParts[index].Open();
         //ボタンをアクティブにする
         m_backBtn.SetActive(true);       
         //カーソルを変更
         SetCursor(false);
+        VigilanceFlag = true;
     }
 
     /// <summary>調査パートを閉じ、探索パートにもどります(ボタンにアタッチしてます)</summary>
@@ -189,7 +193,8 @@ public class InvManager : MonoBehaviour
     private InvManager() { }
     private bool m_vigilanceFlag;                //警戒度上昇フラグ
     private InvType m_currentInvType;            //現在の調査パート状態
-    private InvPart[] m_invParts;                //探索パート配列              
+    private InvPart[] m_invParts;                //探索パート配列
+    private InvPart m_currentPart;               //現在のパート
 
     private void Awake() {
         m_instance = GetComponent<InvManager>();

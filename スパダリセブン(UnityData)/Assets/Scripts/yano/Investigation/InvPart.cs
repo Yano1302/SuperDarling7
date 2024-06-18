@@ -67,7 +67,7 @@ public class InvPart : MonoBehaviour {
 
     /// <summary>残りのアイテムの個数を確認し、全て取得している場合にItemManagerに報告します</summary>
     public void CheckItemNum() {
-       if(transform.childCount == 0) {
+       if(transform.childCount <= 0) {
             ClearFlag = true;                                     //クリアフラグを立てる
             foreach (var g in m_goalList) Destroy(g.gameObject); //このInvPartを呼び出すオブジェクトを全て破棄する
             InvManager.Instance.CheckClear();                   //ItemManagerに全体のクリアを確認させる
@@ -112,6 +112,7 @@ public class InvPart : MonoBehaviour {
             var id = itemManager.GetItemID(name);
             itemObj.ID = id;
             itemObj.name = name;
+            itemObj.Part = this;
             m_itemObj.Add(itemObj);
             //座標を設定する
             var rect = obj.GetComponent<RectTransform>();

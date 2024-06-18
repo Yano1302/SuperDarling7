@@ -16,6 +16,7 @@ public class Goal : MonoBehaviour
             ins.MoveFlag = false;
             ins.VisibilityImage = false;
             InvManager.Instance.Open(InvType);
+
         }
     }
 }
