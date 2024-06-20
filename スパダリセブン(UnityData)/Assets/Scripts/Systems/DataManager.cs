@@ -1,19 +1,52 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 
-public class DataManager : DebugSetting // MasterData‚ğjsonŒ`®‚É•Ï‚¦‚Ä•Û‘¶E“Ç‚İ‚İ‚·‚éƒXƒNƒŠƒvƒg
+public partial class DataManager : DebugSetting // MasterData‚ğjsonŒ`®‚É•Ï‚¦‚Ä•Û‘¶E“Ç‚İ‚İ‚·‚éƒXƒNƒŠƒvƒg
 {
-    [SerializeField] public MasterData data; // json•ÏŠ·‚·‚éƒf[ƒ^‚ÌƒNƒ‰ƒX 
-    string filepath; // jsonƒtƒ@ƒCƒ‹‚ÌƒpƒX
-    string fileName = "MasterData.json"; // jsonƒtƒ@ƒCƒ‹–¼
+    /// --------ŠÖ”ˆê——-------- ///
 
-    protected  override void Awake()
+    #region publicŠÖ”
+    /// -------publicŠÖ”------- ///
+
+    public void Save(MasterData data) // json‚Æ‚µ‚Äƒf[ƒ^‚ğ•Û‘¶‚·‚éŠÖ”
+    {
+        string json = JsonUtility.ToJson(data); // json‚Æ‚µ‚Ä•ÏŠ·
+        StreamWriter writer = new StreamWriter(filepath, false); // ƒtƒ@ƒCƒ‹‘‚«‚İw’è
+        writer.WriteLine(json); // json•ÏŠ·‚µ‚½î•ñ‚ğ‘‚«‚İ
+        writer.Close(); // ƒtƒ@ƒCƒ‹‚ğ•Â‚¶‚é
+        Debug.Log("ƒZ[ƒu‚µ‚Ä‚¢‚Ü‚·" + json);
+    }
+
+    public void ResetMasterData() // ƒf[ƒ^‚ğ‰Šú‰»‚·‚éŠÖ”
+    {
+        Debug.Log("ƒ}ƒXƒ^[ƒf[ƒ^‚Ì‰Šú‰»‚ğs‚¢‚Ü‚·");
+        data = new MasterData(); // data‚ÉMasterDataŒ^‚ğ‘ã“ü
+        Save(data); // ƒZ[ƒu‚·‚é
+    }
+
+    public void DeletaSave()
+    {
+        File.Delete(filepath);
+    }
+
+    /// -------publicŠÖ”------- ///
+    #endregion
+
+    #region protectedŠÖ”
+    /// -----protectedŠÖ”------ ///
+
+    protected override void Awake()
     {
         base.Awake(); // ƒfƒoƒbƒOƒƒO‚ğ•\¦‚·‚é‚©”Û‚©ƒXƒNƒŠƒvƒ^ƒuƒ‹ƒIƒuƒWƒFƒNƒg‚ÌDebugSettings‚ğQÆ
         CheckSaveData(); // ŠJn‚Éƒtƒ@ƒCƒ‹ƒ`ƒFƒbƒNA“Ç‚İ‚İ
     }
+
+    /// -----protectedŠÖ”------ ///
+    #endregion
+
+    #region privateŠÖ”
+    /// ------privateŠÖ”------- ///
+
     private void CheckSaveData() // ŠJn‚Éƒtƒ@ƒCƒ‹ƒ`ƒFƒbƒNA“Ç‚İ‚İ‚·‚éŠÖ”
     {
         Debug.Log("‹N“®ƒ[ƒhŠJn");
@@ -26,15 +59,8 @@ public class DataManager : DebugSetting // MasterData‚ğjsonŒ`®‚É•Ï‚¦‚Ä•Û‘¶E“Ç‚
         }
         data = Load(filepath); // ƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚ñ‚Ådata‚ÉŠi”[
     }
-    public void Save(MasterData data) // json‚Æ‚µ‚Äƒf[ƒ^‚ğ•Û‘¶‚·‚éŠÖ”
-    {
-        string json = JsonUtility.ToJson(data); // json‚Æ‚µ‚Ä•ÏŠ·
-        StreamWriter writer = new StreamWriter(filepath, false); // ƒtƒ@ƒCƒ‹‘‚«‚İw’è
-        writer.WriteLine(json); // json•ÏŠ·‚µ‚½î•ñ‚ğ‘‚«‚İ
-        writer.Close(); // ƒtƒ@ƒCƒ‹‚ğ•Â‚¶‚é
-        Debug.Log("ƒZ[ƒu‚µ‚Ä‚¢‚Ü‚·" + json);
-    }
-    MasterData Load(string path) // jsonƒf[ƒ^‚ğ“Ç‚İ‚ŞŠÖ”
+
+    private MasterData Load(string path) // jsonƒf[ƒ^‚ğ“Ç‚İ‚ŞŠÖ”
     {
         if (File.Exists(path)) // jsonƒf[ƒ^‚ª‚ ‚ê‚Î
         {
@@ -50,19 +76,53 @@ public class DataManager : DebugSetting // MasterData‚ğjsonŒ`®‚É•Ï‚¦‚Ä•Û‘¶E“Ç‚
             return null; // null‚ğ•Ô‚·
         }
     }
-    public void ResetMasterData() // ƒf[ƒ^‚ğ‰Šú‰»‚·‚éŠÖ”
-    {
-        Debug.Log("ƒ}ƒXƒ^[ƒf[ƒ^‚Ì‰Šú‰»‚ğs‚¢‚Ü‚·");
-        data = new MasterData(); // data‚ÉMasterDataŒ^‚ğ‘ã“ü
-        Save(data); // ƒZ[ƒu‚·‚é
-    }
-    //void OnDestroy() // ƒQ[ƒ€I—¹‚É•Û‘¶
+
+    //private void OnDestroy() // ƒQ[ƒ€I—¹‚É•Û‘¶
     //{
     //    Save(data);
     //}
-    public void DeletaSave()
-    {
-        File.Delete(filepath);
-    }
-}
 
+    /// ------privateŠÖ”------- ///
+    #endregion
+
+    /// --------ŠÖ”ˆê——-------- ///
+}
+public partial class DataManager
+{
+    /// --------•Ï”ˆê——-------- ///
+
+    #region public•Ï”
+    /// -------public•Ï”------- ///
+
+    [SerializeField] public MasterData data; // json•ÏŠ·‚·‚éƒf[ƒ^‚ÌƒNƒ‰ƒX 
+
+    /// -------public•Ï”------- ///
+    #endregion
+
+    #region protected•Ï”
+    /// -----protected•Ï”------ ///
+
+
+
+    /// -----protected•Ï”------ ///
+    #endregion
+
+    #region private•Ï”
+    /// ------private•Ï”------- ///
+
+    private string filepath; // jsonƒtƒ@ƒCƒ‹‚ÌƒpƒX
+    private string fileName = "MasterData.json"; // jsonƒtƒ@ƒCƒ‹–¼
+
+    /// ------private•Ï”------- ///
+    #endregion
+
+    #region ƒvƒƒpƒeƒB
+    /// -------ƒvƒƒpƒeƒB------- ///
+
+
+
+    /// -------ƒvƒƒpƒeƒB------- ///
+    #endregion
+
+    /// --------•Ï”ˆê——-------- ///
+}

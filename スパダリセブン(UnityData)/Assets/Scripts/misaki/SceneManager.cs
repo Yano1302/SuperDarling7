@@ -5,50 +5,86 @@ using UnityEngine.UI;
 
 namespace Supadari
 {
-    public class SceneManager : SingletonMonoBehaviour<SceneManager>
+    public partial class SceneManager : SingletonMonoBehaviour<SceneManager>
     {
-        [SerializeField] DisplayManager displayManager; // ディスプレイマネージャー用変数
-        [SerializeField] SCENENAME currentSceneName; // 現在のシーン名
-        [SerializeField] Scene currentScene; // 現在のシーン
-        [SerializeField] Button autoButton; // オートボタン変数
-        [SerializeField] SlideWindow slideWindow; // スライドウィンドウ変数
+        /// --------関数一覧-------- ///
 
-        public int saveSlot; // セーブスロット変数
-        public int stageNum = 0; // ステージ番号
-        BaseTextController controller; // ストーリーコントローラー変数
-        public UIManager uiManager; // UIマネージャー用変数
-        public AudioManager audioManager; // オーディオマネージャー変数
-        public ItemWindow itemWindow; // アイテムウィンドウ変数
-        public SCENENAME CheckSceneName { get { return currentSceneName; } } // 現在のシーン名を取得
-        public Scene CheckScene { get { return currentScene; } } // 現在のシーンを取得
-        // セーブデータを読み込み
-        public JsonSettings<EnvironmentalData> enviromentalData = new JsonSettings<EnvironmentalData>("EnvironmentalData(0)", "JsonSaveFile", "EnvironmentalData");
-        //public JsonSettings<EnvironmentalData> enviromentalData = new JsonSettings<EnvironmentalData>("EnvironmentalData(0)", "/Resources/プランナー監獄エリア/Json", "EnvironmentalData");
-        //public JsonSettings<EnvironmentalData> environmentalData = new JsonSettings<EnvironmentalData>("EnvironmentalData", "/Resources/プランナー監獄エリア/Json");
-        //public JsonSettings<MasterData> saveData = new JsonSettings<MasterData>("MasterData", "/Resources/プランナー監獄エリア/Json");
+        #region public関数
+        /// -------public関数------- ///
+
+        /// <summary>
+        /// シーン遷移を行う関数
+        /// </summary>
+        /// <param name="LoadScene">シーン番号</param>
+        public void SceneChange(int LoadScene)
+        {
+            displayManager.FadeOut(FadeType.Entire, () => UnityEngine.SceneManagement.SceneManager.LoadScene(LoadScene)); // フェードアウトする
+        }
+
+        /// <summary>
+        /// シーン遷移を行う関数
+        /// </summary>
+        /// <param name="LoadScene">シーン名</param>
+        public void SceneChange(string LoadScene)
+        {
+            displayManager.FadeOut(FadeType.Entire, () => UnityEngine.SceneManagement.SceneManager.LoadScene(LoadScene)); // フェードアウトする
+        }
+
+        /// <summary>
+        /// シーン遷移を行う関数
+        /// </summary>
+        /// <param name="LoadScene">シーン名</param>
+        public void SceneChange(SCENENAME LoadScene)
+        {
+            displayManager.FadeOut(FadeType.Entire, () => UnityEngine.SceneManagement.SceneManager.LoadScene((int)LoadScene)); // フェードアウトする
+        }
+
+        /// <summary>
+        /// シーン遷移を行う関数
+        /// </summary>
+        /// <param name="LoadScene">シーン名</param>
+        /// <param name="action">この関数はシーン遷移直前に呼ばれます</param>
+        public void SceneChange(SCENENAME LoadScene, UnityAction action)
+        {
+            displayManager.FadeOut(FadeType.Entire, () => { action?.Invoke(); UnityEngine.SceneManagement.SceneManager.LoadScene((int)LoadScene); }); // フェードアウトする
+        }
+
+        /// -------public関数------- ///
+        #endregion
+
+        #region protected関数
+        /// -----protected関数------ ///
 
         protected override void Awake()
         {
             base.Awake();
             Application.targetFrameRate = 60;
         }
-        void Start()
+
+        /// -----protected関数------ ///
+        #endregion
+
+        #region private関数
+        /// ------private関数------- ///
+
+        private void Start()
         {
             audioManager = GameObject.FindGameObjectWithTag("AudioManager").GetComponent<AudioManager>(); // audioManagerを検索して代入
             UnityEngine.SceneManagement.SceneManager.sceneLoaded += SceneLoaded;
             audioManager.BGM_Play("BGM_title", enviromentalData.TInstance.volumeBGM); // BGMを流す
         }
+
         /// <summary>
         /// イベントハンドラー　シーン遷移時の関数
         /// </summary>
         /// <param name="nextScene"></param>
         /// <param name="mode"></param>
-        void SceneLoaded(Scene nextScene, LoadSceneMode mode)
+        private void SceneLoaded(Scene nextScene, LoadSceneMode mode)
         {
             JsonSettings<MasterData> saveData = new JsonSettings<MasterData>(string.Format("SaveData{0}", saveSlot), "JsonSaveFile", "MasterData");
 
             // 現在のシーンを代入する
-            currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene(); 
+            currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
             currentSceneName = (SCENENAME)currentScene.buildIndex;
             // ストーリーシーンまたは解決シーンであればストーリーメニューを出す
             if (currentSceneName == SCENENAME.StoryScene || currentSceneName == SCENENAME.SolveScene)
@@ -73,7 +109,7 @@ namespace Supadari
                 if (itemWindow.CheckJudge() == true) itemWindow.InactiveJudge();
             }
 
-                // 各シーンでの個別設定 ストーリーシーンはCSVデータを参照して流すのでここでは流さない
+            // 各シーンでの個別設定 ストーリーシーンはCSVデータを参照して流すのでここでは流さない
             switch (currentSceneName)
             {
                 case SCENENAME.TitleScene:
@@ -124,41 +160,75 @@ namespace Supadari
             }
         }
 
-        /// <summary>
-        /// シーン遷移を行う関数
-        /// </summary>
-        /// <param name="LoadScene">シーン番号</param>
-        public void SceneChange(int LoadScene)
-        {
-            displayManager.FadeOut(FadeType.Entire,()=> UnityEngine.SceneManagement.SceneManager.LoadScene(LoadScene)); // フェードアウトする
-        }
+        /// ------private関数------- ///
+        #endregion
 
-        /// <summary>
-        /// シーン遷移を行う関数
-        /// </summary>
-        /// <param name="LoadScene">シーン名</param>
-        public void SceneChange(string LoadScene)
-        {
-            displayManager.FadeOut(FadeType.Entire,()=> UnityEngine.SceneManagement.SceneManager.LoadScene(LoadScene)); // フェードアウトする
-        }
+        /// --------関数一覧-------- ///
+    }
+    public partial class SceneManager
+    {
+        /// --------変数一覧-------- ///
 
-        /// <summary>
-        /// シーン遷移を行う関数
-        /// </summary>
-        /// <param name="LoadScene">シーン名</param>
-        public void SceneChange(SCENENAME LoadScene)
-        {
-            displayManager.FadeOut(FadeType.Entire,()=> UnityEngine.SceneManagement.SceneManager.LoadScene((int)LoadScene)); // フェードアウトする
-        }
+        #region public変数
+        /// -------public変数------- ///
 
-        /// <summary>
-        /// シーン遷移を行う関数
-        /// </summary>
-        /// <param name="LoadScene">シーン名</param>
-        /// <param name="action">この関数はシーン遷移直前に呼ばれます</param>
-        public void SceneChange(SCENENAME LoadScene, UnityAction action)
-        {
-            displayManager.FadeOut(FadeType.Entire, () => { action?.Invoke(); UnityEngine.SceneManagement.SceneManager.LoadScene((int)LoadScene); }); // フェードアウトする
-        }
+        public int saveSlot; // セーブスロット変数
+        public int stageNum = 0; // ステージ番号
+
+        public UIManager uiManager; // UIマネージャー用変数
+
+        public AudioManager audioManager; // オーディオマネージャー変数
+
+        public ItemWindow itemWindow; // アイテムウィンドウ変数
+
+        public SCENENAME CheckSceneName { get { return currentSceneName; } } // 現在のシーン名を取得
+
+        public Scene CheckScene { get { return currentScene; } } // 現在のシーンを取得
+
+        // セーブデータを読み込み
+        public JsonSettings<EnvironmentalData> enviromentalData = new JsonSettings<EnvironmentalData>("EnvironmentalData(0)", "JsonSaveFile", "EnvironmentalData");
+        //public JsonSettings<EnvironmentalData> enviromentalData = new JsonSettings<EnvironmentalData>("EnvironmentalData(0)", "/Resources/プランナー監獄エリア/Json", "EnvironmentalData");
+        //public JsonSettings<EnvironmentalData> environmentalData = new JsonSettings<EnvironmentalData>("EnvironmentalData", "/Resources/プランナー監獄エリア/Json");
+        //public JsonSettings<MasterData> saveData = new JsonSettings<MasterData>("MasterData", "/Resources/プランナー監獄エリア/Json");
+
+
+        /// -------public変数------- ///
+        #endregion
+
+        #region protected変数
+        /// -----protected変数------ ///
+
+
+
+        /// -----protected変数------ ///
+        #endregion
+
+        #region private変数
+        /// ------private変数------- ///
+
+        private BaseTextController controller; // ストーリーコントローラー変数
+
+        [SerializeField] private DisplayManager displayManager; // ディスプレイマネージャー用変数
+
+        [SerializeField] private SCENENAME currentSceneName; // 現在のシーン名
+
+        [SerializeField] private Scene currentScene; // 現在のシーン
+
+        [SerializeField] private Button autoButton; // オートボタン変数
+
+        [SerializeField] private SlideWindow slideWindow; // スライドウィンドウ変数
+
+        /// ------private変数------- ///
+        #endregion
+
+        #region プロパティ
+        /// -------プロパティ------- ///
+
+
+
+        /// -------プロパティ------- ///
+        #endregion
+
+        /// --------変数一覧-------- ///
     }
 }

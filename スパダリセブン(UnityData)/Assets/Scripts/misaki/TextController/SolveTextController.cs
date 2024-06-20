@@ -1,15 +1,12 @@
-
 using UnityEngine;
 using UnityEngine.UI;
 
 public class SolveTextController : BaseTextController
 {
-    private void Start()
-    {
-        OnTalkButtonClicked(); // ゲームスタート時に表示する
-        Button judgeBu = GameObject.FindGameObjectWithTag("Judge").GetComponent<Button>(); // ジャッジボタンを取得
-        judgeBu.onClick.AddListener(Judge); // ジャッジボタンにジャッジ関数を設定
-    }
+    /// --------関数一覧-------- ///
+
+    #region public関数
+    /// -------public関数------- ///
 
     /// <summary>
     /// 選択したアイテムを突き付ける関数
@@ -37,6 +34,7 @@ public class SolveTextController : BaseTextController
 
         itemWindow.WinSlide(); // アイテムウィンドウをしまう
     }
+
     public override void TalkEnd()
     {
         Debug.Log("会話を終了");
@@ -45,4 +43,30 @@ public class SolveTextController : BaseTextController
         sceneManager.SceneChange(storyTalks[talkNum].transition + "Scene"); // ゲームクリアかゲームオーバーシーンに遷移
         talkNum = default; // リセットする
     }
+
+    /// -------public関数------- ///
+    #endregion
+
+    #region protected関数
+    /// -----protected関数------ ///
+
+
+
+    /// -----protected関数------ ///
+    #endregion
+
+    #region private関数
+    /// ------private関数------- ///
+
+    private void Start()
+    {
+        OnTalkButtonClicked(); // ゲームスタート時に表示する
+        Button judgeBu = GameObject.FindGameObjectWithTag("Judge").GetComponent<Button>(); // ジャッジボタンを取得
+        judgeBu.onClick.AddListener(Judge); // ジャッジボタンにジャッジ関数を設定
+    }
+
+    /// ------private関数------- ///
+    #endregion
+
+    /// --------関数一覧-------- ///
 }

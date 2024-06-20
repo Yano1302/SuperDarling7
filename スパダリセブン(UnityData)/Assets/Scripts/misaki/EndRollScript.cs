@@ -1,31 +1,37 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 using TMPro;
 
-public class EndRollScript : DebugSetting
+public partial class EndRollScript : DebugSetting
 {
-    //　テキストのスクロールスピード
-    [SerializeField]
-    private float textScrollSpeed = 10;
-    //　テキストの制限位置
-    [Header("スクロールを止めたいPos.Yを/100した値を入力")]
-    [SerializeField]
-    private float limitPosition = 15f;
-    //　エンドロールが終了したかどうか
-    [SerializeField]
-    private bool isStopEndRoll=false;
-    //　シーン移動用コルーチン
-    private Coroutine endRollCoroutine;
-    CreditData[] creditDates; //csvファイルにある文章を格納する配列
+
+    /// --------関数一覧-------- ///
+
+    #region public関数
+    /// -------public関数------- ///
+
+
+
+    /// -------public関数------- ///
+    #endregion
+
+    #region protected関数
+    /// -----protected関数------ ///
+
     protected override void Awake()
     {
         base.Awake(); // デバッグログを表示するか否かスクリプタブルオブジェクトのGameSettingsを参照
         CreditSetUp(); // クレジットをセット
         this.GetComponent<TextMeshProUGUI>().text = creditDates[0].creditText; // テキストをセット
     }
+
+    /// -----protected関数------ ///
+    #endregion
+
+    #region private関数
+    /// ------private関数------- ///
+
     /// <summary>
     /// クレジットをセットする関数
     /// </summary>
@@ -44,8 +50,8 @@ public class EndRollScript : DebugSetting
         /// ここまで ///
         Debug.Log("Creditを読み込みました");
     }
-    // Update is called once per frame
-    void Update()
+
+    private void Update()
     {
         //　エンドロールが終了した時
         if (isStopEndRoll)
@@ -67,7 +73,7 @@ public class EndRollScript : DebugSetting
         }
     }
 
-    IEnumerator GoToNextScene()
+    private IEnumerator GoToNextScene()
     {
         //　5秒間待つ
         yield return new WaitForSeconds(5f);
@@ -80,9 +86,99 @@ public class EndRollScript : DebugSetting
 
         yield return null;
     }
+
+
+    /// ------private関数------- ///
+    #endregion
+
+    /// --------関数一覧-------- ///
+}
+public partial class EndRollScript
+{
+    /// --------変数一覧-------- ///
+
+    #region public変数
+    /// -------public変数------- ///
+
+
+
+    /// -------public変数------- ///
+    #endregion
+
+    #region protected変数
+    /// -----protected変数------ ///
+
+
+
+    /// -----protected変数------ ///
+    #endregion
+
+    #region private変数
+    /// ------private変数------- ///
+
+    //　エンドロールが終了したかどうか
+    [SerializeField] private bool isStopEndRoll = false;
+
+    //　テキストのスクロールスピード
+    [SerializeField] private float textScrollSpeed = 10;
+    //　テキストの制限位置
+    [Header("スクロールを止めたいPos.Yを/100した値を入力")]
+    [SerializeField] private float limitPosition = 15f;
+
+    //　シーン移動用コルーチン
+    private Coroutine endRollCoroutine;
+
+    private CreditData[] creditDates; //csvファイルにある文章を格納する配列
+
+    /// ------private変数------- ///
+    #endregion
+
+    #region プロパティ
+    /// -------プロパティ------- ///
+
+
+
+    /// -------プロパティ------- ///
+    #endregion
+
+    /// --------変数一覧-------- ///
 }
 [System.Serializable] // サブプロパティを埋め込む
 public class CreditData // CreditDataの中にtalkingCharaとtalksを配置する
 {
+    /// --------変数一覧-------- ///
+
+    #region public変数
+    /// -------public変数------- ///
+
     public string creditText; // クレジットテキスト
+
+    /// -------public変数------- ///
+    #endregion
+
+    #region protected変数
+    /// -----protected変数------ ///
+
+
+
+    /// -----protected変数------ ///
+    #endregion
+
+    #region private変数
+    /// ------private変数------- ///
+
+
+
+    /// ------private変数------- ///
+    #endregion
+
+    #region プロパティ
+    /// -------プロパティ------- ///
+
+
+
+    /// -------プロパティ------- ///
+    #endregion
+
+    /// --------変数一覧-------- ///
 }

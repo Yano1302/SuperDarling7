@@ -2,15 +2,44 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Threading.Tasks;
 
-public class RequisitionController : BaseTextController
+public partial class RequisitionController : BaseTextController
 {
-    [SerializeField] GameObject questUI; // 受注画面UI
-    [SerializeField] GameObject selectUI; // 依頼を選択するUI
-    [SerializeField] Button[] questButtons; // 受注画面のボタン配列
-    private void Start()
+    /// --------関数一覧-------- ///
+
+    #region public関数
+    /// -------public関数------- ///
+
+    public override void TalkEnd()
     {
-        OnTalkButtonClicked();
+        Debug.Log("会話を終了");
+        talkNum = default; // リセットする
+        if (TalkState == TALKSTATE.LASTTALK)
+        {
+            sceneManager.audioManager.SE_Play("SE_quest", sceneManager.enviromentalData.TInstance.volumeSE); // SEを鳴らす
+
+            sceneManager.stageNum = int.Parse(storyTalks[talkNum].stage); // ステージ番号をCSVから取得
+            sceneManager.SceneChange(SCENENAME.InvestigationScene); // 探索シーンに遷移
+            return;
+        }
+        TalkState = TALKSTATE.NOTALK; // 会話ステータスを話していないに変更
     }
+
+    public override void OnTalkButtonClicked(string storynum = "")
+    {
+        base.OnTalkButtonClicked(storynum);
+        if (questUI.activeSelf == true)
+        {
+            questUI.SetActive(false); // 受注画面を非表示
+            selectUI.SetActive(true); // 依頼選択画面を表維持
+        }
+    }
+
+    /// -------public関数------- ///
+    #endregion
+
+    #region protected関数
+    /// -----protected関数------ ///
+
     protected override void StorySetUp(string storynum)
     {
         Debug.Log(storynum + "を読み込みます");
@@ -55,6 +84,7 @@ public class RequisitionController : BaseTextController
         /// ここまで ///
         Debug.Log(storynum + "を読み込みました");
     }
+
     protected override void InstantiateActors()
     {
         // 背景を生成
@@ -74,29 +104,7 @@ public class RequisitionController : BaseTextController
             if (i == 0 && centerCharaImage) centerCharaImage.GetComponent<Image>().color = Color.gray;
         }
     }
-    public override void TalkEnd()
-    {
-        Debug.Log("会話を終了");
-        talkNum = default; // リセットする
-        if (TalkState == TALKSTATE.LASTTALK)
-        {
-            sceneManager.audioManager.SE_Play("SE_quest", sceneManager.enviromentalData.TInstance.volumeSE); // SEを鳴らす
 
-            sceneManager.stageNum = int.Parse(storyTalks[talkNum].stage); // ステージ番号をCSVから取得
-            sceneManager.SceneChange(SCENENAME.InvestigationScene); // 探索シーンに遷移
-            return;
-        }
-        TalkState = TALKSTATE.NOTALK; // 会話ステータスを話していないに変更
-    }
-    public override void OnTalkButtonClicked(string storynum = "")
-    {
-        base.OnTalkButtonClicked(storynum);
-        if (questUI.activeSelf == true)
-        {
-            questUI.SetActive(false); // 受注画面を非表示
-            selectUI.SetActive(true); // 依頼選択画面を表維持
-        }
-    }
     protected override async void NextDialogue()
     {
         base.NextDialogue();
@@ -111,4 +119,61 @@ public class RequisitionController : BaseTextController
             TalkEnd(); // 次のシーンへ遷移する
         }
     }
+
+    /// -----protected関数------ ///
+    #endregion
+
+    #region private関数
+    /// ------private関数------- ///
+
+    private void Start()
+    {
+        OnTalkButtonClicked();
+    }
+
+    /// ------private関数------- ///
+    #endregion
+
+    /// --------関数一覧-------- ///
+}
+public partial class RequisitionController
+{
+    /// --------変数一覧-------- ///
+
+    #region public変数
+    /// -------public変数------- ///
+
+
+
+    /// -------public変数------- ///
+    #endregion
+
+    #region protected変数
+    /// -----protected変数------ ///
+
+
+
+    /// -----protected変数------ ///
+    #endregion
+
+    #region private変数
+    /// ------private変数------- ///
+
+    [SerializeField] private GameObject questUI; // 受注画面UI
+    [SerializeField] private GameObject selectUI; // 依頼を選択するUI
+
+    [SerializeField] private Button[] questButtons; // 受注画面のボタン配列
+
+    /// ------private変数------- ///
+    #endregion
+
+    #region プロパティ
+    /// -------プロパティ------- ///
+
+
+
+    /// -------プロパティ------- ///
+    #endregion
+
+    /// --------変数一覧-------- ///
 }

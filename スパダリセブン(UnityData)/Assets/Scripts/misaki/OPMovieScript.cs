@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
-using System.Collections;
 using TMPro;
 
 public class OPMovieScript : MonoBehaviour

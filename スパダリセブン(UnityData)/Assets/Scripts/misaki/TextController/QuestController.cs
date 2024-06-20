@@ -1,9 +1,13 @@
 using UnityEngine;
 
-public class QuestController : BaseTextController
+public partial class QuestController : BaseTextController
 {
-    [SerializeField] GameObject questUI; // 受注画面UI
-    [SerializeField] GameObject selectUI; // 依頼を選択するUI
+
+    /// --------関数一覧-------- ///
+
+    #region public関数
+    /// -------public関数------- ///
+
     /// <summary>
     /// 依頼内容を表示する関数
     /// </summary>
@@ -17,6 +21,13 @@ public class QuestController : BaseTextController
         charaName.text = storyTalks[talkNum].name; // 依頼名を表示
         textLabel.text = storyTalks[talkNum].talks; // 依頼内容を表示
     }
+
+    /// -------public関数------- ///
+    #endregion
+
+    #region protected関数
+    /// -----protected関数------ ///
+
     protected override void StorySetUp(string storynum)
     {
         Debug.Log(storynum + "を読み込みます");
@@ -31,4 +42,57 @@ public class QuestController : BaseTextController
 
         Debug.Log(storynum + "を読み込みました");
     }
+
+    /// -----protected関数------ ///
+    #endregion
+
+    #region private関数
+    /// ------private関数------- ///
+
+
+
+    /// ------private関数------- ///
+    #endregion
+
+    /// --------関数一覧-------- ///
+
+}
+public partial class QuestController
+{
+    /// --------変数一覧-------- ///
+
+    #region public変数
+    /// -------public変数------- ///
+
+
+
+    /// -------public変数------- ///
+    #endregion
+
+    #region protected変数
+    /// -----protected変数------ ///
+
+
+
+    /// -----protected変数------ ///
+    #endregion
+
+    #region private変数
+    /// ------private変数------- ///
+
+    [SerializeField] private GameObject questUI; // 受注画面UI
+    [SerializeField] private GameObject selectUI; // 依頼を選択するUI
+
+    /// ------private変数------- ///
+    #endregion
+
+    #region プロパティ
+    /// -------プロパティ------- ///
+
+
+
+    /// -------プロパティ------- ///
+    #endregion
+
+    /// --------変数一覧-------- ///
 }

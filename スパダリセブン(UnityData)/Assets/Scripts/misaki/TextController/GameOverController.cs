@@ -1,13 +1,63 @@
 using System.Collections;
 using UnityEngine;
 
-public class GameOverController : BaseTextController
+public partial class GameOverController : BaseTextController
 {
-    // Start is called before the first frame update
-    void Start()
+    /// --------関数一覧-------- ///
+
+    #region public関数
+    /// -------public関数------- ///
+
+    public override void OnTalkButtonClicked(string storynum = "")
     {
-        OnTalkButtonClicked("");
+        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.TInstance.volumeSE);
+        if (TalkState == TALKSTATE.NOTALK) // 会話ステータスが話していないなら
+        {
+            // ストーリー番号があれば
+            if (storynum != "") StorySetUp(storynum); // 対応する会話文をセット
+            TalkState = TALKSTATE.TALKING; // 会話ステータスを会話中に変更
+        }
+        else if (TalkState == TALKSTATE.TALKING) // 会話ステータスが話し中なら
+        {
+            talkSkip = true; // トークスキップフラグを立てる
+            TalkState = TALKSTATE.NEXTTALK; // 会話ステータスを次のセリフに変更
+            return;
+        }
+        if (TalkState != TALKSTATE.LASTTALK) // 会話ステータスが話し中,なら
+        {
+            InitializeTalkField(); // 表示されているテキスト等を初期化
+            StartDialogueCoroutine(); // 文章を表示するコルーチンを開始
+        }
+        else if (TalkState == TALKSTATE.LASTTALK) // 会話ステータスが最後のセリフなら
+        {
+            TalkEnd(); //会話を終了する
+        }
     }
+
+    /// <summary>
+    /// タイトルへ戻るボタンをクリックしたときの関数
+    /// </summary>
+    public void BackTitle()
+    {
+        sceneManager.audioManager.SE_Play("SE_dungeon05", sceneManager.enviromentalData.TInstance.volumeSE); // SEを鳴らす
+        sceneManager.SceneChange(0); // タイトルシーンへ遷移する
+    }
+
+    /// <summary>
+    /// ロードスロットを開く関数
+    /// </summary>
+    public void LoadButton()
+    {
+        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.TInstance.volumeSE); // SEを鳴らす
+        sceneManager.uiManager.OpenUI(UIType.LoadSlot); // ロードスロットを表示
+    }
+
+    /// -------public関数------- ///
+    #endregion
+
+    #region protected関数
+    /// -----protected関数------ ///
+
     protected override void StorySetUp(string storynum)
     {
         Debug.Log(storynum + "を読み込みます");
@@ -23,6 +73,7 @@ public class GameOverController : BaseTextController
         /// ここまで ///
         Debug.Log(storynum + "を読み込みました");
     }
+
     protected override IEnumerator Dialogue()
     {
         talkNum = Random.Range(0, storyTalks.Length); // 表示する文章をランダムで設定
@@ -60,45 +111,20 @@ public class GameOverController : BaseTextController
             OnTalkButtonClicked(); // 次の会話を自動でスタートする
         }
     }
-    public override void OnTalkButtonClicked(string storynum = "")
+
+    /// -----protected関数------ ///
+    #endregion
+
+    #region private関数
+    /// ------private関数------- ///
+
+    private void Start()
     {
-        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.TInstance.volumeSE);
-        if (TalkState == TALKSTATE.NOTALK) // 会話ステータスが話していないなら
-        {
-            // ストーリー番号があれば
-            if (storynum != "") StorySetUp(storynum); // 対応する会話文をセット
-            TalkState = TALKSTATE.TALKING; // 会話ステータスを会話中に変更
-        }
-        else if (TalkState == TALKSTATE.TALKING) // 会話ステータスが話し中なら
-        {
-            talkSkip = true; // トークスキップフラグを立てる
-            TalkState = TALKSTATE.NEXTTALK; // 会話ステータスを次のセリフに変更
-            return;
-        }
-        if (TalkState != TALKSTATE.LASTTALK) // 会話ステータスが話し中,なら
-        {
-            InitializeTalkField(); // 表示されているテキスト等を初期化
-            StartDialogueCoroutine(); // 文章を表示するコルーチンを開始
-        }
-        else if (TalkState == TALKSTATE.LASTTALK) // 会話ステータスが最後のセリフなら
-        {
-            TalkEnd(); //会話を終了する
-        }
+        OnTalkButtonClicked("");
     }
-    /// <summary>
-    /// タイトルへ戻るボタンをクリックしたときの関数
-    /// </summary>
-    public void BackTitle()
-    {
-        sceneManager.audioManager.SE_Play("SE_dungeon05", sceneManager.enviromentalData.TInstance.volumeSE); // SEを鳴らす
-        sceneManager.SceneChange(0); // タイトルシーンへ遷移する
-    }
-    /// <summary>
-    /// ロードスロットを開く関数
-    /// </summary>
-    public void LoadButton()
-    {
-        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.TInstance.volumeSE); // SEを鳴らす
-        sceneManager.uiManager.OpenUI(UIType.LoadSlot); // ロードスロットを表示
-    }
+
+    /// ------private関数------- ///
+    #endregion
+
+    /// --------関数一覧-------- ///
 }

@@ -1,25 +1,15 @@
 using Supadari;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GameSettingScript : MonoBehaviour
+public partial class GameSettingScript : MonoBehaviour
 {
-    SceneManager sceneManager; // シーンマネージャー変数
-    [SerializeField]TestTextController testTextController; // テストテキストコントローラー変数
-    [EnumIndex(typeof(SETTINGSTATE))]
-    [SerializeField] Slider[] slider = new Slider[3]; // スライダー配列
-    void Awake()
-    {
-        // シーンマネージャーを取得
-        sceneManager = GameObject.FindGameObjectWithTag("SceneManager").GetComponent<SceneManager>();
-        // 各スライダーにjsonの値を代入する
-        slider[0].value = sceneManager.enviromentalData.TInstance.volumeBGM;
-        slider[1].value = sceneManager.enviromentalData.TInstance.volumeSE;
-        slider[2].value = sceneManager.enviromentalData.TInstance.textSpeed;
-    }
+    /// --------関数一覧-------- ///
+
+    #region public関数
+    /// -------public関数------- ///
+
     [EnumAction(typeof(SETTINGSTATE))]
     public void Value(int stateNomber)
     {
@@ -34,7 +24,7 @@ public class GameSettingScript : MonoBehaviour
             case SETTINGSTATE.BGM:
                 sceneManager.audioManager.BGM_Volume = slider[stateNomber].value; // BGM音量を変更する
                 sceneManager.enviromentalData.TInstance.volumeBGM = slider[stateNomber].value; // BGM音量を更新する
-                    break;
+                break;
             case SETTINGSTATE.SE:
                 // 音量の変更がなかった場合はSEを鳴らさないようにブレイク
                 if (slider[stateNomber].value == sceneManager.enviromentalData.TInstance.volumeSE) break; // 同じ値ならブレイクする
@@ -49,4 +39,76 @@ public class GameSettingScript : MonoBehaviour
                 break;
         }
     }
+
+    /// -------public関数------- ///
+    #endregion
+
+    #region protected関数
+    /// -----protected関数------ ///
+
+
+
+    /// -----protected関数------ ///
+    #endregion
+
+    #region private関数
+    /// ------private関数------- ///
+
+    private void Awake()
+    {
+        // シーンマネージャーを取得
+        sceneManager = GameObject.FindGameObjectWithTag("SceneManager").GetComponent<SceneManager>();
+        // 各スライダーにjsonの値を代入する
+        slider[0].value = sceneManager.enviromentalData.TInstance.volumeBGM;
+        slider[1].value = sceneManager.enviromentalData.TInstance.volumeSE;
+        slider[2].value = sceneManager.enviromentalData.TInstance.textSpeed;
+    }
+
+    /// ------private関数------- ///
+    #endregion
+
+    /// --------関数一覧-------- ///
+}
+public partial class GameSettingScript
+{
+    /// --------変数一覧-------- ///
+
+    #region public変数
+    /// -------public変数------- ///
+
+
+
+    /// -------public変数------- ///
+    #endregion
+
+    #region protected変数
+    /// -----protected変数------ ///
+
+
+
+    /// -----protected変数------ ///
+    #endregion
+
+    #region private変数
+    /// ------private変数------- ///
+
+    private SceneManager sceneManager; // シーンマネージャー変数
+
+    [SerializeField] private TestTextController testTextController; // テストテキストコントローラー変数
+
+    [EnumIndex(typeof(SETTINGSTATE))]
+    [SerializeField] private Slider[] slider = new Slider[3]; // スライダー配列
+
+    /// ------private変数------- ///
+    #endregion
+
+    #region プロパティ
+    /// -------プロパティ------- ///
+
+
+
+    /// -------プロパティ------- ///
+    #endregion
+
+    /// --------変数一覧-------- ///
 }

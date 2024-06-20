@@ -1,17 +1,13 @@
 using UnityEngine;
 
-public class MenuScript : SingletonMonoBehaviour <MenuScript>
+public partial class MenuScript : SingletonMonoBehaviour <MenuScript>
 {
-    private bool openWindow = false; // ウィンドウを開いているかどうか
-    [SerializeField] GameObject menuWindow; // メニューウィンドウ用変数
-    [SerializeField] GameObject saveMessage; // セーブをした際に表示するテキスト変数
-    [SerializeField] Supadari.SceneManager sceneManager; // スパダリのシーンマネージャー用変数
-    private StoryController storyController = null; // ストーリーコントローラー用変数
 
-    protected override void Awake()
-    {
-        base.Awake();
-    }
+    /// --------関数一覧-------- ///
+
+    #region public関数
+    /// -------public関数------- ///
+
     /// <summary>
     /// Menuボタンをクリックしたときの関数
     /// </summary>
@@ -28,6 +24,7 @@ public class MenuScript : SingletonMonoBehaviour <MenuScript>
         Time.timeScale = 0; // タイムスケールを0にしてFixedUpdateを止める
         if (storyController) storyController.PauseDialogueCoroutine(); // storyControllerのコルーチンを一時停止
     }
+
     /// <summary>
     /// ゲーム再開ボタンを押したときの関数
     /// </summary>
@@ -45,6 +42,7 @@ public class MenuScript : SingletonMonoBehaviour <MenuScript>
         Time.timeScale = 1; // タイムスケールを0にしてFixedUpdateを止める
         if (storyController) storyController.ResumeDialogueCoroutine(); // storyControllerのコルーチンを再開
     }
+
     /// <summary>
     /// セーブボタンをクリックしたときの関数
     /// </summary>
@@ -77,6 +75,7 @@ public class MenuScript : SingletonMonoBehaviour <MenuScript>
         // それ以外の場合はセーブテキストを表示
         else ActiveSaveMessage();
     }
+
     /// <summary>
     /// ロードボタンをクリックしたときの関数
     /// </summary>
@@ -99,6 +98,7 @@ public class MenuScript : SingletonMonoBehaviour <MenuScript>
         sceneManager.SceneChange(saveData.TInstance.scenename);
         sceneManager.uiManager.CloseUI(UIType.LoadSlot);
     }
+
     /// <summary>
     /// タイトルへ戻るボタンをクリックしたときの関数
     /// </summary>
@@ -108,6 +108,7 @@ public class MenuScript : SingletonMonoBehaviour <MenuScript>
         sceneManager.SceneChange(0); // タイトルシーンへ遷移する
         Resume();
     }
+
     /// <summary>
     /// クリックした際にSEを鳴らす関数
     /// </summary>
@@ -115,13 +116,7 @@ public class MenuScript : SingletonMonoBehaviour <MenuScript>
     {
         sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.TInstance.volumeSE);
     }
-    /// <summary>
-    /// セーブメッセージを表示する関数
-    /// </summary>
-    private void ActiveSaveMessage()
-    {
-        saveMessage.SetActive(true);
-    }
+
     /// <summary>
     /// セーブメッセージを非表示にする関数
     /// </summary>
@@ -129,4 +124,79 @@ public class MenuScript : SingletonMonoBehaviour <MenuScript>
     {
         saveMessage.SetActive(false);
     }
+
+    /// -------public関数------- ///
+    #endregion
+
+    #region protected関数
+    /// -----protected関数------ ///
+
+    protected override void Awake()
+    {
+        base.Awake();
+    }
+
+    /// -----protected関数------ ///
+    #endregion
+
+    #region private関数
+    /// ------private関数------- ///
+
+    /// <summary>
+    /// セーブメッセージを表示する関数
+    /// </summary>
+    private void ActiveSaveMessage()
+    {
+        saveMessage.SetActive(true);
+    }
+
+    /// ------private関数------- ///
+    #endregion
+
+    /// --------関数一覧-------- ///
+}
+public partial class MenuScript
+{
+    /// --------変数一覧-------- ///
+
+    #region public変数
+    /// -------public変数------- ///
+
+
+
+    /// -------public変数------- ///
+    #endregion
+
+    #region protected変数
+    /// -----protected変数------ ///
+
+
+
+    /// -----protected変数------ ///
+    #endregion
+
+    #region private変数
+    /// ------private変数------- ///
+
+    private bool openWindow = false; // ウィンドウを開いているかどうか
+
+    [SerializeField] private GameObject menuWindow; // メニューウィンドウ用変数
+    [SerializeField] private GameObject saveMessage; // セーブをした際に表示するテキスト変数
+
+    [SerializeField] private Supadari.SceneManager sceneManager; // スパダリのシーンマネージャー用変数
+
+    private StoryController storyController = null; // ストーリーコントローラー用変数
+
+    /// ------private変数------- ///
+    #endregion
+
+    #region プロパティ
+    /// -------プロパティ------- ///
+
+
+
+    /// -------プロパティ------- ///
+    #endregion
+
+    /// --------変数一覧-------- ///
 }

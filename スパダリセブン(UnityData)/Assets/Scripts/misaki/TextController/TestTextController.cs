@@ -3,6 +3,24 @@ using UnityEngine;
 
 public class TestTextController : BaseTextController
 {
+    /// --------関数一覧-------- ///
+
+    #region public関数
+    /// -------public関数------- ///
+
+    public override void OnTalkButtonClicked(string storynum = "")
+    {
+        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.TInstance.volumeSE);
+        InitializeTalkField(); // 表示されているテキスト等を初期化
+        StartDialogueCoroutine(); // 文章を表示するコルーチンを開始
+    }
+
+    /// -------public関数------- ///
+    #endregion
+
+    #region protected関数
+    /// -----protected関数------ ///
+
     protected override void StorySetUp(string storynum)
     {
         Debug.Log(storynum + "を読み込みます");
@@ -18,6 +36,7 @@ public class TestTextController : BaseTextController
         /// ここまで ///
         Debug.Log(storynum + "を読み込みました");
     }
+
     protected override IEnumerator Dialogue()
     {
         talkNum = default; // デフォルトに戻す
@@ -52,10 +71,17 @@ public class TestTextController : BaseTextController
             OnTalkButtonClicked(); // 次の会話を自動でスタートする
         }
     }
-    public override void OnTalkButtonClicked(string storynum = "")
-    {
-        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.TInstance.volumeSE);
-        InitializeTalkField(); // 表示されているテキスト等を初期化
-        StartDialogueCoroutine(); // 文章を表示するコルーチンを開始
-    }
+
+    /// -----protected関数------ ///
+    #endregion
+
+    #region private関数
+    /// ------private関数------- ///
+
+
+
+    /// ------private関数------- ///
+    #endregion
+
+    /// --------関数一覧-------- ///
 }

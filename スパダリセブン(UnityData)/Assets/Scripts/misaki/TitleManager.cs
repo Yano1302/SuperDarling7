@@ -1,23 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
-public class TitleManager : DebugSetting
+public partial class TitleManager : DebugSetting
 {
-    private bool openWindow = false; // ウィンドウを開いているかどうか
-    private Supadari.SceneManager sceneManager; // スパダリのシーンマネージャー用変数
-    private AudioManager audioManager; // オーディオマネージャー変数
-    public GameObject settingWindow; // 設定のウィンドウ変数
-    
-    protected override void Awake()
-    {
-        base.Awake();
-        // SceneManagerとAudioManagerを探す
-        sceneManager = GameObject.FindGameObjectWithTag("SceneManager").GetComponent<Supadari.SceneManager>();
-        audioManager = GameObject.FindGameObjectWithTag("AudioManager").GetComponent<AudioManager>();
-    }
+    /// --------関数一覧-------- ///
+
+    #region public関数
+    /// -------public関数------- ///
+
     /// <summary>
     /// NewGameをクリックしたときの関数
     /// </summary>
@@ -28,6 +17,7 @@ public class TitleManager : DebugSetting
         //sceneManager.SceneChange(SCENENAME.GameClearScene);
         Debug.Log("ニューゲームを開始");
     }
+
     /// <summary>
     /// Continueをクリックしたときの関数
     /// </summary>
@@ -38,6 +28,7 @@ public class TitleManager : DebugSetting
         //sceneManager.SceneChange(SCENENAME.GameOverScene);
         Debug.Log("コンティニューを開始");
     }
+
     /// <summary>
     /// SettingGameボタンをクリックしたときの関数
     /// </summary>
@@ -53,6 +44,7 @@ public class TitleManager : DebugSetting
         settingWindow.SetActive(true); // ウィンドウを可視化する
         openWindow = true; // trueにする
     }
+
     /// <summary>
     /// ウィンドウを閉じるボタンを押したときの関数
     /// </summary>
@@ -69,6 +61,7 @@ public class TitleManager : DebugSetting
         settingWindow.SetActive(false); // ウィンドウを不可視にする
         openWindow = false; // falseにする
     }
+
     /// <summary>
     /// ゲームを終了する関数
     /// </summary>
@@ -81,4 +74,73 @@ public class TitleManager : DebugSetting
         Application.Quit(); // ゲームアプリケーションの終了
 #endif
     }
+
+    /// -------public関数------- ///
+    #endregion
+
+    #region protected関数
+    /// -----protected関数------ ///
+
+    protected override void Awake()
+    {
+        base.Awake();
+        // SceneManagerとAudioManagerを探す
+        sceneManager = GameObject.FindGameObjectWithTag("SceneManager").GetComponent<Supadari.SceneManager>();
+        audioManager = GameObject.FindGameObjectWithTag("AudioManager").GetComponent<AudioManager>();
+    }
+
+    /// -----protected関数------ ///
+    #endregion
+
+    #region private関数
+    /// ------private関数------- ///
+
+
+
+    /// ------private関数------- ///
+    #endregion
+
+    /// --------関数一覧-------- ///
+}
+public partial class TitleManager
+{
+    /// --------変数一覧-------- ///
+
+    #region public変数
+    /// -------public変数------- ///
+
+    public GameObject settingWindow; // 設定のウィンドウ変数
+
+    /// -------public変数------- ///
+    #endregion
+
+    #region protected変数
+    /// -----protected変数------ ///
+
+
+
+    /// -----protected変数------ ///
+    #endregion
+
+    #region private変数
+    /// ------private変数------- ///
+
+    private bool openWindow = false; // ウィンドウを開いているかどうか
+
+    private Supadari.SceneManager sceneManager; // スパダリのシーンマネージャー用変数
+
+    private AudioManager audioManager; // オーディオマネージャー変数
+
+    /// ------private変数------- ///
+    #endregion
+
+    #region プロパティ
+    /// -------プロパティ------- ///
+
+
+
+    /// -------プロパティ------- ///
+    #endregion
+
+    /// --------変数一覧-------- ///
 }

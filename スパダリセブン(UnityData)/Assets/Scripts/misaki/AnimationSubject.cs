@@ -1,30 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class AnimationSubject : MonoBehaviour
+public partial class AnimationSubject : MonoBehaviour
 {
-    /// --------変数一覧-------- ///
-
-    /// private変数 ///
-    [Header("通知を出したいスクリプト")]
-    [SerializeField] GameClearController gameClearController;
-
-    /// protected変数 ///
-
-
-    /// public変数 ///
-
-
-    /// --------変数一覧-------- ///
     /// --------関数一覧-------- ///
-    /// private関数 ///
 
-
-    /// protected関数 ///
-
-
-    /// public関数 ///
+    #region public関数
+    /// -------public関数------- ///
 
     /// <summary>
     /// アニメーション終了通知を出す関数
@@ -34,5 +15,63 @@ public class AnimationSubject : MonoBehaviour
         gameClearController.AnimEnd = true;
     }
 
+    /// -------public関数------- ///
+    #endregion
+
+    #region protected関数
+    /// -----protected関数------ ///
+
+
+
+    /// -----protected関数------ ///
+    #endregion
+
+    #region private関数
+    /// ------private関数------- ///
+
+
+
+    /// ------private関数------- ///
+    #endregion
+
     /// --------関数一覧-------- ///
+}
+public partial class AnimationSubject
+{
+    /// --------変数一覧-------- ///
+
+    #region public変数
+    /// -------public変数------- ///
+
+
+
+    /// -------public変数------- ///
+    #endregion
+
+    #region protected変数
+    /// -----protected変数------ ///
+
+
+
+    /// -----protected変数------ ///
+    #endregion
+
+    #region private変数
+    /// ------private変数------- ///
+
+    [Header("通知を出したいスクリプト")]
+    [SerializeField] GameClearController gameClearController;
+
+    /// ------private変数------- ///
+    #endregion
+
+    #region プロパティ
+    /// -------プロパティ------- ///
+
+
+
+    /// -------プロパティ------- ///
+    #endregion
+
+    /// --------変数一覧-------- ///
 }

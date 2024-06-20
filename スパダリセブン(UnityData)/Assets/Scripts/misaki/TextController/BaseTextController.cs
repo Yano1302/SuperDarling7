@@ -4,184 +4,12 @@ using UnityEngine.UI;
 using TMPro;
 using Supadari;
 
-public class BaseTextController : DebugSetting
+public partial class BaseTextController : DebugSetting
 {
-    protected int talkNum = 0; // ダイヤログ番号
-    public int displayCharaAnchors = 3; // キャラクター画像の表示箇所数
-    [SerializeField]private float textBaseSpeed = 0.05f; // テキスト送りのベーススピード
-    public float playerTextSpeed = 0.5f; // プレイヤーが指定したテキスト送りのスピード度合
-    public float textDelay = 1.5f; // テキストとテキストの間の時間(オートモードのみ使用)
-    protected bool talkSkip = false; // ボタンがクリックされたかどうかを示すフラグ
-    protected bool talkAuto = false; // 会話がオート状態なのかを示すフラグ
-    private bool autoSetUp = false; // オートモードの準備状態かどうかのフラグ
-    [Header("1-1のように入力")]
-    public string storynum; //ストーリー番号
-    protected string words; // 文章
-    private int currentCharIndex = 0; // 文章の表示位置を示す変数
-    public TextMeshProUGUI charaName; // キャラクター名のテキスト変数
-    public TextMeshProUGUI textLabel; // 文章を格納するテキスト変数
-    public TextMeshProUGUI buttonText; // ボタンのテキスト変数
-
-    protected GameObject[] backImages; // csvファイルに記載された背景の格納配列
-    protected GameObject backImage = null; // 使用する背景画像
-    [Header("背景表示箇所")]
-    [SerializeField] protected GameObject backImageAnchor; // 背景表示箇所
-
-    protected bool[,] charaHighlight; // csvファイルに記載されたキャラクターを光らせるかを格納する2次元配列
-    protected GameObject[,] charaImages; // csvファイルに記載されたキャラクター画像名を格納する2次元配列
-    private GameObject leftCharaImage = null; // 使用するキャラクター画像(左側)
-    private GameObject rightCharaImage = null; // 使用するキャラクター画像(右側)
-    protected GameObject centerCharaImage = null; // 使用するキャラクター画像(中央側)
-    [Header("キャラクター表示箇所 [0]...左側 [1]...右側 [2]...中央")]
-    [SerializeField] protected GameObject[] charaAnchors = new GameObject[3]; // キャラクター表示箇所
-
-    string[] nameBGM; // 鳴らすBGM格納配列
-
-    public GameObject talkButton; // 会話を進めるボタン
-    protected StoryTalkData[] storyTalks; //csvファイルにある文章を格納する配列
-
-    public bool runtimeCoroutine = false; // コルーチンが実行中かどうか
-    private Coroutine dialogueCoroutine; // コルーチンを格納する変数
-    protected string richTextTag = string.Empty; // リッチテキストタグ用変数
-    protected bool isTag = false; // リッチテキストタグを格納しているかどうか
-
-    [SerializeField] protected SceneManager sceneManager; // シーンマネージャー変数
-    [SerializeField] bool testText = false; // ボタンのテキストを表示するかどうか
-    [SerializeField] GameObject autoImage; // オートモードの画像
-
-    protected ItemWindow itemWindow; // アイテムウィンドウ変数
-
-    protected ItemID rightID; // 正しいアイテムID変数
-
-    [SerializeField] Image lifeImage; // ライフの画像変数
-
-    private int missCount = 0; // ミスをした回数
-    protected int MissCount {
-        get { return missCount; }
-        set
-        { 
-            missCount = value;
-            lifeImage.sprite = Resources.Load<Sprite>(string.Format("ライフ/Inference_life_{0}", missCount)); // アイテム画像を代入
-        } 
-    }
-
-    [SerializeField] GameObject clickIcon; // クリックを催促するアイコン変数
-
-    float autoMigration = 0; // オートモードに移行する時間を格納する変数
-
-    public TALKSTATE talkState; // 会話ステータス変数
-    public TALKSTATE TalkState
-    {
-        get { return talkState; }
-        set
-        {
-            talkState = value;
-            switch (talkState)
-            {
-                case TALKSTATE.NOTALK:
-                    if(testText) buttonText.text = "会話開始"; // ボタンテキストを"会話開始"に変更
-                    break;
-                case TALKSTATE.TALKING:
-                    if (testText) buttonText.text = "Skip"; // ボタンテキストを"Skip"に変更
-                    break;
-                case TALKSTATE.NEXTTALK:
-                    if (testText) buttonText.text = "次へ"; // ボタンテキストを"次へ"に変更
-                    break;
-                case TALKSTATE.LASTTALK:
-                    if (testText) buttonText.text = "会話終了"; // ボタンテキストを"会話終了"に変更
-                    break;
-                    
-            }
-        }
-    }
-    protected override void Awake()
-    {
-        base .Awake(); // デバッグログを表示するか否かスクリプタブルオブジェクトのGameSettingsを参照
-        if(storynum!="") StorySetUp(storynum); // 対応する会話文をセットする
-        TalkState = TALKSTATE.NOTALK; // 会話ステータスを話していないに変更
-        sceneManager = GameObject.FindGameObjectWithTag("SceneManager").GetComponent<SceneManager>(); // オーディオマネージャーを取得
-        itemWindow = GameObject.FindGameObjectWithTag("ItemWindow").GetComponent<ItemWindow>(); // アイテムウィンドウを取得 
-        playerTextSpeed = sceneManager.enviromentalData.TInstance.textSpeed; // テキストスピードを設定
-    }
-    private void Update()
-    {
-        // オートモードへ切り替え準備時に動く
-        if (autoSetUp)
-        {
-            // textDelay秒待ってから次のテキストに進む
-            if (autoMigration < textDelay)
-            {
-                autoMigration += Time.deltaTime;
-                return;
-            }
-            autoMigration = default;
-            autoSetUp = false;
-            OnTalkButtonClicked();
-        }
-        else  autoMigration = default;
-    }
-    /// <summary>
-    /// 対応する会話文をセットする関数
-    /// </summary>
-    /// <param name="storynum">読み込むCSVファイルの名前 例(1-1)</param>
-    protected virtual void StorySetUp(string storynum)
-    {
-        Debug.Log("Story"+storynum+"を読み込みます");
-        //　テキストファイルの読み込みを行ってくれるクラス
-        TextAsset textasset = new TextAsset();
-        //　先ほど用意したcsvファイルを読み込ませる。
-        //　ファイルは「Resources」フォルダを作り、そこに入れておくこと。
-        //　Resources.Load 内はcsvファイルの名前。今回は Story1-1 や Story2-5 のようにステージ番号によって読み込むファイルが変えられるようにしている。
-        textasset = Resources.Load("プランナー監獄エリア/Story/Story" + storynum, typeof(TextAsset)) as TextAsset;
-        /// CSVSerializerを用いてcsvファイルを配列に流し込む。///
-        storyTalks = CSVSerializer.Deserialize<StoryTalkData>(textasset.text); // CSVのテキストデータを配列に格納する
-        // 会話中背景格納配列のサイズを[文章の数]にする
-        backImages = new GameObject[storyTalks.Length];
-        // キャラクター画像格納用2次元配列のサイズを[会話中の最大表示人数,文章の数]にする
-        charaImages = new GameObject[displayCharaAnchors, storyTalks.Length];
-        // キャラクターハイライト格納用2次元配列のサイズを[会話中の最大表示人数,文章の数]にする
-        charaHighlight = new bool[displayCharaAnchors, storyTalks.Length];
-        // BGMを格納する配列のサイズを[文章の数]にする
-        nameBGM = new string[storyTalks.Length];
-        // プロジェクト内のTalkCharaImageフォルダにある画像を対応させたい文章ごとに格納する
-        for (int i = 0; i < storyTalks.Length; i++)
-        {
-            backImages[i] = (GameObject)Resources.Load("TalkBackImage/" + storyTalks[i].backImage);
-        } 
-        // プロジェクト内のTalkCharaImageフォルダにある画像を対応させたい文章ごとに格納する
-        for (int i = 0; i < displayCharaAnchors; i++)
-        {
-            for (int j = 0; j < storyTalks.Length; j++)
-            {
-                // charaImages[0,j]には左側に表示するキャラクター画像を格納する
-                if (i == 0) charaImages[i, j] = (GameObject)Resources.Load("TalkCharaImage/" + storyTalks[j].leftTalkingChara);
-                // charaImages[1,j]には右側に表示するキャラクター画像を格納する
-                else if (i == 1) charaImages[i, j] = (GameObject)Resources.Load("TalkCharaImage/" + storyTalks[j].rightTalkingChara);
-                // charaImages[2,j]には中央に表示するキャラクター画像を格納する
-                else charaImages[i, j] = (GameObject)Resources.Load("TalkCharaImage/" + storyTalks[j].centerTalkingChara);
-            }
-        }
-        // charaImages[]に格納された画像が光るかどうかの真偽を対応させたい文章ごとに格納する
-        for (int i = 0; i < displayCharaAnchors; i++)
-        {
-            for (int j = 0; j < storyTalks.Length; j++)
-            {
-                // charaHighlight[0,j]には左側に表示するキャラクター画像が光るかどうかを格納する
-                if (i == 0 && storyTalks[j].leftHighlight == "1") charaHighlight[i, j] = true;
-                // charaHighlight[1,j]には右側に表示するキャラクター画像が光るかどうかを格納する
-                else if (i == 1 && storyTalks[j].rightHighlight == "1") charaHighlight[i, j] = true;
-                // charaHighlight[2,j]には中央に表示するキャラクター画像が光るかどうかを格納する
-                else if (i == 2 && storyTalks[j].centerHighlight == "1") charaHighlight[i, j] = true;
-            }
-        }
-        // BGM名を対応させたい文章ごとに格納する
-        for (int i = 0; i < storyTalks.Length; i++)
-        {
-            nameBGM[i] = storyTalks[i].BGM;
-        }
-        /// ここまで ///
-        Debug.Log("Story" + storynum + "を読み込みました");
-    }
+    /// --------関数一覧-------- ///
+    
+    #region public関数
+    /// -------public関数------- ///
 
     /// <summary>
     /// 会話に関するボタン関数(変更不可)
@@ -234,7 +62,7 @@ public class BaseTextController : DebugSetting
             TalkState = TALKSTATE.NEXTTALK; // 会話ステータスを次のセリフに変更
             return;
         }
-        if (TalkState != TALKSTATE.LASTTALK && TalkState!=TALKSTATE.Question) // 会話ステータスが最後のセリフかつアイテム選択状態以外なら
+        if (TalkState != TALKSTATE.LASTTALK && TalkState != TALKSTATE.Question) // 会話ステータスが最後のセリフかつアイテム選択状態以外なら
         {
             InitializeTalkField(); // 表示されているテキスト等を初期化
             InstantiateActors(); // 登場人物等を生成
@@ -245,6 +73,7 @@ public class BaseTextController : DebugSetting
             TalkEnd(); //会話を終了する
         }
     }
+
     /// <summary>
     /// 会話に関するボタン関数(talkNum変更可)
     /// </summary>
@@ -274,6 +103,7 @@ public class BaseTextController : DebugSetting
             TalkEnd(); //会話を終了する
         }
     }
+
     /// <summary>
     /// 会話を終了する関数
     /// </summary>
@@ -284,13 +114,140 @@ public class BaseTextController : DebugSetting
         TalkState = TALKSTATE.NOTALK; // 会話ステータスを話していないに変更
         if (talkAuto) OnAutoModeCllicked(); // オートモードがオンであればオフにする
     }
+
+    /// <summary>
+    /// コルーチン一時停止関数
+    /// </summary>
+    public void PauseDialogueCoroutine()
+    {
+        // 動いているコルーチンがあれば
+        if (runtimeCoroutine)
+        {
+            StopCoroutine(dialogueCoroutine); // コルーチンを止める
+            currentCharIndex = textLabel.text.Length; // 現在の文字の表示位置を保存
+        }
+    }
+
+    /// <summary>
+    /// コルーチン再開関数
+    /// </summary>
+    public void ResumeDialogueCoroutine()
+    {
+        // コルーチンが止まっていれば、再開用のコルーチン開始
+        if (runtimeCoroutine) dialogueCoroutine = StartCoroutine(ResumeDialogue());
+    }
+
+    /// <summary>
+    /// オートモードを切り替える関数
+    /// </summary>
+    public void OnAutoModeCllicked()
+    {
+        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.TInstance.volumeSE);
+
+        // talkAutoがtrueならfalseに、falseならtrueに変換
+        talkAuto = !talkAuto;
+        if (!autoImage) return;
+        // オートモードならオートモード画像を出す
+        if (talkAuto)
+        {
+            // プレイヤーの入力受付中(NEXTTALKまたはLASTTALK時)はオートモード準備フラグを出す
+            if (TalkState == TALKSTATE.NEXTTALK || TalkState == TALKSTATE.LASTTALK) autoSetUp = true;
+            autoImage.SetActive(true);
+        }
+        // オートモードではないなら画像を出さない
+        else
+        {
+            autoSetUp = false;
+            autoImage.SetActive(false);
+        }
+    }
+
+    /// -------public関数------- ///
+    #endregion
+
+    #region protected関数
+    /// -----protected関数------ ///
+
+    protected override void Awake()
+    {
+        base.Awake(); // デバッグログを表示するか否かスクリプタブルオブジェクトのGameSettingsを参照
+        if (storynum != "") StorySetUp(storynum); // 対応する会話文をセットする
+        TalkState = TALKSTATE.NOTALK; // 会話ステータスを話していないに変更
+        sceneManager = GameObject.FindGameObjectWithTag("SceneManager").GetComponent<SceneManager>(); // オーディオマネージャーを取得
+        itemWindow = GameObject.FindGameObjectWithTag("ItemWindow").GetComponent<ItemWindow>(); // アイテムウィンドウを取得 
+        playerTextSpeed = sceneManager.enviromentalData.TInstance.textSpeed; // テキストスピードを設定
+    }
+
+    /// <summary>
+    /// 対応する会話文をセットする関数
+    /// </summary>
+    /// <param name="storynum">読み込むCSVファイルの名前 例(1-1)</param>
+    protected virtual void StorySetUp(string storynum)
+    {
+        Debug.Log("Story" + storynum + "を読み込みます");
+        //　テキストファイルの読み込みを行ってくれるクラス
+        TextAsset textasset = new TextAsset();
+        //　先ほど用意したcsvファイルを読み込ませる。
+        //　ファイルは「Resources」フォルダを作り、そこに入れておくこと。
+        //　Resources.Load 内はcsvファイルの名前。今回は Story1-1 や Story2-5 のようにステージ番号によって読み込むファイルが変えられるようにしている。
+        textasset = Resources.Load("プランナー監獄エリア/Story/Story" + storynum, typeof(TextAsset)) as TextAsset;
+        /// CSVSerializerを用いてcsvファイルを配列に流し込む。///
+        storyTalks = CSVSerializer.Deserialize<StoryTalkData>(textasset.text); // CSVのテキストデータを配列に格納する
+        // 会話中背景格納配列のサイズを[文章の数]にする
+        backImages = new GameObject[storyTalks.Length];
+        // キャラクター画像格納用2次元配列のサイズを[会話中の最大表示人数,文章の数]にする
+        charaImages = new GameObject[displayCharaAnchors, storyTalks.Length];
+        // キャラクターハイライト格納用2次元配列のサイズを[会話中の最大表示人数,文章の数]にする
+        charaHighlight = new bool[displayCharaAnchors, storyTalks.Length];
+        // BGMを格納する配列のサイズを[文章の数]にする
+        nameBGM = new string[storyTalks.Length];
+        // プロジェクト内のTalkCharaImageフォルダにある画像を対応させたい文章ごとに格納する
+        for (int i = 0; i < storyTalks.Length; i++)
+        {
+            backImages[i] = (GameObject)Resources.Load("TalkBackImage/" + storyTalks[i].backImage);
+        }
+        // プロジェクト内のTalkCharaImageフォルダにある画像を対応させたい文章ごとに格納する
+        for (int i = 0; i < displayCharaAnchors; i++)
+        {
+            for (int j = 0; j < storyTalks.Length; j++)
+            {
+                // charaImages[0,j]には左側に表示するキャラクター画像を格納する
+                if (i == 0) charaImages[i, j] = (GameObject)Resources.Load("TalkCharaImage/" + storyTalks[j].leftTalkingChara);
+                // charaImages[1,j]には右側に表示するキャラクター画像を格納する
+                else if (i == 1) charaImages[i, j] = (GameObject)Resources.Load("TalkCharaImage/" + storyTalks[j].rightTalkingChara);
+                // charaImages[2,j]には中央に表示するキャラクター画像を格納する
+                else charaImages[i, j] = (GameObject)Resources.Load("TalkCharaImage/" + storyTalks[j].centerTalkingChara);
+            }
+        }
+        // charaImages[]に格納された画像が光るかどうかの真偽を対応させたい文章ごとに格納する
+        for (int i = 0; i < displayCharaAnchors; i++)
+        {
+            for (int j = 0; j < storyTalks.Length; j++)
+            {
+                // charaHighlight[0,j]には左側に表示するキャラクター画像が光るかどうかを格納する
+                if (i == 0 && storyTalks[j].leftHighlight == "1") charaHighlight[i, j] = true;
+                // charaHighlight[1,j]には右側に表示するキャラクター画像が光るかどうかを格納する
+                else if (i == 1 && storyTalks[j].rightHighlight == "1") charaHighlight[i, j] = true;
+                // charaHighlight[2,j]には中央に表示するキャラクター画像が光るかどうかを格納する
+                else if (i == 2 && storyTalks[j].centerHighlight == "1") charaHighlight[i, j] = true;
+            }
+        }
+        // BGM名を対応させたい文章ごとに格納する
+        for (int i = 0; i < storyTalks.Length; i++)
+        {
+            nameBGM[i] = storyTalks[i].BGM;
+        }
+        /// ここまで ///
+        Debug.Log("Story" + storynum + "を読み込みました");
+    }
+
     /// <summary>
     /// 会話関係の表示を初期化する関数
     /// </summary>
     protected void InitializeTalkField()
     {
         textLabel.text = ""; // 会話フィールドをリセットする
-        if(charaName) charaName.text = ""; // 話しているキャラクター名をリセットする
+        if (charaName) charaName.text = ""; // 話しているキャラクター名をリセットする
         // 背景画像が表示されていれば画像を破壊する
         if (backImage) Destroy(backImage);
         // 左側キャラクター画像が表示されていれば画像を破壊する
@@ -301,6 +258,7 @@ public class BaseTextController : DebugSetting
         if (centerCharaImage) Destroy(centerCharaImage);
         if (clickIcon != null) clickIcon.SetActive(false); // クリックアイコンを非表示にする
     }
+
     /// <summary>
     /// 登場人物等を生成する関数
     /// </summary>
@@ -334,6 +292,7 @@ public class BaseTextController : DebugSetting
         if (nameBGM[talkNum] == "Stop") sceneManager.audioManager.BGM_Stop(); // StopならBGMを止める
         else if (nameBGM[talkNum] != "0") sceneManager.audioManager.BGM_Play(nameBGM[talkNum], sceneManager.enviromentalData.TInstance.volumeBGM); // BGM名が入っていたら切り替え　空白なら続行
     }
+
     /// <summary>
     /// コルーチン開始関数
     /// </summary>
@@ -345,26 +304,7 @@ public class BaseTextController : DebugSetting
         dialogueCoroutine = StartCoroutine(Dialogue());
         runtimeCoroutine = true; // フラグを実行中に変更
     }
-    /// <summary>
-    /// コルーチン一時停止関数
-    /// </summary>
-    public void PauseDialogueCoroutine()
-    {
-        // 動いているコルーチンがあれば
-        if (runtimeCoroutine)
-        {
-            StopCoroutine(dialogueCoroutine); // コルーチンを止める
-            currentCharIndex = textLabel.text.Length; // 現在の文字の表示位置を保存
-        }
-    }
-    /// <summary>
-    /// コルーチン再開関数
-    /// </summary>
-    public void ResumeDialogueCoroutine()
-    {
-        // コルーチンが止まっていれば、再開用のコルーチン開始
-        if (runtimeCoroutine) dialogueCoroutine = StartCoroutine(ResumeDialogue());
-    }
+
     /// <summary>
     /// 文章を表示するコルーチン
     /// </summary>
@@ -406,11 +346,81 @@ public class BaseTextController : DebugSetting
             OnTalkButtonClicked(); // 次の会話を自動でスタートする
         }
     }
+
+    /// <summary>
+    /// 次のダイアログに変更する関数
+    /// </summary>
+    protected virtual void NextDialogue()
+    {
+        // トークスキップフラグが立ったら
+        if (talkSkip == true)
+        {
+            textLabel.text = storyTalks[talkNum].talks; // 全文を表示
+            if (talkAuto) OnAutoModeCllicked(); // オートモード中ならオートモードを止める
+        }
+        if (clickIcon != null) clickIcon.SetActive(true); // クリックアイコンを表示にする
+        talkSkip = false; // トークスキップフラグをfalseにする
+        runtimeCoroutine = false; // フラグを未実行に変更
+        // アイテム選択状態にする場合
+        if (storyTalks[talkNum].rightItemID != null) // 正解のアイテムを設定されていれば
+        {
+            TalkState = TALKSTATE.Question; // アイテム選択状態にする
+            rightID = (ItemID)int.Parse(storyTalks[talkNum].rightItemID); // 正解のアイテムを代入する
+            if (itemWindow.CheckOpen == false) itemWindow.WinSlide(); // アイテムウィンドウを開いていなければ開く
+            return;
+        }
+        // シーン遷移先の記載があった場合
+        if (storyTalks[talkNum].transition != null)
+        {
+            TalkState = TALKSTATE.LASTTALK; // 会話ステータスを最後のセリフに変更
+            return;
+        }
+        talkNum++; // 次のダイアログに移動
+
+        TalkState = TALKSTATE.NEXTTALK; // 会話ステータスを次のセリフに変更
+        // 次のダイアログで最後なら会話ステータスを最後のセリフに変更
+        if (talkNum >= storyTalks.Length) TalkState = TALKSTATE.LASTTALK;
+    }
+
+    /// <summary>
+    /// テキストスピードを計算する関数
+    /// </summary>
+    /// <returns></returns>
+    protected float CalculataTextSpeed()
+    {
+        // 基礎スピード*10段階のうちのどれか(5が基準)
+        return textBaseSpeed / (playerTextSpeed / 0.5f);
+    }
+
+    /// -----protected関数------ ///
+    #endregion
+
+    #region private関数
+    /// ------private関数------- ///
+
+    private void Update()
+    {
+        // オートモードへ切り替え準備時に動く
+        if (autoSetUp)
+        {
+            // textDelay秒待ってから次のテキストに進む
+            if (autoMigration < textDelay)
+            {
+                autoMigration += Time.deltaTime;
+                return;
+            }
+            autoMigration = default;
+            autoSetUp = false;
+            OnTalkButtonClicked();
+        }
+        else autoMigration = default;
+    }
+
     /// <summary>
     /// 一時停止した箇所から表示するコルーチン
     /// </summary>
     /// <returns></returns>
-    IEnumerator ResumeDialogue()
+    private IEnumerator ResumeDialogue()
     {
         // 文章の残りを再表示
         for (int i = currentCharIndex; i < words.Length; i++)
@@ -440,79 +450,155 @@ public class BaseTextController : DebugSetting
             if (!talkAuto) yield break; // textDelay秒待った間にオートモードではなくなった場合、コルーチンを終了する
             OnTalkButtonClicked(); // 次の会話を自動でスタートする
         }
-    }        
-    /// <summary>
-    /// 次のダイアログに変更する関数
-    /// </summary>
-    protected virtual void NextDialogue()
-    {
-        // トークスキップフラグが立ったら
-        if (talkSkip == true)
-        {
-            textLabel.text = storyTalks[talkNum].talks; // 全文を表示
-            if(talkAuto)OnAutoModeCllicked(); // オートモード中ならオートモードを止める
-        }
-        if (clickIcon != null) clickIcon.SetActive(true); // クリックアイコンを表示にする
-        talkSkip = false; // トークスキップフラグをfalseにする
-        runtimeCoroutine = false; // フラグを未実行に変更
-        // アイテム選択状態にする場合
-        if (storyTalks[talkNum].rightItemID != null) // 正解のアイテムを設定されていれば
-        {
-            TalkState = TALKSTATE.Question; // アイテム選択状態にする
-            rightID = (ItemID)int.Parse(storyTalks[talkNum].rightItemID); // 正解のアイテムを代入する
-            if (itemWindow.CheckOpen == false) itemWindow.WinSlide(); // アイテムウィンドウを開いていなければ開く
-            return;
-        }
-        // シーン遷移先の記載があった場合
-        if (storyTalks[talkNum].transition != null)
-        {
-            TalkState = TALKSTATE.LASTTALK; // 会話ステータスを最後のセリフに変更
-            return;
-        }
-        talkNum++; // 次のダイアログに移動
-        
-        TalkState = TALKSTATE.NEXTTALK; // 会話ステータスを次のセリフに変更
-        // 次のダイアログで最後なら会話ステータスを最後のセリフに変更
-        if (talkNum >= storyTalks.Length) TalkState = TALKSTATE.LASTTALK;
     }
-    /// <summary>
-    /// テキストスピードを計算する関数
-    /// </summary>
-    /// <returns></returns>
-    protected float CalculataTextSpeed()
-    {
-        // 基礎スピード*10段階のうちのどれか(5が基準)
-        return textBaseSpeed / (playerTextSpeed / 0.5f);
-    }
-    /// <summary>
-    /// オートモードを切り替える関数
-    /// </summary>
-    public void OnAutoModeCllicked()
-    {
-        sceneManager.audioManager.SE_Play("SE_click", sceneManager.enviromentalData.TInstance.volumeSE);
 
-        // talkAutoがtrueならfalseに、falseならtrueに変換
-        talkAuto = !talkAuto;
-        if (!autoImage) return;
-        // オートモードならオートモード画像を出す
-        if (talkAuto)
-        {
-            // プレイヤーの入力受付中(NEXTTALKまたはLASTTALK時)はオートモード準備フラグを出す
-            if(TalkState == TALKSTATE.NEXTTALK || TalkState == TALKSTATE.LASTTALK) autoSetUp = true;
-            autoImage.SetActive(true);
-        }
-        // オートモードではないなら画像を出さない
-        else
-        {
-            autoSetUp = false;
-            autoImage.SetActive(false);
-        }
-    }
+    /// ------private関数------- ///
+    #endregion
+
+    /// --------関数一覧-------- ///
 }
+public partial class BaseTextController
+{
+    /// --------変数一覧-------- ///
+    
+    #region public変数
+    /// -------public変数------- ///
+    
+    public bool runtimeCoroutine = false; // コルーチンが実行中かどうか
 
+    public int displayCharaAnchors = 3; // キャラクター画像の表示箇所数
+
+    public float playerTextSpeed = 0.5f; // プレイヤーが指定したテキスト送りのスピード度合
+    public float textDelay = 1.5f; // テキストとテキストの間の時間(オートモードのみ使用)
+
+    [Header("1-1のように入力")]
+    public string storynum; //ストーリー番号
+
+    public TextMeshProUGUI charaName; // キャラクター名のテキスト変数
+    public TextMeshProUGUI textLabel; // 文章を格納するテキスト変数
+
+    public GameObject talkButton; // 会話を進めるボタン
+
+    public TALKSTATE talkState; // 会話ステータス変数
+
+
+    /// -------public変数------- ///
+    #endregion
+
+    #region protected変数
+    /// -----protected変数------ ///
+
+    protected bool[,] charaHighlight; // csvファイルに記載されたキャラクターを光らせるかを格納する2次元配列
+    protected bool isTag = false; // リッチテキストタグを格納しているかどうか
+
+    protected bool talkSkip = false; // ボタンがクリックされたかどうかを示すフラグ
+    protected bool talkAuto = false; // 会話がオート状態なのかを示すフラグ
+
+    protected int talkNum = 0; // ダイヤログ番号
+
+    protected string words; // 文章
+    protected string richTextTag = string.Empty; // リッチテキストタグ用変数
+
+    protected GameObject[] backImages; // csvファイルに記載された背景の格納配列
+    protected GameObject backImage = null; // 使用する背景画像
+    protected GameObject[,] charaImages; // csvファイルに記載されたキャラクター画像名を格納する2次元配列
+    protected GameObject centerCharaImage = null; // 使用するキャラクター画像(中央側)
+    [Header("背景表示箇所")]
+    [SerializeField] protected GameObject backImageAnchor; // 背景表示箇所
+    [Header("キャラクター表示箇所 [0]...左側 [1]...右側 [2]...中央")]
+    [SerializeField] protected GameObject[] charaAnchors = new GameObject[3]; // キャラクター表示箇所
+
+    protected StoryTalkData[] storyTalks; //csvファイルにある文章を格納する配列
+
+    [SerializeField] protected SceneManager sceneManager; // シーンマネージャー変数
+
+    protected ItemWindow itemWindow; // アイテムウィンドウ変数
+
+    protected ItemID rightID; // 正しいアイテムID変数
+
+    /// -----protected変数------ ///
+    #endregion
+
+    #region private変数
+    /// ------private変数------- ///
+
+    private bool autoSetUp = false; // オートモードの準備状態かどうかのフラグ
+    [SerializeField] private bool testText = false; // ボタンのテキストを表示するかどうか
+
+    private int currentCharIndex = 0; // 文章の表示位置を示す変数
+    private int missCount = 0; // ミスをした回数
+
+    private float autoMigration = 0; // オートモードに移行する時間を格納する変数
+    [SerializeField] private float textBaseSpeed = 0.05f; // テキスト送りのベーススピード
+
+    private string[] nameBGM; // 鳴らすBGM格納配列
+
+    private GameObject leftCharaImage = null; // 使用するキャラクター画像(左側)
+    private GameObject rightCharaImage = null; // 使用するキャラクター画像(右側)
+    [SerializeField] private GameObject autoImage; // オートモードの画像
+    [SerializeField] private GameObject clickIcon; // クリックを催促するアイコン変数
+
+    [SerializeField] private TextMeshProUGUI buttonText; // ボタンのテキスト変数
+
+    [SerializeField] private Image lifeImage; // ライフの画像変数
+
+    private Coroutine dialogueCoroutine; // コルーチンを格納する変数
+
+    /// ------private変数------- ///
+    #endregion
+
+    #region プロパティ
+    /// -------プロパティ------- ///
+
+    public TALKSTATE TalkState
+    {
+        get { return talkState; }
+        set
+        {
+            talkState = value;
+            switch (talkState)
+            {
+                case TALKSTATE.NOTALK:
+                    if (testText) buttonText.text = "会話開始"; // ボタンテキストを"会話開始"に変更
+                    break;
+                case TALKSTATE.TALKING:
+                    if (testText) buttonText.text = "Skip"; // ボタンテキストを"Skip"に変更
+                    break;
+                case TALKSTATE.NEXTTALK:
+                    if (testText) buttonText.text = "次へ"; // ボタンテキストを"次へ"に変更
+                    break;
+                case TALKSTATE.LASTTALK:
+                    if (testText) buttonText.text = "会話終了"; // ボタンテキストを"会話終了"に変更
+                    break;
+
+            }
+        }
+    }
+
+    protected int MissCount
+    {
+        get { return missCount; }
+        set
+        {
+            missCount = value;
+            lifeImage.sprite = Resources.Load<Sprite>(string.Format("ライフ/Inference_life_{0}", missCount)); // アイテム画像を代入
+        }
+    }
+
+
+    /// -------プロパティ------- ///
+    #endregion
+
+    /// --------変数一覧-------- ///
+}
 [System.Serializable] // サブプロパティを埋め込む
 public class StoryTalkData
 {
+    /// --------変数一覧-------- ///
+    
+    #region public変数
+    /// -------public変数------- ///
+
     public string backImage; // 背景画像
     public string leftTalkingChara; // キャラクター画像名(左側)
     public string rightTalkingChara; // キャラクター画像名(右側)
@@ -529,4 +615,33 @@ public class StoryTalkData
     public string miss; // 不正解時のストーリー行数
     public string gameOver; // ゲームオーバー時のストーリー行数
     public string transition; // 遷移するどうか
+
+    /// -------public変数------- ///
+    #endregion
+
+    #region protected変数
+    /// -----protected変数------ ///
+
+
+
+    /// -----protected変数------ ///
+    #endregion
+
+    #region private変数
+    /// ------private変数------- ///
+
+
+
+    /// ------private変数------- ///
+    #endregion
+
+    #region プロパティ
+    /// -------プロパティ------- ///
+
+
+
+    /// -------プロパティ------- ///
+    #endregion
+
+    /// --------変数一覧-------- ///
 }

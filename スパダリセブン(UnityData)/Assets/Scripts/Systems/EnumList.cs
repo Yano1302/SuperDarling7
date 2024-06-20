@@ -1,6 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+/// --------変数一覧-------- ///
+
+#region public変数
+/// -------public変数------- ///
 
 // シーンの名称　数字はビルド番号に合わせている
 public enum SCENENAME
@@ -14,8 +15,9 @@ public enum SCENENAME
     GameOverScene = 6, // ゲームオーバーシーン
     GameClearScene = 7 // ゲームクリアシーン
 }
+
 // 会話関係のステータス
-public enum TALKSTATE 
+public enum TALKSTATE
 {
     NOTALK, // 話していない
     TALKING, // 会話中
@@ -23,6 +25,7 @@ public enum TALKSTATE
     LASTTALK, // 最後のセリフ
     Question // 解決シーンにてアイテムを選択する状態
 }
+
 // 環境設定のステータス
 public enum SETTINGSTATE
 {
@@ -30,9 +33,39 @@ public enum SETTINGSTATE
     SE = 1, // SEの設定
     TEXTSPEED = 2 // テキストスピードの設定
 }
+
 // ストーリーメニュー画面のスライドのステータス
 public enum SLIDESTATE
 {
     DEFAULT = 0, // スライドしていない
     SLIDE = 1 // スライド中
 }
+
+/// -------public変数------- ///
+#endregion
+
+#region protected変数
+/// -----protected変数------ ///
+
+
+
+/// -----protected変数------ ///
+#endregion
+
+#region private変数
+/// ------private変数------- ///
+
+
+
+/// ------private変数------- ///
+#endregion
+
+#region プロパティ
+/// -------プロパティ------- ///
+
+
+
+/// -------プロパティ------- ///
+#endregion
+
+/// --------変数一覧-------- ///

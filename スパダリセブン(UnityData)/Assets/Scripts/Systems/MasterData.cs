@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using System;
 
 // 岬作成のセーブ・ロードするクラスのスクリプトです
@@ -8,11 +5,43 @@ using System;
 [Serializable]
 public class MasterData // jsonデータとして保存するclass
 {
-    // 証拠？
-    //public GameObject[] evidences = new GameObject[10];
+    /// --------変数一覧-------- ///
+
+    #region public変数
+    /// -------public変数------- ///
+
     // シーン名
     public SCENENAME scenename = SCENENAME.TitleScene;
     // セーブしたことがあるか
     public bool haveSaved = false;
+
+    /// -------public変数------- ///
+    #endregion
+
+    #region protected変数
+    /// -----protected変数------ ///
+
+
+
+    /// -----protected変数------ ///
+    #endregion
+
+    #region private変数
+    /// ------private変数------- ///
+
+
+
+    /// ------private変数------- ///
+    #endregion
+
+    #region プロパティ
+    /// -------プロパティ------- ///
+
+
+
+    /// -------プロパティ------- ///
+    #endregion
+
+    /// --------変数一覧-------- ///
 }
 
