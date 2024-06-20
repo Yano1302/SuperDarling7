@@ -4,6 +4,7 @@ using UnityEngine;
 using System.IO;
 using UnityEngine.SceneManagement;
 
+
 //TODO JSONに対応させる
 public enum MapType {
     Dummy = 0,
@@ -12,7 +13,7 @@ public enum MapType {
     wall   = 3,
     catchtrap = 4,
     pitfall = 5,
-    Goal1 = 6,
+    Goal = 6,
     
 }
 
@@ -38,6 +39,9 @@ public class MapManager : SingletonMonoBehaviour<MapManager> {
     // アタッチ変数  //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
     [SerializeField, Header("マップオブジェクト"), EnumIndex(typeof(MapType))]
     private GameObject[] MapObject;
+
+    [SerializeField, Header("Invマネージャーオブジェクト")]
+    private GameObject InvManagerObject;
     //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
    
     /// <summary>ステージのCSVを読み込むためのインデックスを管理します</summary>
@@ -46,7 +50,7 @@ public class MapManager : SingletonMonoBehaviour<MapManager> {
         name = 1,
         time = 2,
         size = 3,
-        danger = 4,
+        InvPart= 4,
         itemStart = 5,
         otherItem = 11,
     }
@@ -54,7 +58,7 @@ public class MapManager : SingletonMonoBehaviour<MapManager> {
     //  プライベート変数  //------------------------------------------------------------------------------------------------------------------------------
 
     //マップデータ
-    StageData m_stageData;
+    private StageData m_stageData;
 
     //ステージのデータを管理する構造体
     private struct StageData {
@@ -71,7 +75,7 @@ public class MapManager : SingletonMonoBehaviour<MapManager> {
     //初期化
     protected override void Awake() {
         base.Awake();
-        //マップ情報だけ先に読み込んでおく
+        //ステージ情報だけ先に読み込んでおく
         if (StageData.Data == null) {
             //ステージ作成に必要なデータが入ったCSVを読み込む
             StageData.Data = new CSVSetting("ステージ情報");
@@ -87,34 +91,41 @@ public class MapManager : SingletonMonoBehaviour<MapManager> {
         KeyDebug.AddKeyAction("マップのサイズをログに表示する", () => { Debug.Log(m_stageData.size); });
     }
 
-    /// <summary>マップを作成します Note:岬さんのシーンマネージャーから呼び出します</summary>
+    /// <summary>マップを作成します
     /// <param name="mapNumber">作成するステージ番号 Note:ステージ番号はステージ情報一覧.csvに記載</param>
     private void _Create(int mapNumber) {
-        //ステージ名を格納しているインデックスを確保する
-        StageData.Data.GetColumnIndex(0, "ステージ名", out int nameIndex);
-        //ステージ名を取得
-        StageData.Data.GetData(nameIndex, mapNumber, out string data);
+        //調査パートを管理するオブジェクトを生成する
+        Instantiate(InvManagerObject);
+        //マップ情報の調査パート一覧を読み込む
+        StageData.Data.GetData((int)StageCsvIndex.InvPart,mapNumber,out string invStr);
+        
+        //ステージ名を取得する
+        StageData.Data.GetData((int)StageCsvIndex.name, mapNumber, out string data);
         //ステージ名と一致するCSVファイルがあるはずなので読み込む
         var mapData = new CSVSetting(data);
         //現在のステージ番号を格納する
         m_stageData.number = mapNumber;
+        
         //現在のステージのアイテム数を取得する
         var im = ItemManager.Instance;
         m_stageData.totalitem = im.GetTotalItemNum(mapNumber);
         //マップの高さと１マスのサイズを取得
         int maxY = mapData.TotalLine;//高さ
          Vector2 scale = new Vector2(m_stageData.size, m_stageData.size); //サイズ
+         List<Goal> goalList = new List<Goal>();
         //縦のループ
         for (int y = 0; y < maxY; y++) {
             //マップの横幅を取得
             int MaxX = mapData.GetLength(y);
             //横のループ
             for (int x = 0; x < MaxX; x++) {
+                //マスの配置場所を計算する
+                Vector2 vec = new Vector2(m_stageData.size * x, m_stageData.size - (m_stageData.size * y));
                 //読み込んだものを数字に変換する。変換できた場合にマスの作成を行う
-                if(mapData.GetData(x, y, out int typeNum)) {
+                if (mapData.GetData(x, y, out int typeNum)) {
                     //数字から配置するマスを決定し配置する
                     if (typeNum == 0) {  continue;  }//０の場合は配置しない
-                    Vector2 vec = new Vector2(m_stageData.size * x, m_stageData.size - (m_stageData.size * y));//マスの配置場所を計算する
+                   
                     //マスを作成
                     var obj = Instantiate(MapObject[typeNum], vec, Quaternion.identity);
                     obj.transform.localScale = scale;
@@ -122,10 +133,41 @@ public class MapManager : SingletonMonoBehaviour<MapManager> {
                         //他の背景用に道オブジェクトを配置する　TODO:仮置き
                         Instantiate(MapObject[(int)MapType.road], vec, Quaternion.identity);
                     }
-                }     
+                }
+                else {
+                    //変換できない場合の例外処理
+
+                    //調査パート用マスを配置します
+                    mapData.GetData(x, y,out string str);
+                    int type = CutParentheses(str,out string d);
+                    switch ((MapType)type) {
+                        case MapType.Goal:
+                            var obj = Instantiate(MapObject[type], vec, Quaternion.identity);
+                            UsefulSystem.GetEnum(out InvType t, str);
+                            var g = obj.GetComponent<Goal>();
+                            g.InvType = t;
+                            goalList.Add(g);
+                            Instantiate(MapObject[(int)MapType.road], vec, Quaternion.identity);    //道も後ろに置いておく
+                            break;
+                    } 
+                }
             }        
         }
-    
+        //調査パート名は'/'で区切られているはずなので分解してそれぞれ取得する
+        var invData = invStr.Split('/');
+        //調査パートの配列にこのステージの全ての調査パートを格納する
+        InvType[] invTypes = new InvType[invData.Length];
+        for (int i = 0; i < invData.Length; i++) {
+            if (UsefulSystem.GetEnum(out InvType t, invData[i])) {
+                invTypes[i] = t;
+            }
+            else {
+                UsefulSystem.LogError($"{ invData[i]  }に一致する調査パート名が見つかりません。InvTypeの記述やCSV内を確認してください。");
+            }
+        }
+        //調査パート全体の管理オブジェクトに情報を渡す
+        InvManager.Instance.SetUpInv(invTypes,goalList);
+
         //マップ生成後にタイマーを開く
         TimerManager.Instance.SetTimer(m_stageData.time);
         // アイテムウィンドウを表示
@@ -135,4 +177,12 @@ public class MapManager : SingletonMonoBehaviour<MapManager> {
     private void SceneUnloaded(Scene thisScene) {
         m_stageData.number = -1;
     }
+
+    /// <summary>[]外の数字と[]内の文字列をそれぞれ取得します</summary>
+    private int CutParentheses(in string str,out string Data) {
+        int startIndex = str.IndexOf('[');
+        Data = str.Substring(startIndex,str.Length - startIndex - 1 );  //-1は閉じかっこ　] の分
+        return int.Parse(str.Substring(0,startIndex));
+    }
+
 }

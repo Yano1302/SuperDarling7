@@ -924,7 +924,7 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager>
             fileNames[i] = part[part.Length - 1].Remove(index);
         }
         foreach (string name in fileNames) {
-            AudioClip audio = (AudioClip)Resources.Load(name);
+            AudioClip audio = Resources.Load(name)as AudioClip;
             dic[name] = audio;
         }
     }

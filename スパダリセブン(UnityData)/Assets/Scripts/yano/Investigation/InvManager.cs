@@ -5,195 +5,215 @@ using UnityEngine.UI;
 using Supadari;
 using SceneManager = Supadari.SceneManager;
 
+/// <summary>
+/// MapManagerがマップ生成のついでにステージ情報を全て取得する
+///                     ↓
+///  MapManagerがInvManagerを作成し、ステージ情報にある探索パート情報を渡す
+///                     ↓
+///  InvManagerが渡された情報を元にInvPartクラスを作成し、InvTypeを指定する。
+///  この際に作成したInvPart情報を保管しておき、Open()関数でこの作成したInvPartを開けるようにする
+///                     ↓
+///  InvTypeは指定されたInvTypeに対応するテクスチャをInvTextureholderから取得すると同時に、
+///  対応するCSVファイルを読み込み、アイテムオブジェクトを子として作成する
+///                     ↓
+///  この際にItemObjectにInvPart参照を渡し、ItemObjectからInvPartにアイテムが取得された事を報告する
+///  
+/// 
+///   管理者  /管理オブジェクト
+///     
+/// InvManager/警戒度フラグ ->　InvPart毎にフラグを設定する訳ではないので外部からもフラグが設定しやすいInvManagerに設置
+/// InvManager/マウスカーソル-> これも単一であるのが保証されているのでInvManagerに設置しItemObject等からも呼び出しやすいようにしている
+///  
+/// InvPart   / 警戒度ゲージ -> 調査パート毎に警戒度の設定が違うのでゲージクラスの管理はInvPartに委譲(SetUpInv()でゲージクラスを渡している)
+/// InvPart   / 危険メッセージ-> 最初はInvManagerで保管するつもりだったが、ステージによって危険メッセージが出てからの猶予を変える可能性があるためInvPartに委譲
+/// 
+/// アイテムについて
+/// 
+///                     全て取得している場合は推理パートに移行する
+///                                         ↑
+///             InvManagerが全てのInvPartを確認し、アイテムを全て取得しているか確認する　→　取得していない場合は現在のInvPartを閉じるだけ
+///                                         ↑
+///             InvPartが自身のパートのアイテムが全て無くなった(取得済み)なのを判断し、対応するゴールオブジェクトを破棄したのちInvManagerに報告する
+///                                         ↑
+///             InvPartが残りのアイテム数を確認する(自身の子の残数がそのまま残り個数) <----------------------------------------------------------------|
+///                                         ↑                                                                                                         |
+///             ItemObjectが自身を取得された場合にItemManagerへアイテムを追加しつつ、InvPartに報告する                                                 |
+///                                         ↑                                                                                                         |
+///             InvPartが開かれたタイミングでItemObjectが自身のアイテムを既に取得しているかどうかItemManagerに確認しに行く　→　既に持っていた場合には重複を防ぐため破壊しInvPartに報告する
+///                                         ↑
+/// //探索パートを開くまでの流れ            ↑
+///             ゴールオブジェクトに当たった際にInvManagerのOpenからゴールオブジェクトが持っているInvTypeの調査パートを呼び出す。      
+///                                         ↑
+///              MapManagerがマップ生成する際にゴールオブジェクトに対応するInvTypeを登録しておく。
+///   
+/// </summary>
 
-public enum InvType {
-   A, B, C,
-}
+
+
 
 public class InvManager : MonoBehaviour
 {
+
     /// <summary>探索パート～調査パート間のみ取得できるインスタンス</summary>
     public static InvManager Instance { get { Debug.Assert(m_instance, "シーンが違うのでインスタンスを取得できません。"); return m_instance; } }
-    /// <summary>この調査パートに配置されたアイテムの中で取得しているアイテム数</summary>
-    public int GetItemNum { get { return m_getItemNum; } set { m_getItemNum = value; if (m_getItemNum >= MapManager.Instance.TotalItem) { ClearInv(); } } }
 
-    /// <summary>警戒度が上がるフラグを設定します。</summary>
-    public bool VigilanceFlag { get { return m_vigilance.VigilanceFlag; } set { m_vigilance.VigilanceFlag = value; } }
+    /// <summary>警戒度上昇フラグを設定します。</summary>
+    public bool VigilanceFlag { get { return m_vigilanceFlag; } set { m_vigilanceFlag = value; } }
+
+    ///
+    public InvPart CurrentPart { get { return m_currentPart; } }
+
+    /// <summary>MapManagerから調査パートのセットアップを行います</summary>
+    public void SetUpInv(in InvType[] type,List<Goal> goalList) {
+        if (m_invParts == null) {
+            m_invParts = new InvPart[type.Length];
+            for (int i = 0; i < type.Length; i++) {
+                //InvPart用オブジェクトを作成し、このManagerクラスの子にする
+                var obj = Instantiate(m_baseInvObject);
+                obj.transform.SetParent(m_invCanvas.transform, false);
+                //InvPartクラスをアタッチし、セットアップ関数を呼び出す
+                m_invParts[i] = obj.AddComponent<InvPart>();
+                m_invParts[i].SetUpInvPart(type[i], m_baseInvItem, m_gauge, m_warningMessage);
+                //InvPartに対応するゴールを検索し格納する
+                foreach(var g in goalList) {
+                    if(g.InvType == m_invParts[i].InvPartType) {
+                        m_invParts[i].SetGoal(g);
+                    }
+                }
+            }
+            //生成したアイテムで埋もれない様にUIを一番上に持ってくる
+            m_backBtn.gameObject.transform.SetAsLastSibling();
+            m_gauge.gameObject.transform.SetAsLastSibling();
+            m_warningMessage.gameObject.transform.SetAsLastSibling();
+
+        }
+    }
 
     /// <summary>調査パートを開きます</summary>
     public void Open(InvType type) {
-        Debug.Assert(!m_isOpen, "探索パートが既に開かれています");
-        //シーンを開く
-        m_currentInvType = type; m_invObj[(int)m_currentInvType].SetActive(true);
-        //ボタンをアクティブにする
-        m_backBtn.SetActive(true);
-        //座標を初期化する
-        m_vigilance.mouseVec = Input.mousePosition;
-        //フラグ設定
-        m_gauge.enabled = true;
-        m_gaugefill.enabled = true;
-        m_isOpen = true;
-        m_vigilance.VigilanceFlag = true;
+        //プレイヤーを行動不可にする
         Player.Instance.MoveFlag = false;
+        //シーンを開く
+        m_currentInvType = type;
+        int index = (int)m_currentInvType;
+        m_currentPart = m_invParts[index];
+        m_invParts[index].gameObject.SetActive(true);
+        m_invParts[index].Open();
+        //ボタンをアクティブにする
+        m_backBtn.SetActive(true);       
         //カーソルを変更
         SetCursor(false);
-
+        VigilanceFlag = true;
     }
 
     /// <summary>調査パートを閉じ、探索パートにもどります(ボタンにアタッチしてます)</summary>
     public void Close() {
-        if (m_vigilance.VigilanceFlag) {
+        if (VigilanceFlag) {
             //シーンを閉じる
-            m_invObj[(int)m_currentInvType].SetActive(false);
+            int index = (int)m_currentInvType;
+            m_invParts[index].Close();
+            m_invParts[index].gameObject.SetActive(false);
             //ボタンを非表示に
             m_backBtn.SetActive(false);
             //フラグ設定
             VigilanceFlag = false; // 岬追記　警戒度はリセットしないようにしています
-            m_isOpen = false;
             var ins= Player.Instance;
             ins.MoveFlag = true;
             ins.VisibilityImage = true;
-            m_currentInvType = 0;
+            m_currentInvType = InvType.None;
             //カーソルを元に戻す
             SetCursor(null);
         }
     }
 
-    /// <summary>マウスアイコンを設定します<br />
-    /// targetがnullの場合;デフォルトのマウスカーソルになります<br />
-    /// targetがtrueの場合:カーソルがターゲットカーソルになります<br />
-    /// targetがfalseの場合:カーソルが非ターゲットカーソルになります</summary>
+    /// <summary>マウスアイコンを設定します</summary>
+    ///  <param name="target">
+    ///  targetがnullの場合 ;デフォルトのマウスカーソルになります          <br />
+    ///  targetがtrueの場合 :カーソルがターゲットカーソルになります        <br />
+    ///  targetがfalseの場合:カーソルが非ターゲットカーソルになります      </param>
     public void SetMouseIcon(bool? target) {
         SetCursor(target);
     }
 
-    public void ResetVigilance() { SetVigilance(0); }
+    /// <summary>現在の調査パートの警戒度をリセット(0)します</summary>
+    public void ResetVigilance() { m_invParts[(int)m_currentInvType].ResetVigilance(); }
+
+    /// <summary>指定した調査パートの警戒度をリセット(0)します</summary>
+    public void ResetVigilance(InvType type) { 
+        foreach (var inv in m_invParts) {
+            if (inv.InvPartType == type) {
+                inv.ResetVigilance();
+                return;
+            }
+        }
+        UsefulSystem.LogWarning($"指定された調査パートが見つかりませんでした : { type }");
+    }
+
+    //全ての調査パートの警戒度をリセット(0)にします
+    public void AllResetVigilance() { foreach (var inv in m_invParts)inv.ResetVigilance();}
+
+    /// <summary>全てのInvPartがクリアされているか確認します。この関数はInvPartが一つクリアされる度呼ばれます。</summary>
+    public void CheckClear() { 
+        foreach(var part in m_invParts) {
+            if(!part.ClearFlag) {
+                //まだクリアしていないPartがあるので現在のPartを閉じるだけ
+                Close();
+                return;
+            }
+        }
+        //ここに到達した場合にはクリアしている
+        ClearInv();
+    }
 
     //  アタッチ用   //------------------------------------------------------------------------------
     #region Attach
     [SerializeField, Header("戻るボタン")]
     private GameObject m_backBtn;
     [SerializeField, Header("警戒度ゲージ")]
-    private Image m_gauge;
-    [SerializeField]
-    private Image m_gaugefill;
-    [SerializeField]
-    private Image m_waves;
-    [SerializeField]
-    private float m_waveDirectionTime;
-    [SerializeField]
-    private float m_waveInterval;
+    private InvGauge m_gauge;
     [SerializeField, Header("危険メッセージボックス")]
     private GameObject m_warningMessage;
     [SerializeField, Header("マウスカーソル画像1")]
     Texture2D m_cursor;
     [SerializeField, Header("マウスカーソル画像1")]
     Texture2D m_cursorTaget;
-
-    [SerializeField, Header("探索パート背景用ImageObjct"), EnumIndex(typeof(InvType))]
-    private GameObject[] m_invObj;
+    [SerializeField, Header("探索パート用キャンバス")]
+    private GameObject m_invCanvas;
+    [SerializeField, Header("探索パート背景用ImageObjct")]
+    private GameObject m_baseInvObject;
+    [SerializeField, Header("探索パートのアイテムの当たり判定用オブジェクト")]
+    private GameObject m_baseInvItem;
     #endregion
+
+
+
     //-----------------------------------------------------------------------------------------------
-    //自身のインスタンス
-    private static InvManager m_instance;
-    private InvManager() { }
-
-    private AudioManager m_audioManager;
-
-    private InvType m_currentInvType;           //現在の調査パート状態
-    private bool m_isOpen;                       //開いているかのフラグ
-    private Vigilance m_vigilance;               //警戒度用構造体
-    private int m_getItemNum;                    //現在取得しているアイテム数
-    [Header("警戒度最大時に動いても良い猶予時間")]
-    [SerializeField] private float m_graceTime = 60; // 警戒度最大時に動いても良い猶予時間 岬追記
-    private float m_reprieveGameOver = 0; // ゲームオーバーになるまでの猶予時間　岬追記
-
-    private struct Vigilance {
-        public float MaxVigilance;               //最大警戒度
-        public float Level { get { return m_VigilanceLevel; } set { if (VigilanceFlag) { m_VigilanceLevel = value;  }  } }
-        public float Rate { get { return m_VigilanceLevel / MaxVigilance; } }
-        public bool IsOver { get { return m_VigilanceLevel >= MaxVigilance; } }
-        public Vector2 mouseVec;               //マウス座標
-        public bool VigilanceFlag;             //このフラグがOnの時のみ警戒度を設定できます
-        public float WaveInterval;             //鼓動の間隔
-        private float m_VigilanceLevel;        //警戒度
-
-    }
     
+    private static InvManager m_instance;        //自身のインスタンス
+    private InvManager() { }
+    private bool m_vigilanceFlag;                //警戒度上昇フラグ
+    private InvType m_currentInvType;            //現在の調査パート状態
+    private InvPart[] m_invParts;                //探索パート配列
+    private InvPart m_currentPart;               //現在のパート
+
     private void Awake() {
-        //最大値を設定する
-        m_vigilance.MaxVigilance = 20;
-        //警戒度を初期化する
-        SetVigilance(0);
-        m_isOpen = false;
-        m_getItemNum = 0;
-        m_vigilance.WaveInterval = m_waveInterval;
         m_instance = GetComponent<InvManager>();
-        m_gauge.enabled = false;
-        m_gaugefill.enabled = false;
-    }
-    private void Start() {
-        m_audioManager = AudioManager.Instance;
-    }
-
-    private void Update() {
-
-        if (m_vigilance.VigilanceFlag)
-        {
-            AddVigilance(Time.deltaTime);
-            CheckMouseMove();
-        }
-    }
-    /// <summary>マウスが動いたかどうかを調べます</summary>
-    /// <returns>ゲームオーバーの場合にはfalseを返します</returns>
-    private void CheckMouseMove() {
-        Vector2 pos = Input.mousePosition;
-        //マウスが動かされている場合
-        if (m_vigilance.mouseVec != pos) {
-            if (m_vigilance.IsOver) {
-                m_reprieveGameOver++;
-                if (m_reprieveGameOver>m_graceTime) OverVigilance();
-            }
-            else {
-                m_vigilance.mouseVec = pos;
-                AddVigilance(Time.deltaTime);
-            }
-        }
+        VigilanceFlag = false;
+        m_gauge.CloseGauge();
+        m_gauge.SetRate(0);
+        m_currentInvType = InvType.None;
     }
 
-    /// <summary>警戒度を追加します</summary>
-    /// <returns>警戒度が最大値以上の場合にtrueを返します</returns>
-    private bool AddVigilance(float addValue) {
-        m_vigilance.Level += m_vigilance.IsOver? 0 : addValue;
-        m_gaugefill.fillAmount = m_vigilance.Rate;
-        //警戒度が更新された場合の処理
-        if (m_vigilance.Rate > m_vigilance.WaveInterval) {
-            StartCoroutine("Waves");
-            m_vigilance.WaveInterval += m_waveInterval;
-        }
-        m_warningMessage.SetActive(m_vigilance.IsOver);
-        return m_vigilance.IsOver;
-    }
-
-    /// <summary>警戒度を設定します</summary>
-    /// <returns>警戒度が最大値以上の場合にtrueを返します</returns>
-    private bool SetVigilance(float value) {
-        m_vigilance.Level = value;
-        m_gaugefill.fillAmount = m_vigilance.Rate;
-        m_warningMessage.SetActive(m_vigilance.IsOver);
-        return m_vigilance.IsOver;
-    }
-
-
+   
     /// <summary>全てのアイテムを取得した際の処理を記述します</summary>
     private void ClearInv() {
         TimerManager timerManager=TimerManager.Instance;
         SceneManager sceneManager = SceneManager.Instance;
         JsonSettings<SettingsGetItemFlags> saveItemData = new JsonSettings<SettingsGetItemFlags>(string.Format("Data{0}", sceneManager.saveSlot), "JsonSaveFile", "ItemGetFlags");
         // 警戒ゲージと制限時間を止める　岬追記
-        m_vigilance.VigilanceFlag = false;
+        VigilanceFlag = false;
         timerManager.TimerFlag = false;
-        StopCoroutine("Waves");
+        m_gauge.StopWave();
 
         // アイテム所持フラグを保存し、シーン遷移
         saveItemData = ItemManager.Instance.UsingItemFlag;
@@ -201,49 +221,13 @@ public class InvManager : MonoBehaviour
         SceneManager.Instance.SceneChange(SCENENAME.SolveScene, () => { UIManager.Instance.CloseUI(UIType.Timer); SetCursor(null); });
     }
 
+
+
     /// <summary>カーソルを設定します</summary>
-    /// <param name="target"></param>
     private void SetCursor(bool? target) {
         Texture2D tex = target == null ? null : (bool)target ? m_cursorTaget : m_cursor;
         Vector2 vec = tex  == null ? Vector2.zero : new Vector2(tex.width/2,tex.height/2);
         Cursor.SetCursor(tex, vec, CursorMode.Auto);
-    }
+    }   
 
-    /// <summary>
-    /// 警戒度がマックスの際にマウスを動かしてしまった場合の処理
-    /// </summary>
-    private void OverVigilance() {
-        if (m_vigilance.VigilanceFlag) {
-            m_warningMessage.SetActive(false);
-            StopCoroutine("Waves");
-            SceneManager.Instance.SceneChange(SCENENAME.GameOverScene, () => { UIManager.Instance.CloseUI(UIType.Timer); SetCursor(null); });
-        }
-    }
-
-    private IEnumerator Waves() {
-        float time = 0;
-        if (m_vigilance.IsOver) { m_audioManager.SE_Play("SE_survey01"); }
-        else { m_audioManager.SE_Play("SE_survey02"); }
-
-        WaitForSeconds wait = new WaitForSeconds(Time.deltaTime);
-        while (time < 0.5) {
-            float t = Time.deltaTime / m_waveDirectionTime;
-            Color c = m_waves.color;
-            c.a += t * 2;
-            m_waves.color = c;
-            time += t;
-            yield return wait;
-        }
-        while(time < 1) {
-            float t = Time.deltaTime / m_waveDirectionTime;
-            Color c = m_waves.color;
-            c.a -= t * 2;
-            m_waves.color = c;
-            time += t;
-            yield return wait;
-        }
-        Color col = m_waves.color;
-        col.a = 0;
-        m_waves.color = col;
-    }
 }

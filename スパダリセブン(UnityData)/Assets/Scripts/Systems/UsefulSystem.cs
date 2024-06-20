@@ -38,7 +38,7 @@ public class UsefulSystem : SingletonMonoBehaviour<UsefulSystem>
     /// <summary>ファイル名(拡張子込み)からファイルパスを検索します</summary>
     /// <param name="FileName">ファイル名(拡張子込み)</param>
     /// <returns>ファイルパスが見つかった場合にパスを返します</returns>
-    public static string FindFilePath(string FileName)
+    public static string FindFilePath(in string FileName)
     {
         var paths = Directory.GetFiles(Application.dataPath, FileName, SearchOption.AllDirectories);
         if (paths != null && paths.Length > 0)
@@ -68,12 +68,22 @@ public class UsefulSystem : SingletonMonoBehaviour<UsefulSystem>
         return lines;
     }
 
-
+    public static T ResourcesLoad<T>(in string fileNameInExtension) where T : class {
+        string[] path = FindFilePath(fileNameInExtension).Split('.');       //全体パスの取得(拡張子と分離)
+        int index = path[0].IndexOf("Resources/") + 10;                     //相対パスの始めの位置を取得
+        var obj = Resources.Load(path[0].Substring(index, path[0].Length - (index))); // Resources以下のパスだけ取得してロードする 
+        Debug.Assert(obj != null,"指定した名前のファイルがリソースフォルダ内に存在しないか、同じ名前のファイルが複数あります。");
+        T t = obj as T;
+        Debug.Assert(t != null,$"{ typeof(T).Name}への変換に失敗しました。");
+        return t;
+    }
 
 
     /// <summary>Vector3の要素数同士を掛け合わせます</summary>
     /// <returns>掛け合わせたVector3</returns>
     public static Vector3 Mul(in Vector3 a, in Vector3 b) { return new Vector3(a.x * b.x, a.y * b.y, a.z * b.z); }
+
+
 
     /// <summary>列挙型の変数をint型にキャストします。ビットフラグを使用している場合は列挙型自体に[Flags]属性を付けてください</summary>
     /// <param name="type">キャストしたい変数</param>
@@ -88,6 +98,22 @@ public class UsefulSystem : SingletonMonoBehaviour<UsefulSystem>
     /// <typeparam name="T">列挙型の型</typeparam>
     /// <returns>列挙型の項目数</returns>
     public static int GetEnumLength<T>() where T : Enum { return Enum.GetValues(typeof(T)).Length; }
+
+    /// <summary>文字列型から列挙型を取得します</summary>
+    /// <typeparam name="T">列挙型の型</typeparam>
+    /// <param name="t">列挙型が出力されます</param>
+    /// <param name="str">この文字列から列挙型を検索します</param>
+    /// <returns>一致する列挙型があった場合はtrueを返します</returns>
+    public static bool GetEnum<T>(out T t , in string str) where T : Enum {
+        foreach (T Value in Enum.GetValues(typeof(T))) {
+            if(Value.ToString() == str) {
+                t = Value;
+                return true;
+            }
+        }
+        t = (T)Enum.GetValues(typeof(T)).GetValue(0);
+        return false;
+    }
 
     //  デバッグ用   //--------------------------------------------------------------------------------------------------------------------------------
 
